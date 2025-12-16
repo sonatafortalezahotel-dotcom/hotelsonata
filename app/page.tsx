@@ -309,7 +309,7 @@ export default function Home() {
       </div>
 
       {/* Experiências Visuais - Cards Interativos */}
-      <section className="py-16 lg:py-24 bg-background relative overflow-hidden">
+      <section className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-50 dark:to-slate-100 relative overflow-hidden">
         {/* Padrão decorativo nordestino sutil */}
         <NordestinoPattern variant="lace" opacity={0.03} />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

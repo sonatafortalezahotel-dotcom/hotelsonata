@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, parse } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { 
   Bed, 
@@ -80,6 +80,7 @@ interface Room {
 export default function RoomDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { locale } = useLanguage();
   const { formatPrice: formatPriceCurrency } = useCurrency();
   const t = getPageTranslation(locale, "rooms");
@@ -93,6 +94,18 @@ export default function RoomDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const code = params?.code as string;
+
+  // Ler parâmetros da URL para pré-preencher o widget
+  const checkInParam = searchParams.get("checkin");
+  const checkOutParam = searchParams.get("checkout");
+  const adultsParam = searchParams.get("adults");
+  const childrenParam = searchParams.get("children");
+
+  const initialCheckIn = checkInParam ? parse(checkInParam, "yyyy-MM-dd", new Date()) : null;
+  const initialCheckOut = checkOutParam ? parse(checkOutParam, "yyyy-MM-dd", new Date()) : null;
+  
+  const validCheckIn = initialCheckIn && !isNaN(initialCheckIn.getTime()) ? initialCheckIn : null;
+  const validCheckOut = initialCheckOut && !isNaN(initialCheckOut.getTime()) ? initialCheckOut : null;
 
   useEffect(() => {
     async function fetchRoom() {
@@ -449,6 +462,10 @@ export default function RoomDetailPage() {
                   basePrice={room.basePrice || 0}
                   maxGuests={room.maxGuests}
                   onReservationComplete={handleReservationComplete}
+                  initialCheckIn={validCheckIn}
+                  initialCheckOut={validCheckOut}
+                  initialAdults={adultsParam || "2"}
+                  initialChildren={childrenParam || "0"}
                 />
               )}
             </div>

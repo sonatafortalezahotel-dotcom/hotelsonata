@@ -42,6 +42,10 @@ interface ReservationWidgetProps {
   maxGuests: number;
   className?: string;
   onReservationComplete?: (reservationId: number, confirmationNumber: string) => void;
+  initialCheckIn?: Date | null;
+  initialCheckOut?: Date | null;
+  initialAdults?: string;
+  initialChildren?: string;
 }
 
 export default function ReservationWidget({
@@ -51,13 +55,17 @@ export default function ReservationWidget({
   maxGuests,
   className,
   onReservationComplete,
+  initialCheckIn,
+  initialCheckOut,
+  initialAdults = "2",
+  initialChildren = "0",
 }: ReservationWidgetProps) {
   const { locale } = useLanguage();
   const { formatPrice: formatPriceCurrency } = useCurrency();
-  const [checkIn, setCheckIn] = useState<Date | null>(null);
-  const [checkOut, setCheckOut] = useState<Date | null>(null);
-  const [adults, setAdults] = useState("2");
-  const [children, setChildren] = useState("0");
+  const [checkIn, setCheckIn] = useState<Date | null>(initialCheckIn || null);
+  const [checkOut, setCheckOut] = useState<Date | null>(initialCheckOut || null);
+  const [adults, setAdults] = useState(initialAdults);
+  const [children, setChildren] = useState(initialChildren);
   const [promoCode, setPromoCode] = useState("");
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [checkingAvailability, setCheckingAvailability] = useState(false);

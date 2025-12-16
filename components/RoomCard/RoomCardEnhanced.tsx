@@ -132,10 +132,10 @@ export default function RoomCardEnhanced({
   const isAvailable = room.available !== false; // Default true se não verificado
   const amenities = room.translatedAmenities || room.amenities || [];
 
-  // Construir URL de reserva com parâmetros
+  // Construir URL de reserva com parâmetros - Redirecionar para detalhes do quarto
   const reservationUrl = checkIn && checkOut 
-    ? `/reservas?checkin=${checkIn}&checkout=${checkOut}&room=${room.code}`
-    : `/reservas?room=${room.code}`;
+    ? `/quartos/${room.code}?checkin=${checkIn}&checkout=${checkOut}`
+    : `/quartos/${room.code}`;
 
   return (
     <Card className={cn(
