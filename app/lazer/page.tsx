@@ -269,22 +269,22 @@ export default function LazerPage() {
       />
 
       {/* 2. Galeria - Piscina Vista Mar - Full Width */}
-      <ContentSection variant="nordeste" width="full" className="px-0 py-0 pb-0">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+      <ContentSection width="full" className="px-0">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8">
           <div className="text-center mb-8">
-            <Badge className="mb-4 bg-white/20 hover:bg-white/30 text-white border-none text-base px-4 py-2">
+            <Badge className="mb-4 bg-blue-600 hover:bg-blue-700 text-base px-4 py-2">
               <Waves className="h-4 w-4 mr-2 inline" />
               {t.gallery.pool.badge}
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t.gallery.pool.title}
             </h2>
-            <p className="text-lg text-white/90 max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               {t.gallery.pool.subtitle}
             </p>
           </div>
         </div>
-        
+
         <FullWidthGallery
           images={lazerImagesWithDistributed.piscina.galeria
             .map((photo, index) => {
@@ -292,10 +292,10 @@ export default function LazerPage() {
               return {
                 src: photo.imageUrl,
                 alt: title,
-                title: title
+                title: title,
               };
             })
-            .filter(img => img.src)}
+            .filter((img) => img.src)}
           height="h-[400px] md:h-[600px]"
         />
       </ContentSection>
@@ -400,13 +400,13 @@ export default function LazerPage() {
       </section>
 
       {/* 6. Atividades - Resumo com Cards - 15/15 (5 cards com carrosséis) */}
-      <ContentSection variant="dark">
+      <ContentSection>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t.section.title}
             </h2>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               {t.section.subtitle}
             </p>
           </div>
@@ -430,19 +430,19 @@ export default function LazerPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-slate-400">
+              <p className="text-muted-foreground">
                 Carregando atividades...
               </p>
             </div>
           )}
 
           <div className="mt-12 text-center">
-            <p className="text-slate-300 mb-4">
+            <p className="text-muted-foreground mb-4">
               {tServices.footer.text}
             </p>
             <a 
               href="/contato"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-slate-700 bg-transparent text-white hover:bg-white hover:text-slate-900 h-11 px-8"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
             >
               {tServices.footer.contactButton}
             </a>
@@ -509,17 +509,17 @@ export default function LazerPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-600/90 to-blue-700 text-white">
+      <section className="py-16 lg:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             {t.cta.title}
           </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto text-white/90">
+          <p className="text-lg mb-8 max-w-2xl mx-auto text-muted-foreground">
             {t.cta.subtitle}
           </p>
           <a 
             href="/"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-blue-700 hover:bg-white/90 h-11 px-8"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
           >
             {t.cta.bookNow}
           </a>
