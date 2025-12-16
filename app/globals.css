@@ -1,0 +1,407 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 204 47% 20%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 12 78% 56%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Variáveis personalizadas do projeto - Hotel Sonata */
+    --hotel-primary: #1B364B;
+    --hotel-secondary: #E65837;
+    --hotel-primary-hsl: 204 47% 20%;
+    --hotel-secondary-hsl: 12 78% 56%;
+    
+    /* Cores Nordestinas - Identidade Regional */
+    --nordeste-sol: 43 96% 56%;        /* Amarelo sol - #F5A623 */
+    --nordeste-terra: 25 65% 45%;       /* Terracota - #B85C38 */
+    --nordeste-areia: 38 35% 75%;       /* Areia da praia - #D4B896 */
+    --nordeste-ceu: 204 60% 55%;        /* Céu azul - #4A90E2 */
+    --nordeste-ocaso: 15 85% 55%;       /* Pôr do sol - #E67E22 */
+    --nordeste-verde: 142 45% 35%;      /* Verde da caatinga - #4A7C59 */
+  }
+
+  .dark {
+    /* Paleta dark baseada no azul primário do projeto (#1B364B) */
+    /* Background: Azul muito escuro mantendo a identidade do projeto */
+    --background: 204 50% 8%;
+    --foreground: 210 20% 95%;
+    /* Cards: Azul escuro um pouco mais claro que o background */
+    --card: 204 45% 12%;
+    --card-foreground: 210 20% 95%;
+    --popover: 204 45% 12%;
+    --popover-foreground: 210 20% 95%;
+    /* Primary: Mantém o azul primário, mas um pouco mais claro para contraste */
+    --primary: 204 50% 25%;
+    --primary-foreground: 0 0% 100%;
+    /* Secondary: Mantém o coral vibrante */
+    --secondary: 12 78% 56%;
+    --secondary-foreground: 0 0% 100%;
+    /* Muted: Tons de azul intermediários */
+    --muted: 204 35% 18%;
+    --muted-foreground: 210 15% 70%;
+    /* Accent: Azul médio para elementos interativos */
+    --accent: 204 40% 22%;
+    --accent-foreground: 210 20% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    /* Borders e inputs: Azul escuro com boa visibilidade */
+    --border: 204 35% 20%;
+    --input: 204 35% 20%;
+    --ring: 204 50% 40%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 204 60% 45%;
+    --chart-3: 173 58% 39%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    @apply bg-background text-foreground;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* Gradientes Nordestinos - Pôr do Sol */
+  .gradient-nordeste-sunset {
+    background: linear-gradient(135deg, 
+      hsl(var(--nordeste-ocaso)) 0%, 
+      hsl(var(--nordeste-sol)) 50%, 
+      hsl(var(--nordeste-terra)) 100%);
+  }
+  
+  /* Gradiente Céu Nordestino */
+  .gradient-nordeste-sky {
+    background: linear-gradient(180deg, 
+      hsl(var(--nordeste-ceu)) 0%, 
+      hsl(var(--primary)) 100%);
+  }
+  
+  /* Padrão de Renda de Bilro (inspirado) */
+  .pattern-nordeste-lace {
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 10px, 
+        hsl(var(--nordeste-areia) / 0.03) 10px, 
+        hsl(var(--nordeste-areia) / 0.03) 20px),
+      repeating-linear-gradient(-45deg, transparent, transparent 10px, 
+        hsl(var(--nordeste-areia) / 0.03) 10px, 
+        hsl(var(--nordeste-areia) / 0.03) 20px);
+  }
+  
+  /* Borda decorativa inspirada em azulejos */
+  .border-nordeste-tile {
+    position: relative;
+  }
+  
+  .border-nordeste-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, 
+                  hsl(var(--nordeste-sol)), 
+                  hsl(var(--nordeste-terra)), 
+                  hsl(var(--primary))) border-box;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  h1, h2, h3, h4, h5, h6, p {
+    border-width: 0 !important;
+    border-style: none !important;
+    text-decoration: none !important;
+    text-decoration-line: none !important;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Ajustes para imagens do Next.js */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Scrollbar personalizada - Light mode */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Scrollbar personalizada - Dark mode */
+.dark ::-webkit-scrollbar-track {
+  background: hsl(204 45% 12%);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(204 35% 25%);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(204 40% 35%);
+}
+
+/* Animações para dropdown de idioma */
+@keyframes fadeInSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Acessibilidade - Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Garantir que o footer não tenha elementos decorativos indesejados */
+footer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; /* Cria novo contexto de empilhamento */
+  background: transparent !important;
+  background-image: none !important;
+  margin-top: 0 !important;
+}
+
+/* Background sólido apenas na div interna do footer */
+footer > div:first-child {
+  background: hsl(var(--primary)) !important;
+  background-image: none !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-attachment: scroll !important;
+  background-clip: border-box !important;
+}
+
+/* Garantir que todos os elementos dentro do footer não tenham background patterns */
+footer * {
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+}
+
+/* Especificamente para o container do footer */
+footer > div {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Forçar que nenhum elemento filho do footer tenha background patterns */
+footer *,
+footer *::before,
+footer *::after {
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  background-attachment: scroll !important;
+}
+
+footer::before,
+footer::after {
+  display: none !important;
+  content: none !important;
+  visibility: hidden !important;
+}
+
+/* Garantir que seções anteriores não vazem para o footer */
+section:has(+ footer) {
+  overflow: hidden !important;
+  position: relative;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background: hsl(var(--background)) !important;
+  isolation: isolate;
+}
+
+/* Fallback para navegadores sem suporte a :has() */
+body > section:last-of-type {
+  overflow: hidden !important;
+  position: relative;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background: hsl(var(--background)) !important;
+  isolation: isolate;
+}
+
+/* Garantir que TODAS as seções com gradientes não vazem para o footer */
+section[class*="bg-gradient"],
+section[class*="bg-gradient-to"] {
+  overflow: hidden !important;
+  position: relative !important;
+  isolation: isolate !important;
+  /* Forçar que gradientes não se estendam além dos limites */
+  background-clip: border-box !important;
+  background-origin: border-box !important;
+}
+
+/* Forçar background sólido em seções que aparecem antes do footer */
+section:has(+ section:has(+ footer)),
+section:has(+ footer),
+body > section:last-of-type:not(footer),
+main > section:last-of-type {
+  overflow: hidden !important;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+/* Barreira final antes do footer - AwardsSection deve bloquear qualquer vazamento */
+.awards-section-no-gradient,
+section.awards-section-no-gradient {
+  background-image: none !important;
+  background: hsl(var(--background)) !important;
+  background-repeat: no-repeat !important;
+  overflow: hidden !important;
+  position: relative !important;
+  isolation: isolate !important;
+  /* Criar barreira física */
+  border-bottom: 2px solid hsl(var(--background)) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 4rem !important;
+}
+
+/* Garantir que seções anteriores ao AwardsSection não vazem através dele */
+.awards-section-no-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: hsl(var(--background)) !important;
+  z-index: 100;
+}
+
+/* Barreira final antes do footer - remover gradientes de qualquer seção antes do AwardsSection */
+body > section:nth-last-of-type(2):not(footer) {
+  background-image: none !important;
+  background: hsl(var(--background)) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+/* Especificamente para AwardsSection - remover qualquer gradiente */
+.awards-section-no-gradient,
+section.awards-section-no-gradient {
+  background-image: none !important;
+  background: hsl(var(--background)) !important;
+  background-repeat: no-repeat !important;
+  overflow: hidden !important;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+/* Remover gradientes de elementos filhos do AwardsSection */
+.awards-section-no-gradient *,
+.awards-section-no-gradient *::before,
+.awards-section-no-gradient *::after {
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Barreira visual entre seções e footer */
+section:has(+ footer)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: hsl(var(--background)) !important;
+  background-image: none !important;
+  z-index: 15;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Forçar que qualquer elemento entre AwardsSection e Footer tenha background sólido */
+body > section:last-of-type + div {
+  background: hsl(var(--background)) !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}

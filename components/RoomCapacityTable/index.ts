@@ -1,0 +1,2 @@
+export { RoomCapacityTable } from './RoomCapacityTable';
+

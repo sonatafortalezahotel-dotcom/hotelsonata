@@ -1,0 +1,10 @@
+# Hooks Customizados
+
+Esta pasta contém hooks customizados do React para uso em toda a aplicação.
+
+Hooks recomendados para criar:
+- `use-booking.ts` - Lógica de reservas
+- `use-local-storage.ts` - Persistência local
+- `use-scroll.ts` - Detecção de scroll
+- `use-media-query.ts` - Breakpoints responsivos
+

@@ -1,0 +1,2 @@
+export { EventRoomCard } from './EventRoomCard';
+

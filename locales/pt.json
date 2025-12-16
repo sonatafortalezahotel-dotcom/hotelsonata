@@ -1,0 +1,27 @@
+{
+  "common": {
+    "home": "Início",
+    "about": "Sobre",
+    "contact": "Contato"
+  },
+  "pages": {
+    "esg": {
+      "title": "ESG - Meio Ambiente, Social e Governança"
+    },
+    "gastronomy": {
+      "title": "Gastronomia"
+    },
+    "leisure": {
+      "title": "Lazer"
+    },
+    "rooms": {
+      "title": "Quartos"
+    },
+    "events": {
+      "title": "Eventos"
+    },
+    "hotel": {
+      "title": "O Hotel"
+    }
+  }
+}

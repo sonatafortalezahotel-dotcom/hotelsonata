@@ -1,0 +1,2 @@
+export { AwardsSection } from './AwardsSection';
+

@@ -1,0 +1,142 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import NordestinoPattern from "@/components/NordestinoPattern";
+
+interface PhotoStoryItem {
+  image: string;
+  title: string;
+  description: string;
+  time?: string;
+}
+
+interface PhotoStoryProps {
+  title: string;
+  subtitle?: string;
+  items: PhotoStoryItem[];
+  backgroundColor?: "white" | "muted" | "primary";
+}
+
+export function PhotoStory({
+  title,
+  subtitle,
+  items,
+  backgroundColor = "white"
+}: PhotoStoryProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const bgClasses = {
+    white: "bg-background",
+    muted: "bg-muted/30",
+    primary: "bg-gradient-to-br from-primary/5 to-primary/10"
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number(entry.target.getAttribute("data-index"));
+            setActiveIndex(index);
+          }
+        });
+      },
+      { threshold: 0.6, rootMargin: "-20% 0px -20% 0px" }
+    );
+
+    const items = containerRef.current?.querySelectorAll("[data-index]");
+    items?.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section className={`py-16 lg:py-24 ${bgClasses[backgroundColor]} relative overflow-hidden`}>
+      {/* Padrão decorativo nordestino sutil */}
+      {backgroundColor === "muted" && (
+        <NordestinoPattern variant="sunset" opacity={0.04} />
+      )}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Cabeçalho */}
+        <div className="text-center mb-12 lg:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Grid de Histórias */}
+        <div 
+          ref={containerRef}
+          className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto"
+        >
+          {items.map((item, index) => (
+            <div
+              key={index}
+              data-index={index}
+              className="group relative"
+            >
+              {/* Imagem */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl mb-6">
+                {item.image && item.image.trim() !== "" ? (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                    <span className="text-muted-foreground/50 text-sm">{item.title}</span>
+                  </div>
+                )}
+                
+                {/* Overlay com horário */}
+                {item.time && (
+                  <div className="absolute top-4 left-4">
+                    <span className="px-4 py-2 bg-black/70 text-white rounded-full text-sm font-semibold backdrop-blur-sm">
+                      {item.time}
+                    </span>
+                  </div>
+                )}
+
+                {/* Indicador de progresso */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                  <div 
+                    className="h-full bg-primary transition-all duration-500"
+                    style={{ 
+                      width: activeIndex >= index ? "100%" : "0%" 
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Conteúdo */}
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Número do Item (decorativo) */}
+              <div className="absolute -top-4 -right-4 lg:-right-8 text-8xl font-bold text-primary/5 select-none pointer-events-none">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+

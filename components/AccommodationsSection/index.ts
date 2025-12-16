@@ -1,0 +1,2 @@
+export { AccommodationsSection } from './AccommodationsSection';
+

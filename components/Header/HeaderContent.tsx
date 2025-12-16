@@ -1,0 +1,347 @@
+"use client";
+
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import { useScrollBehavior } from "@/hooks/useScrollBehavior";
+import ThemeToggle from "@/components/ThemeToggle";
+import { useLanguage } from "@/lib/context/LanguageContext";
+
+interface HeaderContentProps {
+  usePrimaryBackground?: boolean;
+}
+
+export default function HeaderContent({ usePrimaryBackground = false }: HeaderContentProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const { isScrolled, scrollY } = useScrollBehavior(50);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
+  const { locale, setLocale, t } = useLanguage();
+
+  // Fecha dropdown de idioma ao clicar fora
+  useEffect(() => {
+    if (!isLanguageMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.language-selector')) {
+        setIsLanguageMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isLanguageMenuOpen]);
+
+  // Navegação por teclado - Escape fecha menus
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (isLanguageMenuOpen) {
+          setIsLanguageMenuOpen(false);
+        }
+        if (isMobileMenuOpen) {
+          setIsMobileMenuOpen(false);
+        }
+      }
+    };
+
+    if (isLanguageMenuOpen || isMobileMenuOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [isLanguageMenuOpen, isMobileMenuOpen]);
+
+  const handleLanguageKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsLanguageMenuOpen(!isLanguageMenuOpen);
+    }
+  }, [isLanguageMenuOpen]);
+
+  const menuItems = [
+    { label: { pt: "Hotel", es: "Hotel", en: "Hotel" }, href: "/hotel" },
+    { label: { pt: "Lazer", es: "Ocio", en: "Leisure" }, href: "/lazer" },
+    { label: { pt: "Quartos", es: "Habitaciones", en: "Rooms" }, href: "/quartos" },
+    { label: { pt: "Gastronomia", es: "Gastronomía", en: "Gastronomy" }, href: "/gastronomia" },
+    { label: { pt: "Eventos", es: "Eventos", en: "Events" }, href: "/eventos" },
+    { label: { pt: "ESG", es: "ESG", en: "ESG" }, href: "/esg" },
+    { label: { pt: "Contatos", es: "Contactos", en: "Contact" }, href: "/contato" },
+  ];
+
+  const languages = [
+    { code: "pt" as const, name: "PT", label: "Português", flag: "🇧🇷" },
+    { code: "es" as const, name: "ES", label: "Español", flag: "🇪🇸" },
+    { code: "en" as const, name: "EN", label: "English", flag: "🇬🇧" },
+  ];
+
+  const currentLanguage = useMemo(
+    () => languages.find((lang) => lang.code === locale) || languages[0],
+    [locale]
+  );
+
+  const headerClasses = cn(
+    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+    usePrimaryBackground || isScrolled
+      ? "bg-primary shadow-lg"
+      : "bg-primary/95 backdrop-blur-sm"
+  );
+
+  const textColor = "text-primary-foreground";
+  const languageButtonHover = "hover:bg-primary-foreground/10 hover:text-primary-foreground active:bg-primary-foreground/15";
+
+  return (
+    <header 
+      className={headerClasses}
+      role="banner"
+      aria-label="Cabeçalho principal"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-24">
+          {/* Logo */}
+          <Link 
+            href="/"
+            className="flex items-center gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg transition-transform hover:scale-105"
+            aria-label="Hotel Sonata de Iracema - Página inicial"
+          >
+            <div className="relative h-28 w-28 sm:h-44 sm:w-44 flex-shrink-0">
+              <Image
+                src="/Logo/logo-soneto (1).png"
+                alt="Logo"
+                fill
+                className="object-contain"
+                priority
+                sizes="(max-width: 640px) 112px, 176px"
+              />
+            </div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className={cn("h-8 sm:h-12 w-px bg-primary-foreground/30")} aria-hidden="true" />
+              <div>
+                <h1 className={cn("text-sm sm:text-lg font-bold tracking-tight", textColor)}>
+                  Hotel Sonata
+                </h1>
+                <p className={cn("text-[10px] sm:text-xs opacity-80", textColor)}>
+                  de Iracema
+                </p>
+                <p className={cn("text-[9px] sm:text-[10px] mt-0.5 flex items-center gap-1", "text-yellow-400")}>
+                  <Star className="h-2 w-2 sm:h-2.5 sm:w-2.5 fill-yellow-400 text-yellow-400" />
+                  4.5 Traveller's Choice • 99/100
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <div className="flex lg:hidden items-center gap-2">
+            <ThemeToggle
+              variant="ghost"
+              className={cn(textColor, languageButtonHover)}
+              size="icon"
+            />
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(textColor, languageButtonHover)}
+                  aria-label="Abrir menu"
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-6 w-6" />
+                  ) : (
+                    <Menu className="h-6 w-6" />
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-8">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-lg font-medium hover:text-primary transition-colors"
+                    >
+                      {item.label[locale as keyof typeof item.label] || item.label.pt}
+                    </Link>
+                  ))}
+                </nav>
+
+                {/* Mobile Language Selector */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <div className="flex items-center gap-2 mb-3 px-4">
+                    <Globe className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      Idioma
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2 px-4">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setLocale(lang.code);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                          locale === lang.code
+                            ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                            : "bg-accent text-foreground hover:bg-accent/80 hover:text-primary active:bg-accent/60"
+                        )}
+                        aria-selected={locale === lang.code}
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        <span className="flex-1">{lang.label}</span>
+                        {locale === lang.code && (
+                          <span className="text-xs opacity-70">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-6" role="navigation">
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative text-sm font-medium transition-colors group",
+                  textColor
+                )}
+              >
+                <span>
+                  {item.label[locale as keyof typeof item.label] || item.label.pt}
+                </span>
+                <span
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 transition-all duration-300 group-hover:w-3/4 bg-primary-foreground"
+                  aria-hidden="true"
+                />
+              </Link>
+            ))}
+
+            <ThemeToggle
+              variant="ghost"
+              size="icon"
+              className={cn(textColor, languageButtonHover)}
+            />
+
+            {/* Language Selector */}
+            <div className="relative group language-selector" ref={languageMenuRef}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-2",
+                  textColor,
+                  languageButtonHover,
+                  isLanguageMenuOpen && "bg-primary-foreground/15"
+                )}
+                onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                onKeyDown={handleLanguageKeyDown}
+                aria-label="Selecionar idioma"
+                aria-expanded={isLanguageMenuOpen}
+                aria-haspopup="true"
+              >
+                <Globe className="h-4 w-4" />
+                <span className="text-sm">{currentLanguage.name}</span>
+                <ChevronDown className={cn(
+                  "h-3.5 w-3.5 transition-transform duration-200",
+                  isLanguageMenuOpen && "rotate-180"
+                )} />
+              </Button>
+              
+              {/* Language Dropdown */}
+              {isLanguageMenuOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setIsLanguageMenuOpen(false)}
+                    aria-hidden="true"
+                  />
+                  <div 
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 0.5rem)",
+                      right: 0,
+                      minWidth: "14rem",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                      zIndex: 50,
+                    }}
+                  >
+                    <div style={{ padding: "0.5rem 0" }}>
+                      {languages.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setLocale(lang.code);
+                            setIsLanguageMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors relative",
+                            locale === lang.code
+                              ? "bg-primary/5 text-primary font-semibold"
+                              : "text-foreground hover:text-primary"
+                          )}
+                          style={{
+                            cursor: "pointer",
+                            textAlign: "left",
+                          }}
+                          aria-selected={locale === lang.code}
+                        >
+                          {locale === lang.code && (
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
+                          )}
+                          
+                          <span className="text-base" style={{ minWidth: "1.5rem" }}>
+                            {lang.flag}
+                          </span>
+                          
+                          <div className="flex-1">
+                            <div className="font-medium">{lang.label}</div>
+                            <div className="text-xs text-muted-foreground">{lang.code.toUpperCase()}</div>
+                          </div>
+                          
+                          {locale === lang.code && (
+                            <div 
+                              className="absolute top-1/2 -translate-y-1/2"
+                              style={{ right: "1.25rem" }}
+                            >
+                              <span className="text-xs opacity-70">✓</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+  );
+}
+
