@@ -124,7 +124,7 @@ export default function VideoCarousel({
               {currentItem.imageUrl && (
                 <Image
                   src={currentItem.imageUrl}
-                  alt={currentItem.title}
+                  alt={currentItem.title || `Imagem do destaque ${currentIndex + 1}`}
                   fill
                   className="object-cover"
                   priority
@@ -136,7 +136,7 @@ export default function VideoCarousel({
             currentItem.imageUrl ? (
               <Image
                 src={currentItem.imageUrl}
-                alt={currentItem.title}
+                alt={currentItem.title || `Imagem do destaque ${currentIndex + 1}`}
                 fill
                 className="object-cover"
                 priority

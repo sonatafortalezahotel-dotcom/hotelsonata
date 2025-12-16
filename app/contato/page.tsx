@@ -11,9 +11,8 @@ import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getGallery } from "@/lib/hooks/useGallery";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 // Função para buscar informações de contato
 async function getContactInfo() {
@@ -57,9 +56,51 @@ async function getContactInfo() {
 export default function ContatoPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "contact");
-  const photoTracker = usePhotoTracker();
   const [contactInfo, setContactInfo] = useState<any>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+
+  // Buscar todas as imagens usando useMemo
+  const contatoImages = useMemo(() => {
+    if (!galleryPhotos || galleryPhotos.length === 0) {
+      return {
+        hero: null,
+        galeriaEquipe: [],
+        galeriaLocalizacao: [],
+      };
+    }
+
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    const getPhotosBySection = (section: string, limit?: number) => {
+      const filtered = galleryPhotos
+        .filter((img: any) => {
+          if (!img?.active) return false;
+          if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+          if (!img.imageUrl.trim()) return false;
+
+          const page = normalize(img.page);
+          const sec = normalize(img.section);
+          return page === "contato" && sec === section.toLowerCase().trim();
+        })
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+      if (typeof limit === "number") {
+        return filtered.slice(0, limit);
+      }
+      return filtered;
+    };
+
+    const heroPhoto = getPhotosBySection("hero-contato", 1)[0] || null;
+    const galeriaEquipePhotos = getPhotosBySection("galeria-equipe", 3);
+    const galeriaLocalizacao = getPhotosBySection("galeria-localizacao", 4);
+
+    return {
+      hero: heroPhoto?.imageUrl || null,
+      galeriaEquipe: galeriaEquipePhotos.map((p: any) => p.imageUrl),
+      galeriaLocalizacao,
+    };
+  }, [galleryPhotos]);
 
   useEffect(() => {
     async function fetchData() {
@@ -79,7 +120,7 @@ export default function ContatoPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || galleryPhotos[0]?.imageUrl || ""}
+        image={contatoImages.hero || galleryPhotos[0]?.imageUrl || null}
         imageAlt="Recepção Hotel Sonata de Iracema"
         badge={t.hero.badge}
         height="large"
@@ -101,7 +142,7 @@ export default function ContatoPage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
-                const imageUrl = photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || galleryPhotos[0]?.imageUrl;
+                const imageUrl = contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -122,7 +163,7 @@ export default function ContatoPage() {
 
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
-                const imageUrl = photoTracker.getUnusedPhoto(galleryPhotos, ["gastronomia", "restaurante"])?.imageUrl || galleryPhotos[1]?.imageUrl;
+                const imageUrl = contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -143,7 +184,7 @@ export default function ContatoPage() {
 
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
-                const imageUrl = photoTracker.getUnusedPhoto(galleryPhotos, ["lazer", "piscina"])?.imageUrl || galleryPhotos[2]?.imageUrl;
+                const imageUrl = contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -387,10 +428,7 @@ export default function ContatoPage() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, ["recepcao", "piscina"], 4, {
-              allowRelatedCategories: true,
-              relatedCategories: ["geral"]
-            })
+            images={contatoImages.galeriaLocalizacao
               .map((photo, index) => {
                 const keys = Object.keys(t.locationGallery.items) as Array<keyof typeof t.locationGallery.items>;
                 const key = keys[index % keys.length];

@@ -93,7 +93,6 @@ export async function getGallery(
   limit?: number
 ): Promise<GalleryPhoto[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const params = new URLSearchParams();
     
     // Suporta duas formas de chamada para compatibilidade
@@ -110,6 +109,12 @@ export async function getGallery(
     }
     
     params.append("active", "true");
+
+    // Detectar se está rodando no servidor ou cliente
+    const isServer = typeof window === "undefined";
+    const baseUrl = isServer 
+      ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+      : ""; // No cliente, usar URL relativa
 
     const response = await fetch(`${baseUrl}/api/gallery?${params.toString()}`, {
       cache: "no-store",

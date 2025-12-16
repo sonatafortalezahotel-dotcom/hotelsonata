@@ -44,11 +44,18 @@ export default function PageImagesAdmin() {
 
   const loadGallery = async () => {
     try {
-      const response = await fetch(`/api/gallery?page=${page}`);
+      setLoading(true);
+      const response = await fetch(`/api/gallery?page=${page}&active=all`);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar imagens: ${response.status}`);
+      }
       const data = await response.json();
       setItems(Array.isArray(data) ? data : []);
+      console.log(`Carregadas ${Array.isArray(data) ? data.length : 0} imagens para a página ${page}`);
     } catch (error) {
+      console.error("Erro ao carregar imagens:", error);
       toast.error("Erro ao carregar imagens");
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -84,7 +91,8 @@ export default function PageImagesAdmin() {
     lazer: "Lazer",
     gastronomia: "Gastronomia",
     esg: "ESG",
-    contato: "Contato"
+    contato: "Contato",
+    reservas: "Reservas",
   };
 
   const getSectionType = (sectionId: string): "video" | "gallery" | "card" | "single" => {

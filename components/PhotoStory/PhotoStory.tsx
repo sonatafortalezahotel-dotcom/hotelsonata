@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import NordestinoPattern from "@/components/NordestinoPattern";
 
 interface PhotoStoryItem {
-  image: string;
+  image: string | null;
   title: string;
   description: string;
   time?: string;

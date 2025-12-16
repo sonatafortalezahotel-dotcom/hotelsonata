@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,16 +18,65 @@ import { getPageTranslation } from "@/lib/translations/pages";
 import { getEvents } from "@/lib/hooks/useEvents";
 import { getGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 export default function EventosPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "events");
-  const photoTracker = usePhotoTracker();
   const [events, setEvents] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+
+  // Buscar todas as imagens usando useMemo para evitar múltiplas chamadas
+  const eventosImages = useMemo(() => {
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    const filterBySection = (section: string) =>
+      galleryPhotos
+        .filter((img: any) => {
+          if (!img?.active) return false;
+          if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+          if (!img.imageUrl.trim()) return false;
+
+          const page = normalize(img.page);
+          const sec = normalize(img.section);
+          return page === "eventos" && sec === section.toLowerCase().trim();
+        })
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+    const corporativoGallery = filterBySection("evento-corporativo");
+    const casamentoGallery = filterBySection("evento-casamento");
+    const nupciasGallery = filterBySection("evento-nupcias");
+
+    // Hero preferencialmente vem da galeria corporativa, depois de outras seções
+    const heroFromGallery =
+      corporativoGallery[0]?.imageUrl ||
+      casamentoGallery[0]?.imageUrl ||
+      nupciasGallery[0]?.imageUrl ||
+      null;
+
+    // Galeria principal: combinar imagens da galeria + imagens dos eventos
+    const galleryImages: Array<{ imageUrl: string; title?: string | null; category?: string | null }> = [];
+
+    const pushImage = (url: any) => {
+      if (!url || typeof url !== "string" || !url.trim()) return;
+      if (galleryImages.some((p) => p.imageUrl === url)) return;
+      galleryImages.push({ imageUrl: url });
+    };
+
+    [...corporativoGallery, ...casamentoGallery, ...nupciasGallery].forEach(
+      (p: any) => pushImage(p.imageUrl),
+    );
+
+    events.forEach((ev: any) => pushImage(ev.imageUrl));
+
+    return {
+      hero: heroFromGallery,
+      corporativo: corporativoGallery[0]?.imageUrl || null,
+      gallery: galleryImages,
+    };
+  }, [events, galleryPhotos]);
 
   useEffect(() => {
     setMounted(true);
@@ -114,7 +163,7 @@ export default function EventosPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={mounted ? (events[0]?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["eventos", "recepcao"])?.imageUrl || "/Sobre Hotel/Eventos/eventos-1.jpg") : undefined}
+        image={mounted ? (events[0]?.imageUrl || eventosImages.hero || "/Sobre Hotel/Eventos/eventos-1.jpg") : undefined}
         imageAlt="Espaço para Eventos - Hotel Sonata"
         icon={<Briefcase className="h-16 w-16" />}
         badge={t.hero.badge}
@@ -139,10 +188,7 @@ export default function EventosPage() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, ["eventos", "recepcao"], 6, {
-              allowRelatedCategories: true,
-              relatedCategories: ["geral"]
-            })
+            images={eventosImages.gallery
               .map((photo, index) => {
                 const title = getGalleryImageTitle(photo, index + 1);
                 return {
@@ -151,7 +197,7 @@ export default function EventosPage() {
                   title: title
                 };
               })
-              .filter(img => img.src)}
+              .filter(img => img.src && typeof img.src === 'string' && img.src.trim() !== '')}
             columns={3}
             aspectRatio="landscape"
           />
@@ -258,7 +304,7 @@ export default function EventosPage() {
             <div className="relative aspect-video overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
                 const eventPhoto = events.find(e => e.type === "corporativo");
-                const imageUrl = eventPhoto?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["eventos", "recepcao"])?.imageUrl;
+                const imageUrl = eventPhoto?.imageUrl || eventosImages.corporativo;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -281,7 +327,7 @@ export default function EventosPage() {
             <div className="relative aspect-video overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
                 const eventPhoto = events.find(e => e.type === "corporativo" || e.type === "social");
-                const imageUrl = eventPhoto?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["eventos", "recepcao"])?.imageUrl;
+                const imageUrl = eventPhoto?.imageUrl || eventosImages.corporativo;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -304,7 +350,7 @@ export default function EventosPage() {
             <div className="relative aspect-video overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
                 const eventPhoto = events.find(e => e.type === "social" || e.type === "casamento");
-                const imageUrl = eventPhoto?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["eventos", "recepcao"])?.imageUrl;
+                const imageUrl = eventPhoto?.imageUrl || eventosImages.corporativo;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
@@ -327,7 +373,7 @@ export default function EventosPage() {
             <div className="relative aspect-video overflow-hidden rounded-2xl shadow-xl group">
               {(() => {
                 const eventPhoto = events.find(e => e.type === "social" || e.type === "corporativo");
-                const imageUrl = eventPhoto?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["eventos", "recepcao"])?.imageUrl;
+                const imageUrl = eventPhoto?.imageUrl || eventosImages.corporativo;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}

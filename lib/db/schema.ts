@@ -356,8 +356,55 @@ export const reservations = pgTable("reservations", {
   // Informações adicionais
   specialRequests: text("special_requests"), // Solicitações especiais do hóspede
   status: varchar("status", { length: 20 }).default("pending").notNull(), // "pending", "confirmed", "cancelled", "completed"
+  // Pagamento
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending").notNull(), // "pending", "paid", "failed", "refunded"
+  paymentMethod: varchar("payment_method", { length: 50 }), // "credit_card", "pix", "bank_transfer"
+  paymentIntentId: varchar("payment_intent_id", { length: 200 }), // ID do pagamento no gateway (Stripe, etc.)
+  paymentDate: timestamp("payment_date"), // Data do pagamento
   // Metadados
   notes: text("notes"), // Notas internas do hotel
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Tabela de landing pages dinâmicas para SEO
+export const seoLandingPages = pgTable("seo_landing_pages", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(), // "hotel-em-fortaleza", "quartos-com-vista-mar"
+  locale: varchar("locale", { length: 5 }).notNull().default("pt"), // "pt", "es", "en"
+  title: text("title").notNull(), // Título SEO otimizado
+  description: text("description").notNull(), // Meta description
+  keywords: text("keywords").notNull(), // Palavras-chave principais separadas por vírgula
+  h1: text("h1"), // Título H1 da página (pode ser diferente do title)
+  content: text("content"), // Conteúdo HTML da landing page
+  ogImage: text("og_image"), // Imagem Open Graph
+  canonicalUrl: text("canonical_url"), // URL canônica
+  // Configurações de conteúdo dinâmico
+  contentType: varchar("content_type", { length: 50 }), // "rooms", "packages", "general", "location"
+  relatedRoomIds: jsonb("related_room_ids"), // IDs de quartos relacionados
+  relatedPackageIds: jsonb("related_package_ids"), // IDs de pacotes relacionados
+  // SEO técnico
+  priority: decimal("priority", { precision: 2, scale: 1 }).default("0.8"), // Prioridade no sitemap (0.0 a 1.0)
+  changeFrequency: varchar("change_frequency", { length: 20 }).default("weekly"), // "always", "hourly", "daily", "weekly", "monthly", "yearly", "never"
+  // Status
+  active: boolean("active").default(true).notNull(),
+  // Analytics
+  viewCount: integer("view_count").default(0).notNull(),
+  lastViewedAt: timestamp("last_viewed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Tabela de traduções para landing pages
+export const seoLandingPageTranslations = pgTable("seo_landing_page_translations", {
+  id: serial("id").primaryKey(),
+  landingPageId: integer("landing_page_id").notNull().references(() => seoLandingPages.id, { onDelete: "cascade" }),
+  locale: varchar("locale", { length: 5 }).notNull(), // "pt", "es", "en"
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  h1: text("h1"),
+  content: text("content"),
+  keywords: text("keywords"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Hero from "@/components/Hero";
 import VideoCarousel from "@/components/VideoCarousel";
 import ReservationForm from "@/components/ReservationForm";
@@ -16,23 +16,26 @@ import { Waves, UtensilsCrossed, Bed, Sparkles, Heart, Trophy } from "lucide-rea
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { getGalleryImageTitle } from "@/lib/utils";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 // Função para buscar pacotes do banco de dados
 async function getPackages() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/packages`, {
-      next: { revalidate: 3600 }, // Cache de 1 hora
-      cache: 'force-cache'
+    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
+    const res = await fetch('/api/packages', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar pacotes:', res.status);
+      console.error('Erro ao buscar pacotes:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar pacotes:', error);
     return [];
@@ -40,20 +43,26 @@ async function getPackages() {
 }
 
 // Função para buscar galeria de fotos do banco de dados
+// Busca apenas imagens da home para melhor performance
 async function getGalleryPhotos() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/gallery`, {
-      next: { revalidate: 3600 }, // Cache de 1 hora
-      cache: 'force-cache'
+    // Buscar apenas imagens da página home
+    const res = await fetch('/api/gallery?page=home&active=true', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar galeria:', res.status);
+      console.error('Erro ao buscar galeria:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    console.log('Imagens carregadas da galeria (home):', data.length);
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar galeria:', error);
     return [];
@@ -63,18 +72,22 @@ async function getGalleryPhotos() {
 // Função para buscar posts das redes sociais do banco de dados
 async function getSocialMediaPosts() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/social-media`, {
-      next: { revalidate: 1800 }, // Cache de 30 minutos
-      cache: 'force-cache'
+    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
+    const res = await fetch('/api/social-media', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar posts das redes sociais:', res.status);
+      console.error('Erro ao buscar posts das redes sociais:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar posts das redes sociais:', error);
     return [];
@@ -84,18 +97,22 @@ async function getSocialMediaPosts() {
 // Função para buscar dados de sustentabilidade
 async function getSustainability() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/sustainability`, {
-      next: { revalidate: 3600 }, // Cache de 1 hora
-      cache: 'force-cache'
+    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
+    const res = await fetch('/api/sustainability', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar sustentabilidade:', res.status);
+      console.error('Erro ao buscar sustentabilidade:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar sustentabilidade:', error);
     return [];
@@ -105,18 +122,22 @@ async function getSustainability() {
 // Função para buscar certificações
 async function getCertifications() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/certifications`, {
-      next: { revalidate: 3600 }, // Cache de 1 hora
-      cache: 'force-cache'
+    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
+    const res = await fetch('/api/certifications', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar certificações:', res.status);
+      console.error('Erro ao buscar certificações:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar certificações:', error);
     return [];
@@ -126,18 +147,22 @@ async function getCertifications() {
 // Função para buscar highlights do carrossel principal
 async function getHighlights() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/highlights`, {
-      next: { revalidate: 1800 }, // Cache de 30 minutos
-      cache: 'force-cache'
+    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
+    const res = await fetch('/api/highlights', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     });
     
     if (!res.ok) {
-      console.error('Erro ao buscar highlights:', res.status);
+      console.error('Erro ao buscar highlights:', res.status, res.statusText);
       return [];
     }
     
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar highlights:', error);
     return [];
@@ -148,7 +173,6 @@ async function getHighlights() {
 export default function Home() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "home");
-  const photoTracker = usePhotoTracker(); // Sistema de rastreamento de fotos
   const [packages, setPackages] = useState<any[]>([]);
   const [socialPosts, setSocialPosts] = useState<any[]>([]);
   const [sustainability, setSustainability] = useState<any[]>([]);
@@ -157,25 +181,106 @@ export default function Home() {
   const [highlights, setHighlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Buscar imagens para cada seção usando useMemo para evitar múltiplas chamadas
+  const homeImages = useMemo(() => {
+    if (!galleryPhotos || galleryPhotos.length === 0) {
+      return {
+        experienceImages: {
+          piscina: [],
+          gastronomia: [],
+          quartos: [],
+          spa: [],
+          beachTennis: [],
+          sustentabilidade: [],
+        },
+        photoStoryPhotos: [],
+        galeriaMomentosPhotos: [],
+      };
+    }
+
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    const getPhotosBySection = (section: string, limit?: number) => {
+      const filtered = galleryPhotos
+        .filter((img: any) => {
+          if (!img?.active) return false;
+          if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+          if (!img.imageUrl.trim()) return false;
+
+          const page = normalize(img.page);
+          const sec = normalize(img.section);
+
+          return page === "home" && sec === section.toLowerCase().trim();
+        })
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+      if (typeof limit === "number") {
+        return filtered.slice(0, limit);
+      }
+      return filtered;
+    };
+
+    // Experience Cards - imagens vêm diretamente das seções da home
+    const experienceImages = {
+      piscina: getPhotosBySection("experiencias-piscina", 4).map(
+        (p: any) => p.imageUrl,
+      ),
+      gastronomia: getPhotosBySection("experiencias-gastronomia", 4).map(
+        (p: any) => p.imageUrl,
+      ),
+      quartos: getPhotosBySection("experiencias-quartos", 3).map(
+        (p: any) => p.imageUrl,
+      ),
+      spa: getPhotosBySection("experiencias-spa", 3).map(
+        (p: any) => p.imageUrl,
+      ),
+      beachTennis: getPhotosBySection("experiencias-beach-tennis", 2).map(
+        (p: any) => p.imageUrl,
+      ),
+      sustentabilidade: getPhotosBySection(
+        "experiencias-sustentabilidade",
+        2,
+      ).map((p: any) => p.imageUrl),
+    };
+
+    // PhotoStory - 8 imagens de "photo-story"
+    const photoStoryPhotos = getPhotosBySection("photo-story", 8);
+
+    // Galeria de Momentos - 9 imagens
+    const galeriaMomentosPhotos = getPhotosBySection("galeria-momentos", 9);
+
+    return {
+      experienceImages,
+      photoStoryPhotos,
+      galeriaMomentosPhotos,
+    };
+  }, [galleryPhotos]);
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [packagesData, socialData, sustainabilityData, certificationsData, galleryData, highlightsData] = await Promise.all([
-        getPackages(),
-        getSocialMediaPosts(),
-        getSustainability(),
-        getCertifications(),
-        getGalleryPhotos(), // Buscar todas as fotos da galeria
-        getHighlights() // Buscar highlights do carrossel
-      ]);
-      
-      setPackages(packagesData);
-      setSocialPosts(socialData);
-      setSustainability(sustainabilityData);
-      setCertifications(certificationsData);
-      setGalleryPhotos(galleryData);
-      setHighlights(highlightsData);
-      setLoading(false);
+      try {
+        const [packagesData, socialData, sustainabilityData, certificationsData, galleryData, highlightsData] = await Promise.all([
+          getPackages(),
+          getSocialMediaPosts(),
+          getSustainability(),
+          getCertifications(),
+          getGalleryPhotos(), // Buscar todas as fotos da galeria
+          getHighlights() // Buscar highlights do carrossel
+        ]);
+        
+        setPackages(Array.isArray(packagesData) ? packagesData : []);
+        setSocialPosts(Array.isArray(socialData) ? socialData : []);
+        setSustainability(Array.isArray(sustainabilityData) ? sustainabilityData : []);
+        setCertifications(Array.isArray(certificationsData) ? certificationsData : []);
+        setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
+        setHighlights(Array.isArray(highlightsData) ? highlightsData : []);
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     
     fetchData();
@@ -222,9 +327,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.pool.title}
               description={t.experiences.cards.pool.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, "piscina", 4)
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.piscina}
               icon={Waves}
               badge={t.experiences.cards.pool.badge}
               ctaText={t.experiences.cards.pool.cta}
@@ -235,9 +338,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.gastronomy.title}
               description={t.experiences.cards.gastronomy.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, ["gastronomia", "restaurante"], 4)
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.gastronomia}
               icon={UtensilsCrossed}
               badge={t.experiences.cards.gastronomy.badge}
               ctaText={t.experiences.cards.gastronomy.cta}
@@ -248,9 +349,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.rooms.title}
               description={t.experiences.cards.rooms.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, ["quarto", "recepcao"], 3)
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.quartos}
               icon={Bed}
               badge={t.experiences.cards.rooms.badge}
               ctaText={t.experiences.cards.rooms.cta}
@@ -261,9 +360,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.spa.title}
               description={t.experiences.cards.spa.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, ["spa", "academia"], 3)
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.spa}
               icon={Sparkles}
               badge={t.experiences.cards.spa.badge}
               ctaText={t.experiences.cards.spa.cta}
@@ -274,9 +371,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.beachTennis.title}
               description={t.experiences.cards.beachTennis.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, ["lazer", "esporte"], 2)
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.beachTennis}
               icon={Trophy}
               badge={t.experiences.cards.beachTennis.badge}
               ctaText={t.experiences.cards.beachTennis.cta}
@@ -287,12 +382,7 @@ export default function Home() {
             <ExperienceCard
               title={t.experiences.cards.sustainability.title}
               description={t.experiences.cards.sustainability.description}
-              images={photoTracker.getUnusedPhotos(galleryPhotos, "sustentabilidade", 2, {
-                allowRelatedCategories: true,
-                relatedCategories: ["geral"]
-              })
-                .map(p => p.imageUrl)
-                .filter(Boolean)}
+              images={homeImages.experienceImages.sustentabilidade}
               icon={Heart}
               badge={t.experiences.cards.sustainability.badge}
               ctaText={t.experiences.cards.sustainability.cta}
@@ -307,56 +397,27 @@ export default function Home() {
         title={t.photoStory.title}
         subtitle={t.photoStory.subtitle}
         backgroundColor="muted"
-        items={[
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || "",
-            title: t.photoStory.items.sunrise.title,
-            description: t.photoStory.items.sunrise.description,
-            time: t.photoStory.items.sunrise.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, ["gastronomia", "cafe"])?.imageUrl || "",
-            title: t.photoStory.items.breakfast.title,
-            description: t.photoStory.items.breakfast.description,
-            time: t.photoStory.items.breakfast.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "lazer")?.imageUrl || "",
-            title: t.photoStory.items.bike.title,
-            description: t.photoStory.items.bike.description,
-            time: t.photoStory.items.bike.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "esporte")?.imageUrl || "",
-            title: t.photoStory.items.beachTennis.title,
-            description: t.photoStory.items.beachTennis.description,
-            time: t.photoStory.items.beachTennis.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, ["restaurante", "gastronomia"])?.imageUrl || "",
-            title: t.photoStory.items.lunch.title,
-            description: t.photoStory.items.lunch.description,
-            time: t.photoStory.items.lunch.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "spa")?.imageUrl || "",
-            title: t.photoStory.items.spa.title,
-            description: t.photoStory.items.spa.description,
-            time: t.photoStory.items.spa.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || "",
-            title: t.photoStory.items.poolAfternoon.title,
-            description: t.photoStory.items.poolAfternoon.description,
-            time: t.photoStory.items.poolAfternoon.time
-          },
-          {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || "",
-            title: t.photoStory.items.sunset.title,
-            description: t.photoStory.items.sunset.description,
-            time: t.photoStory.items.sunset.time
-          }
-        ].filter(item => item.image)} // Remove itens sem imagem
+        items={homeImages.photoStoryPhotos
+          .map((photo, index) => {
+            const items = [
+              { title: t.photoStory.items.sunrise.title, description: t.photoStory.items.sunrise.description, time: t.photoStory.items.sunrise.time },
+              { title: t.photoStory.items.breakfast.title, description: t.photoStory.items.breakfast.description, time: t.photoStory.items.breakfast.time },
+              { title: t.photoStory.items.bike.title, description: t.photoStory.items.bike.description, time: t.photoStory.items.bike.time },
+              { title: t.photoStory.items.beachTennis.title, description: t.photoStory.items.beachTennis.description, time: t.photoStory.items.beachTennis.time },
+              { title: t.photoStory.items.lunch.title, description: t.photoStory.items.lunch.description, time: t.photoStory.items.lunch.time },
+              { title: t.photoStory.items.spa.title, description: t.photoStory.items.spa.description, time: t.photoStory.items.spa.time },
+              { title: t.photoStory.items.poolAfternoon.title, description: t.photoStory.items.poolAfternoon.description, time: t.photoStory.items.poolAfternoon.time },
+              { title: t.photoStory.items.sunset.title, description: t.photoStory.items.sunset.description, time: t.photoStory.items.sunset.time }
+            ];
+            const item = items[index] || items[0];
+            return {
+              image: photo.imageUrl || null,
+              title: item.title,
+              description: item.description,
+              time: item.time
+            };
+          })
+          .filter(item => item.image)}
       />
 
       {/* Galeria - Momentos Inesquecíveis */}
@@ -374,10 +435,7 @@ export default function Home() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, [
-              "piscina", "gastronomia", "restaurante", "quarto", "recepcao",
-              "spa", "academia", "lazer", "esporte", "sustentabilidade", "geral"
-            ], 9)
+            images={homeImages.galeriaMomentosPhotos
               .map((photo, index) => {
                 const title = getGalleryImageTitle(photo, index + 1);
                 return {

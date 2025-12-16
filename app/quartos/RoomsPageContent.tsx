@@ -32,7 +32,11 @@ export default function RoomsPageContent() {
     async function fetchRooms() {
       try {
         setLoading(true);
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        // No cliente, usar URL relativa
+        const isServer = typeof window === "undefined";
+        const baseUrl = isServer 
+          ? (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+          : '';
         const res = await fetch(`${baseUrl}/api/rooms?locale=${locale}&active=true`, {
           cache: 'no-store'
         });

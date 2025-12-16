@@ -56,10 +56,22 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     
     // Garante que o path começa com /
     if (!newPath.startsWith("/")) newPath = "/" + newPath;
-    if (newPath === "/") newPath = ""; 
-
-    // Redireciona para a nova URL
-    router.push(`/${newLocale}${newPath}`);
+    
+    // Se estiver na home (/), não adiciona locale na URL
+    // Apenas atualiza o estado e salva no localStorage
+    // O componente vai re-renderizar com o novo idioma
+    if (newPath === "/" || newPath === "") {
+      // Não faz nada além de atualizar o estado
+      // O React vai re-renderizar os componentes que usam o locale
+      return;
+    }
+    
+    // Para outras rotas, adiciona o locale na URL
+    // Remove a barra inicial se existir para evitar duplicação
+    const cleanPath = newPath.startsWith("/") ? newPath.slice(1) : newPath;
+    
+    // Redireciona para a nova URL com locale
+    router.push(`/${newLocale}/${cleanPath}`);
   };
 
   // Função de tradução simples

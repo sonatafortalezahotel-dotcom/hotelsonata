@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useCurrency } from "@/lib/hooks/useCurrency";
 
 interface Package {
   id: number;
@@ -34,6 +35,7 @@ export default function PackageDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { locale } = useLanguage();
+  const { formatPrice: formatPriceCurrency } = useCurrency();
   
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState(true);
@@ -172,13 +174,7 @@ export default function PackageDetailPage() {
 
   const formatPrice = (price?: number | null) => {
     if (!price) return null;
-    return new Intl.NumberFormat(
-      locale === "pt" ? "pt-BR" : locale === "es" ? "es-ES" : "en-US",
-      {
-        style: "currency",
-        currency: locale === "pt" ? "BRL" : locale === "es" ? "EUR" : "USD",
-      }
-    ).format(price / 100);
+    return formatPriceCurrency(price, locale);
   };
 
   const formatDate = (dateString: string) => {

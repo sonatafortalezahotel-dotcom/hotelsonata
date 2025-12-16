@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Award, Coffee, UtensilsCrossed, ChefHat } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
@@ -12,15 +12,60 @@ import { PhotoStory } from "@/components/PhotoStory";
 import { getGastronomy } from "@/lib/hooks/useGastronomy";
 import { getGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 export default function GastronomiaPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "gastronomy");
-  const photoTracker = usePhotoTracker();
   const [gastronomy, setGastronomy] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Buscar todas as imagens usando useMemo
+  const gastronomiaImages = useMemo(() => {
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    const getPhotosBySection = (section: string, limit?: number) => {
+      const filtered = galleryPhotos
+        .filter((img: any) => {
+          if (!img?.active) return false;
+          if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+          if (!img.imageUrl.trim()) return false;
+
+          const page = normalize(img.page);
+          const sec = normalize(img.section);
+
+          return page === "gastronomia" && sec === section.toLowerCase().trim();
+        })
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+      if (typeof limit === "number") {
+        return filtered.slice(0, limit);
+      }
+      return filtered;
+    };
+
+    const heroPhoto = getPhotosBySection("hero-gastronomia", 1)[0] || null;
+    const cardCafeManha = getPhotosBySection("card-cafe-manha", 4);
+    const cardRestaurante = getPhotosBySection("card-restaurante", 5);
+    const galeriaCafe = getPhotosBySection("galeria-cafe", 6);
+    const galeriaRestaurante = getPhotosBySection("galeria-restaurante", 6);
+    const photoStoryPhotos = getPhotosBySection("photo-story-gastronomia", 4);
+
+    return {
+      hero: heroPhoto?.imageUrl || null,
+      cardCafeManha,
+      cardRestaurante,
+      galeriaCafe,
+      galeriaRestaurante,
+      photoStory: {
+        restaurante: photoStoryPhotos[0]?.imageUrl || null,
+        cafe1: photoStoryPhotos[1]?.imageUrl || null,
+        cafe2: photoStoryPhotos[2]?.imageUrl || null,
+        cafe3: photoStoryPhotos[3]?.imageUrl || null,
+      },
+    };
+  }, [galleryPhotos]);
 
   useEffect(() => {
     async function fetchData() {
@@ -42,7 +87,7 @@ export default function GastronomiaPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={gastronomy.find(g => g.type === "restaurante")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, ["restaurante", "gastronomia"])?.imageUrl || undefined}
+        image={gastronomy.find(g => g.type === "restaurante")?.imageUrl || gastronomiaImages.hero || undefined}
         imageAlt="Restaurante Hotel Sonata de Iracema"
         icon={<UtensilsCrossed className="h-16 w-16" />}
         badge="Sabores Regionais"
@@ -61,11 +106,11 @@ export default function GastronomiaPage() {
               images={(() => {
                 const cafe = gastronomy.find(g => g.type === "cafe" || g.type === "cafe-da-manha");
                 if (cafe?.gallery && Array.isArray(cafe.gallery)) {
-                  return cafe.gallery;
+                  return cafe.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "");
                 }
-                return photoTracker.getUnusedPhotos(galleryPhotos, ["cafe", "gastronomia"], 4)
-                  .map(p => p.imageUrl)
-                  .filter(Boolean);
+                return gastronomiaImages.cardCafeManha
+                  .map((p) => p.imageUrl)
+                  .filter((url: any) => url && typeof url === "string" && url.trim() !== "");
               })()}
               icon={Coffee}
               schedule={gastronomy.find(g => g.type === "cafe")?.schedule || `${t.breakfast.scheduleWeekday} / ${t.breakfast.scheduleWeekend}`}
@@ -86,11 +131,11 @@ export default function GastronomiaPage() {
               images={(() => {
                 const restaurante = gastronomy.find(g => g.type === "restaurante");
                 if (restaurante?.gallery && Array.isArray(restaurante.gallery)) {
-                  return restaurante.gallery;
+                  return restaurante.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "");
                 }
-                return photoTracker.getUnusedPhotos(galleryPhotos, ["restaurante", "gastronomia"], 5)
-                  .map(p => p.imageUrl)
-                  .filter(Boolean);
+                return gastronomiaImages.cardRestaurante
+                  .map((p) => p.imageUrl)
+                  .filter((url: any) => url && typeof url === "string" && url.trim() !== "");
               })()}
               icon={UtensilsCrossed}
               schedule={gastronomy.find(g => g.type === "restaurante")?.schedule || `${t.restaurant.lunch} / ${t.restaurant.dinner}`}
@@ -160,16 +205,21 @@ export default function GastronomiaPage() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, ["cafe", "gastronomia"], 6)
+            images={gastronomiaImages.galeriaCafe
               .map((photo, index) => {
                 const title = getGalleryImageTitle(photo, index + 1);
                 return {
                   src: photo.imageUrl,
                   alt: title,
-                  title: title
+                  title: title,
                 };
               })
-              .filter(img => img.src)}
+              .filter(
+                (img) =>
+                  img.src &&
+                  typeof img.src === "string" &&
+                  img.src.trim() !== "",
+              )}
             columns={3}
             aspectRatio="square"
           />
@@ -183,26 +233,26 @@ export default function GastronomiaPage() {
         backgroundColor="white"
         items={[
           {
-            image: gastronomy.find(g => g.type === "restaurante")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "restaurante")?.imageUrl || "",
+            image: gastronomy.find(g => g.type === "restaurante")?.imageUrl || gastronomiaImages.photoStory.restaurante || null,
             title: t.photoStory.items.restaurant.title,
             description: t.photoStory.items.restaurant.description,
           },
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, ["gastronomia", "restaurante"])?.imageUrl || "",
+            image: gastronomiaImages.photoStory.cafe1 || null,
             title: t.photoStory.items.seafood.title,
             description: t.photoStory.items.seafood.description,
           },
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, ["gastronomia", "restaurante"])?.imageUrl || "",
+            image: gastronomiaImages.photoStory.cafe2 || null,
             title: t.photoStory.items.chef.title,
             description: t.photoStory.items.chef.description,
           },
           {
-            image: gastronomy.find(g => g.type === "cafe")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "cafe")?.imageUrl || "",
+            image: gastronomy.find(g => g.type === "cafe")?.imageUrl || gastronomiaImages.photoStory.cafe3 || null,
             title: t.photoStory.items.breakfast.title,
             description: t.photoStory.items.breakfast.description,
           },
-        ].filter(item => item.image)}
+        ]}
       />
 
       {/* Galeria do Restaurante e Pratos */}
@@ -222,16 +272,21 @@ export default function GastronomiaPage() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, ["restaurante", "gastronomia"], 6)
+            images={gastronomiaImages.galeriaRestaurante
               .map((photo, index) => {
                 const title = getGalleryImageTitle(photo, index + 1);
                 return {
                   src: photo.imageUrl,
                   alt: title,
-                  title: title
+                  title: title,
                 };
               })
-              .filter(img => img.src)}
+              .filter(
+                (img) =>
+                  img.src &&
+                  typeof img.src === "string" &&
+                  img.src.trim() !== "",
+              )}
             columns={3}
             aspectRatio="landscape"
           />

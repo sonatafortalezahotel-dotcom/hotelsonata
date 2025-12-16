@@ -162,6 +162,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   background-image: none !important;
   background-repeat: no-repeat !important;
 }
@@ -242,16 +244,19 @@ footer {
 footer > div:first-child {
   background: hsl(var(--primary)) !important;
   background-image: none !important;
+  -webkit-background-size: 100% 100% !important;
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-attachment: scroll !important;
+  -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
 }
 
 /* Garantir que todos os elementos dentro do footer não tenham background patterns */
 footer * {
   background-repeat: no-repeat !important;
+  -webkit-background-size: contain !important;
   background-size: contain !important;
 }
 
@@ -266,6 +271,7 @@ footer *,
 footer *::before,
 footer *::after {
   background-repeat: no-repeat !important;
+  -webkit-background-size: contain !important;
   background-size: contain !important;
   background-attachment: scroll !important;
 }
@@ -304,6 +310,7 @@ section[class*="bg-gradient-to"] {
   position: relative !important;
   isolation: isolate !important;
   /* Forçar que gradientes não se estendam além dos limites */
+  -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
   background-origin: border-box !important;
 }

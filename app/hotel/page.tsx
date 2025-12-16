@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +23,32 @@ export default function HotelPage() {
   const photoTracker = usePhotoTracker();
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Buscar todas as imagens usando useMemo
+  const hotelImages = useMemo(() => {
+    photoTracker.reset();
+    
+    return {
+      hero: photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || null,
+      historia: photoTracker.getUnusedPhoto(galleryPhotos, "piscina", {
+        allowRelatedCategories: true,
+        relatedCategories: ["geral"]
+      })?.imageUrl || null,
+      familia: photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || null,
+      galeria: photoTracker.getUnusedPhotos(galleryPhotos, [
+        "piscina", "gastronomia", "restaurante", "quarto", "recepcao",
+        "spa", "academia", "lazer", "esporte", "sustentabilidade", "geral"
+      ], 9),
+      localizacao: (() => {
+        // Buscar 3 imagens de localização de uma vez (para os 3 cards)
+        const locationPhotos = photoTracker.getUnusedPhotos(galleryPhotos, "localizacao", 3, {
+          allowRelatedCategories: true,
+          relatedCategories: ["geral"]
+        });
+        return locationPhotos.map(p => p.imageUrl).filter(Boolean);
+      })(),
+    };
+  }, [galleryPhotos, photoTracker]);
 
   useEffect(() => {
     async function fetchData() {
@@ -65,19 +91,18 @@ export default function HotelPage() {
     { year: "2025", title: t.timeline.anniversary.title, description: t.timeline.anniversary.description }
   ];
 
-  const hotelGalleryImages = photoTracker.getUnusedPhotos(galleryPhotos, [
-    "piscina", "gastronomia", "restaurante", "quarto", "recepcao",
-    "spa", "academia", "lazer", "esporte", "sustentabilidade", "geral"
-  ], 9)
-    .map((photo, index) => {
-      const title = getGalleryImageTitle(photo, index + 1);
-      return {
-        src: photo.imageUrl,
-        alt: title,
-        title: title
-      };
-    })
-    .filter(img => img.src);
+  const hotelGalleryImages = useMemo(() => {
+    return hotelImages.galeria
+      .map((photo, index) => {
+        const title = getGalleryImageTitle(photo, index + 1);
+        return {
+          src: photo.imageUrl,
+          alt: title,
+          title: title
+        };
+      })
+      .filter(img => img.src);
+  }, [hotelImages.galeria]);
 
   return (
     <>
@@ -85,7 +110,7 @@ export default function HotelPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || galleryPhotos[0]?.imageUrl || ""}
+        image={hotelImages.hero || galleryPhotos[0]?.imageUrl || null}
         imageAlt="Hotel Sonata de Iracema - Vista da Piscina"
         icon={<Heart className="h-16 w-16" />}
         badge={t.hero.badge}
@@ -104,10 +129,7 @@ export default function HotelPage() {
             <p>{t.history.paragraph4}</p>
           </div>
         }
-        image={photoTracker.getUnusedPhoto(galleryPhotos, "piscina", {
-          allowRelatedCategories: true,
-          relatedCategories: ["geral"]
-        })?.imageUrl || galleryPhotos[1]?.imageUrl || ""}
+        image={hotelImages.historia || galleryPhotos[1]?.imageUrl || null}
         imageAlt="História do Hotel Sonata"
         badge="Desde 2005"
         imagePosition="right"
@@ -238,7 +260,7 @@ export default function HotelPage() {
             <p>{t.family.paragraph2}</p>
           </div>
         }
-        image={photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || galleryPhotos[2]?.imageUrl || ""}
+        image={hotelImages.familia || galleryPhotos[2]?.imageUrl || null}
         imageAlt={t.family.imageAlt}
         badge="Hospitalidade Familiar"
         imagePosition="left"
@@ -262,14 +284,15 @@ export default function HotelPage() {
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
                 {(() => {
-                  const locationPhoto = photoTracker.getUnusedPhoto(galleryPhotos, "localizacao", {
-                    allowRelatedCategories: true,
-                    relatedCategories: ["geral"]
-                  });
-                  const imageUrl = locationPhoto?.imageUrl || galleryPhotos[3]?.imageUrl;
-                  return imageUrl && imageUrl.trim() !== "" ? (
+                  const base =
+                    (Array.isArray(hotelImages.localizacao)
+                      ? hotelImages.localizacao[0]
+                      : hotelImages.localizacao) || galleryPhotos[3]?.imageUrl;
+                  const valid =
+                    typeof base === "string" && base.trim() !== "";
+                  return valid ? (
                     <img
-                      src={imageUrl}
+                      src={base}
                       alt={t.explore.spots.beach.title}
                       className="w-full h-full object-cover"
                     />
@@ -291,14 +314,15 @@ export default function HotelPage() {
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
                 {(() => {
-                  const locationPhoto = photoTracker.getUnusedPhoto(galleryPhotos, "localizacao", {
-                    allowRelatedCategories: true,
-                    relatedCategories: ["geral"]
-                  });
-                  const imageUrl = locationPhoto?.imageUrl || galleryPhotos[4]?.imageUrl;
-                  return imageUrl && imageUrl.trim() !== "" ? (
+                  const base =
+                    (Array.isArray(hotelImages.localizacao)
+                      ? hotelImages.localizacao[1]
+                      : undefined) || galleryPhotos[4]?.imageUrl;
+                  const valid =
+                    typeof base === "string" && base.trim() !== "";
+                  return valid ? (
                     <img
-                      src={imageUrl}
+                      src={base}
                       alt={t.explore.spots.culture.title}
                       className="w-full h-full object-cover"
                     />
@@ -320,14 +344,15 @@ export default function HotelPage() {
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
                 {(() => {
-                  const locationPhoto = photoTracker.getUnusedPhoto(galleryPhotos, "localizacao", {
-                    allowRelatedCategories: true,
-                    relatedCategories: ["geral"]
-                  });
-                  const imageUrl = locationPhoto?.imageUrl || galleryPhotos[5]?.imageUrl;
-                  return imageUrl && imageUrl.trim() !== "" ? (
+                  const base =
+                    (Array.isArray(hotelImages.localizacao)
+                      ? hotelImages.localizacao[2]
+                      : undefined) || galleryPhotos[5]?.imageUrl;
+                  const valid =
+                    typeof base === "string" && base.trim() !== "";
+                  return valid ? (
                     <img
-                      src={imageUrl}
+                      src={base}
                       alt={t.explore.spots.market.title}
                       className="w-full h-full object-cover"
                     />

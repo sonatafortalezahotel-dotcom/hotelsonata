@@ -3,7 +3,7 @@
  * Define onde cada imagem aparece no site de forma clara e didática
  */
 
-export type PageType = "home" | "lazer" | "gastronomia" | "esg" | "contato";
+export type PageType = "home" | "lazer" | "gastronomia" | "esg" | "contato" | "reservas";
 
 export interface PageSection {
   id: string;
@@ -271,6 +271,16 @@ export const PAGE_SECTIONS: Record<PageType, PageSection[]> = {
       whereAppears: "Página Contato - Seção 'Como Chegar' (grid de 4 imagens + mapa)",
       recommendedImages: 4,
       imageTypes: ["Hotel", "Arredores", "Localização", "Pontos turísticos"]
+    }
+  ],
+  reservas: [
+    {
+      id: "hero-reservas",
+      name: "Hero - Imagem de Fundo",
+      description: "Imagem de fundo no topo da página de Reservas",
+      whereAppears: "Página Reservas - Topo da página com título e subtítulo sobrepostos",
+      recommendedImages: 1,
+      imageTypes: ["Quartos", "Hotel", "Vista mar", "Alta resolução"]
     }
   ]
 };

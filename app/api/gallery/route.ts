@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { gallery } from "@/lib/db/schema";
-import { eq, desc, and, or, isNull } from "drizzle-orm";
+import { eq, asc, desc, and, or, isNull } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
@@ -62,14 +62,22 @@ export async function GET(request: Request) {
         query = query.where(and(...conditions)) as typeof query;
       }
     } else {
-      // Sem filtros específicos: busca todas as imagens ativas
-      if (active === "true" || active === null) {
+      // Sem filtros específicos: busca todas as imagens
+      // Se active não for especificado ou for "true", retorna apenas ativas (comportamento padrão)
+      // Se active for "false", retorna apenas inativas
+      // Se active for "all", retorna todas (útil para admin)
+      if (active === "false") {
+        query = query.where(eq(gallery.active, false)) as typeof query;
+      } else if (active === "all") {
+        // Retorna todas sem filtro de active
+      } else {
+        // Padrão: retorna apenas ativas
         query = query.where(eq(gallery.active, true)) as typeof query;
       }
     }
 
-    // Ordenação (sempre por order desc)
-    query = query.orderBy(desc(gallery.order)) as typeof query;
+    // Ordenação (sempre por order asc - menor primeiro, conforme definido no seed)
+    query = query.orderBy(asc(gallery.order)) as typeof query;
 
     // Limite
     if (limitParam) {

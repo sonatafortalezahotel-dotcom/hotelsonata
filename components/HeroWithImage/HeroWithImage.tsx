@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 interface HeroWithImageProps {
   title: string;
   subtitle?: string;
-  image?: string;
+  image?: string | null;
   imageAlt: string;
   icon?: ReactNode;
   badge?: string;
@@ -29,8 +29,8 @@ export function HeroWithImage({
 }: HeroWithImageProps) {
   // Altura padronizada para todas as imagens de títulos
   const heightClasses = {
-    small: "h-[70vh] lg:h-[80vh]",
-    medium: "h-[70vh] lg:h-[80vh]",
+    small: "h-[40vh] lg:h-[50vh]",
+    medium: "h-[50vh] lg:h-[60vh]",
     large: "h-[70vh] lg:h-[80vh]",
     full: "h-[70vh] lg:h-[80vh]"
   };
@@ -65,6 +65,7 @@ export function HeroWithImage({
             className="object-cover"
             priority
             quality={90}
+            loading="eager"
           />
           {/* Overlay gradiente */}
           <div className={`absolute inset-0 ${overlayClasses[overlay]}`} />

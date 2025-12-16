@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Users } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -21,41 +21,74 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { toast } from "sonner";
 
 export default function BookingBar() {
   const { locale } = useLanguage();
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
-  const [guests, setGuests] = useState("2");
+  const [adults, setAdults] = useState("2");
+  const [children, setChildren] = useState("0");
 
   const labels = {
     pt: {
       checkIn: "Check-in",
       checkOut: "Check-out",
+      adults: "Adultos",
+      children: "Crianças",
       guests: "Hóspedes",
       reserve: "RESERVAR AGORA",
+      selectDate: "Selecione a data",
     },
     es: {
       checkIn: "Entrada",
       checkOut: "Salida",
+      adults: "Adultos",
+      children: "Niños",
       guests: "Huéspedes",
       reserve: "RESERVAR AHORA",
+      selectDate: "Seleccione la fecha",
     },
     en: {
       checkIn: "Check-in",
       checkOut: "Check-out",
+      adults: "Adults",
+      children: "Children",
       guests: "Guests",
       reserve: "BOOK NOW",
+      selectDate: "Select date",
     },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.pt;
+  const dateLocale = locale === "pt" ? ptBR : undefined;
 
   const handleReserve = () => {
-    if (!checkIn || !checkOut) return;
+    if (!checkIn || !checkOut) {
+      toast.error(
+        locale === "en"
+          ? "Please select check-in and check-out dates"
+          : locale === "es"
+          ? "Por favor seleccione las fechas de entrada y salida"
+          : "Por favor, selecione as datas de check-in e check-out"
+      );
+      return;
+    }
+
+    if (checkOut <= checkIn) {
+      toast.error(
+        locale === "en"
+          ? "Check-out must be after check-in"
+          : locale === "es"
+          ? "La salida debe ser después de la entrada"
+          : "O check-out deve ser após o check-in"
+      );
+      return;
+    }
+
     const checkInStr = format(checkIn, "yyyy-MM-dd");
     const checkOutStr = format(checkOut, "yyyy-MM-dd");
-    window.location.href = `/reservas?checkin=${checkInStr}&checkout=${checkOutStr}&guests=${guests}`;
+    window.location.href = `/reservas?checkin=${checkInStr}&checkout=${checkOutStr}&adults=${adults}&children=${children}`;
   };
 
   return (
@@ -80,9 +113,9 @@ export default function BookingBar() {
                   <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
                   <span className="truncate">
                     {checkIn ? (
-                      format(checkIn, "dd/MM/yyyy")
+                      format(checkIn, "dd/MM/yyyy", { locale: dateLocale })
                     ) : (
-                      <span>Selecione a data</span>
+                      <span>{t.selectDate}</span>
                     )}
                   </span>
                 </Button>
@@ -117,9 +150,9 @@ export default function BookingBar() {
                   <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
                   <span className="truncate">
                     {checkOut ? (
-                      format(checkOut, "dd/MM/yyyy")
+                      format(checkOut, "dd/MM/yyyy", { locale: dateLocale })
                     ) : (
-                      <span>Selecione a data</span>
+                      <span>{t.selectDate}</span>
                     )}
                   </span>
                 </Button>
@@ -139,22 +172,44 @@ export default function BookingBar() {
             </Popover>
           </div>
 
-          {/* Guests */}
+          {/* Adults */}
           <div className="flex-1 w-full lg:w-auto space-y-2">
-            <Label htmlFor="guests" className="block text-sm font-semibold text-foreground">
-              {t.guests}
+            <Label htmlFor="adults" className="block text-sm font-semibold text-foreground">
+              {t.adults}
             </Label>
-            <Select value={guests} onValueChange={setGuests}>
+            <Select value={adults} onValueChange={setAdults}>
               <SelectTrigger 
-                id="guests" 
+                id="adults" 
                 className="w-full h-11 border-2 hover:border-primary/50 focus:border-primary bg-background transition-all duration-200"
               >
-                <SelectValue placeholder="Selecione" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[1, 2, 3, 4, 5, 6].map((num) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? "hóspede" : "hóspedes"}
+                    {num}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Children */}
+          <div className="flex-1 w-full lg:w-auto space-y-2">
+            <Label htmlFor="children" className="block text-sm font-semibold text-foreground">
+              {t.children}
+            </Label>
+            <Select value={children} onValueChange={setChildren}>
+              <SelectTrigger 
+                id="children" 
+                className="w-full h-11 border-2 hover:border-primary/50 focus:border-primary bg-background transition-all duration-200"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -17,6 +17,7 @@ import {
   X,
   MapPin,
   BookOpen,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +35,7 @@ const menuItems = [
   { icon: MapPin, label: "Pontos Turísticos", href: "/admin/nearby-attractions" },
   { icon: Award, label: "Certificações", href: "/admin/certifications" },
   { icon: Instagram, label: "Redes Sociais", href: "/admin/social-media" },
+  { icon: Search, label: "SEO & Landing Pages", href: "/admin/seo" },
   { icon: Settings, label: "Configurações", href: "/admin/settings" },
 ];
 

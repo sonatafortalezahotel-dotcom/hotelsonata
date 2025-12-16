@@ -29,12 +29,13 @@ interface GalleryItem {
 }
 
 interface SectionBlockEditorProps {
-  page: PageType;
+  page: PageType | "seo-landing-page";
   section: PageSection;
   items: GalleryItem[];
   sectionType: "video" | "gallery" | "card" | "single";
   onSave: () => void;
   onSavingChange?: (saving: boolean) => void;
+  customPageId?: string; // Para landing pages de SEO, usa o slug como identificador
 }
 
 export function SectionBlockEditor({
@@ -44,6 +45,7 @@ export function SectionBlockEditor({
   sectionType,
   onSave,
   onSavingChange,
+  customPageId,
 }: SectionBlockEditorProps) {
   const [localItems, setLocalItems] = useState<GalleryItem[]>(items);
   const [uploading, setUploading] = useState(false);
@@ -60,7 +62,10 @@ export function SectionBlockEditor({
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("folder", `images/${page}`);
+      const folderName = page === "seo-landing-page" && customPageId 
+        ? `images/seo-landing-pages/${customPageId}`
+        : `images/${page}`;
+      formData.append("folder", folderName);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -145,8 +150,12 @@ export function SectionBlockEditor({
           body: JSON.stringify({
             title: item.title || null,
             imageUrl: item.imageUrl,
-            page,
-            section: section.id,
+            page: page === "seo-landing-page" ? "seo-landing-page" : page,
+            section: page === "seo-landing-page" && customPageId 
+              ? `${customPageId}-${section.id}` 
+              : page === "seo-landing-page"
+              ? section.id // Para seções padrão de SEO, usar apenas o ID da seção
+              : section.id,
             description: item.description || null,
             active: item.active,
             order: item.order,
@@ -160,6 +169,8 @@ export function SectionBlockEditor({
       }
 
       // Atualizar itens existentes (PUT)
+      const itemsToCreate: GalleryItem[] = []; // Itens que não existem mais e precisam ser criados
+      
       for (const item of existingItems) {
         // Validar que o ID é um número válido e positivo
         if (!item.id || item.id <= 0 || item.id > 2147483647) {
@@ -173,8 +184,12 @@ export function SectionBlockEditor({
           body: JSON.stringify({
             title: item.title || null,
             imageUrl: item.imageUrl,
-            page,
-            section: section.id,
+            page: page === "seo-landing-page" ? "seo-landing-page" : page,
+            section: page === "seo-landing-page" && customPageId 
+              ? `${customPageId}-${section.id}` 
+              : page === "seo-landing-page"
+              ? section.id // Para seções padrão de SEO, usar apenas o ID da seção
+              : section.id,
             description: item.description || null,
             active: item.active,
             order: item.order,
@@ -183,7 +198,49 @@ export function SectionBlockEditor({
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          
+          // Se a foto não foi encontrada (404), converter para criação
+          if (response.status === 404) {
+            console.warn(`Foto com ID ${item.id} não encontrada. Convertendo para criação.`);
+            itemsToCreate.push({
+              ...item,
+              id: -(Date.now() % 1000000), // ID negativo temporário
+            });
+            continue;
+          }
+          
+          // Para outros erros, lançar exceção
           throw new Error(errorData.error || "Erro ao atualizar imagem");
+        }
+      }
+
+      // Criar itens que não existiam mais no banco
+      if (itemsToCreate.length > 0) {
+        toast.info(`${itemsToCreate.length} item(ns) não encontrado(s) no banco. Recriando...`);
+      }
+      
+      for (const item of itemsToCreate) {
+        const response = await fetch("/api/gallery", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: item.title || null,
+            imageUrl: item.imageUrl,
+            page: page === "seo-landing-page" ? "seo-landing-page" : page,
+            section: page === "seo-landing-page" && customPageId 
+              ? `${customPageId}-${section.id}` 
+              : page === "seo-landing-page"
+              ? section.id // Para seções padrão de SEO, usar apenas o ID da seção
+              : section.id,
+            description: item.description || null,
+            active: item.active,
+            order: item.order,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Erro ao criar imagem");
         }
       }
 

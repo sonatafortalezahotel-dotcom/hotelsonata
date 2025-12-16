@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Users, Maximize2, Eye, Waves, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useCurrency } from "@/lib/hooks/useCurrency";
 
 interface RoomCardProps {
   room: {
@@ -30,6 +31,7 @@ interface RoomCardProps {
 
 export default function RoomCard({ room }: RoomCardProps) {
   const { locale } = useLanguage();
+  const { formatPrice: formatPriceCurrency } = useCurrency();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Criar array de imagens: imageUrl + gallery, filtrando strings vazias
@@ -40,10 +42,8 @@ export default function RoomCard({ room }: RoomCardProps) {
 
   const formatPrice = (price?: number) => {
     if (!price) return null;
-    return new Intl.NumberFormat(locale === "pt" ? "pt-BR" : locale === "es" ? "es-ES" : "en-US", {
-      style: "currency",
-      currency: locale === "pt" ? "BRL" : locale === "es" ? "EUR" : "USD",
-    }).format(price);
+    // O preço vem em centavos do banco, então precisa dividir por 100
+    return formatPriceCurrency(price, locale);
   };
 
   const goToNext = (e: React.MouseEvent) => {

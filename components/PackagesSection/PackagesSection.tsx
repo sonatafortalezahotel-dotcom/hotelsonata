@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import NordestinoPattern from "@/components/NordestinoPattern";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useCurrency } from "@/lib/hooks/useCurrency";
 
 interface Package {
   id: number;
@@ -28,14 +29,11 @@ export default function PackagesSection({
   packages = [],
 }: PackagesSectionProps) {
   const { locale } = useLanguage();
+  const { formatPrice: formatPriceCurrency } = useCurrency();
   const items = packages;
 
   const formatPrice = (price?: number) => {
-    if (!price) return "Consulte";
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(price);
+    return formatPriceCurrency(price, locale);
   };
 
   if (items.length === 0) {

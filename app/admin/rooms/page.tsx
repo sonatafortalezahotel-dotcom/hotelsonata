@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Bed, Info } from "lucide-react";
+import { Plus, Pencil, Trash2, Bed, Info, X } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { GalleryUpload } from "@/components/admin/GalleryUpload";
@@ -36,20 +36,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface Room {
   id: number;
   code: string;
   name: string;
   description?: string;
+  shortDescription?: string;
   imageUrl: string;
   gallery?: string[] | null;
   size: number;
   maxGuests: number;
   hasSeaView: boolean;
   hasBalcony: boolean;
+  amenities?: string[] | null;
   basePrice?: number;
   active: boolean;
+  order?: number;
 }
 
 export default function RoomsPage() {
@@ -228,15 +232,19 @@ function RoomForm({
     code: item?.code || "",
     name: item?.name || "",
     description: item?.description || "",
+    shortDescription: item?.shortDescription || "",
     imageUrl: item?.imageUrl || "",
     gallery: (Array.isArray(item?.gallery) ? item.gallery : []) as string[],
     size: item?.size || 20,
     maxGuests: item?.maxGuests || 2,
     hasSeaView: item?.hasSeaView ?? true,
     hasBalcony: item?.hasBalcony ?? false,
+    amenities: (Array.isArray(item?.amenities) ? item.amenities : []) as string[],
     basePrice: item?.basePrice || 0,
     active: item?.active ?? true,
+    order: item?.order || 0,
   });
+  const [newAmenity, setNewAmenity] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Atualizar formData quando o item mudar
@@ -246,31 +254,54 @@ function RoomForm({
         code: item.code || "",
         name: item.name || "",
         description: item.description || "",
+        shortDescription: item.shortDescription || "",
         imageUrl: item.imageUrl || "",
         gallery: Array.isArray(item.gallery) ? item.gallery : [],
         size: item.size || 20,
         maxGuests: item.maxGuests || 2,
         hasSeaView: item.hasSeaView ?? true,
         hasBalcony: item.hasBalcony ?? false,
-        basePrice: item.basePrice || 0,
+        amenities: Array.isArray(item.amenities) ? item.amenities : [],
+        basePrice: item.basePrice || 0, // Já vem em centavos do banco
         active: item.active ?? true,
+        order: item.order || 0,
       });
     } else {
       setFormData({
         code: "",
         name: "",
         description: "",
+        shortDescription: "",
         imageUrl: "",
         gallery: [],
         size: 20,
         maxGuests: 2,
         hasSeaView: true,
         hasBalcony: false,
+        amenities: [],
         basePrice: 0,
         active: true,
+        order: 0,
       });
     }
   }, [item]);
+
+  const addAmenity = () => {
+    if (newAmenity.trim() && !formData.amenities.includes(newAmenity.trim())) {
+      setFormData({
+        ...formData,
+        amenities: [...formData.amenities, newAmenity.trim()],
+      });
+      setNewAmenity("");
+    }
+  };
+
+  const removeAmenity = (index: number) => {
+    setFormData({
+      ...formData,
+      amenities: formData.amenities.filter((_, i) => i !== index),
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -283,6 +314,8 @@ function RoomForm({
       const payload = {
         ...formData,
         gallery: formData.gallery.length > 0 ? formData.gallery : null,
+        amenities: formData.amenities.length > 0 ? formData.amenities : null,
+        basePrice: formData.basePrice ? Math.round(formData.basePrice * 100) : null, // Converter para centavos
         locale: "pt", // Sempre salvar em português primeiro
       };
 
@@ -353,14 +386,28 @@ function RoomForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Descrição</Label>
+          <Label htmlFor="shortDescription">Descrição Curta</Label>
+          <Textarea
+            id="shortDescription"
+            value={formData.shortDescription}
+            onChange={(e) =>
+              setFormData({ ...formData, shortDescription: e.target.value })
+            }
+            rows={2}
+            placeholder="Breve descrição que aparece nos cards (opcional)"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Descrição Completa</Label>
           <Textarea
             id="description"
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            rows={3}
+            rows={5}
+            placeholder="Descrição detalhada do quarto"
           />
         </div>
 
@@ -428,15 +475,87 @@ function RoomForm({
             <Input
               id="basePrice"
               type="number"
-              value={formData.basePrice}
+              value={formData.basePrice ? (formData.basePrice / 100) : ""}
               onChange={(e) => {
                 const value = parseFloat(e.target.value) || 0;
-                setFormData({ ...formData, basePrice: value });
+                setFormData({ ...formData, basePrice: Math.round(value * 100) }); // Armazenar em centavos
               }}
               min="0"
               step="0.01"
+              placeholder="250.00"
             />
+            <p className="text-xs text-muted-foreground">
+              Digite o valor em reais (ex: 250.00). Será convertido para centavos automaticamente.
+            </p>
           </div>
+        </div>
+
+        {/* Amenidades */}
+        <div className="space-y-2">
+          <Label htmlFor="amenities">Amenidades</Label>
+          <div className="flex gap-2">
+            <Input
+              id="amenities"
+              value={newAmenity}
+              onChange={(e) => setNewAmenity(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addAmenity();
+                }
+              }}
+              placeholder="Ex: WiFi, Ar Condicionado, TV Smart..."
+            />
+            <Button
+              type="button"
+              onClick={addAmenity}
+              variant="outline"
+              disabled={!newAmenity.trim()}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          {formData.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-lg bg-muted/50">
+              {formData.amenities.map((amenity, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="flex items-center gap-1 pr-1"
+                >
+                  {amenity}
+                  <button
+                    type="button"
+                    onClick={() => removeAmenity(index)}
+                    className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Adicione as amenidades do quarto. Pressione Enter ou clique no botão + para adicionar.
+          </p>
+        </div>
+
+        {/* Ordem */}
+        <div className="space-y-2">
+          <Label htmlFor="order">Ordem de Exibição</Label>
+          <Input
+            id="order"
+            type="number"
+            value={formData.order}
+            onChange={(e) => {
+              const value = parseInt(e.target.value) || 0;
+              setFormData({ ...formData, order: value });
+            }}
+            min="0"
+          />
+          <p className="text-xs text-muted-foreground">
+            Quartos com menor número aparecem primeiro na listagem.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">

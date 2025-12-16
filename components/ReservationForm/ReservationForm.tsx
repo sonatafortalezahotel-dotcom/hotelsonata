@@ -47,7 +47,7 @@ export default function ReservationForm({
       children: "Crianças",
       promoCode: "Código Promocional",
       promoCodePlaceholder: "Digite o código",
-      reserve: "BUSCAR DISPONIBILIDADE",
+      reserve: "RESERVAR AGORA",
       selectDate: "Selecione a data",
     },
     es: {
@@ -57,7 +57,7 @@ export default function ReservationForm({
       children: "Niños",
       promoCode: "Código Promocional",
       promoCodePlaceholder: "Ingrese el código",
-      reserve: "BUSCAR DISPONIBILIDAD",
+      reserve: "RESERVAR AHORA",
       selectDate: "Seleccione la fecha",
     },
     en: {
@@ -67,7 +67,7 @@ export default function ReservationForm({
       children: "Children",
       promoCode: "Promotional Code",
       promoCodePlaceholder: "Enter code",
-      reserve: "CHECK AVAILABILITY",
+      reserve: "BOOK NOW",
       selectDate: "Select date",
     },
   };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import RoomsPageContent from "./RoomsPageContent";
@@ -11,15 +11,69 @@ import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";
 import { getGallery } from "@/lib/hooks/useGallery";
 import { getRooms } from "@/lib/hooks/useRooms";
 import { getGalleryImageTitle } from "@/lib/utils";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 export default function RoomsPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "rooms");
-  const photoTracker = usePhotoTracker();
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Buscar todas as imagens usando useMemo para evitar múltiplas chamadas
+  const quartosImages = useMemo(() => {
+    if (!galleryPhotos || galleryPhotos.length === 0) {
+      return {
+        hero: null,
+        gallery: [],
+        photoStory: {
+          beds: null,
+          view: null,
+          modern: null,
+          shared: null,
+        },
+      };
+    }
+
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    // Imagens de experiências de quartos (sistema novo: page=home, section=experiencias-quartos)
+    const quartosPhotos = galleryPhotos
+      .filter((img: any) => {
+        if (!img?.active) return false;
+        if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+        if (!img.imageUrl.trim()) return false;
+
+        const page = normalize(img.page);
+        const section = normalize(img.section);
+        return page === "home" && section === "experiencias-quartos";
+      })
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      .slice(0, 8);
+
+    // Imagens antigas por categoria "quarto" (sistema antigo)
+    const quartoPhotos = galleryPhotos
+      .filter((img: any) => {
+        if (!img?.active) return false;
+        if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+        if (!img.imageUrl.trim()) return false;
+        const category = normalize(img.category);
+        return category === "quarto";
+      })
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      .slice(0, 3);
+
+    return {
+      hero: quartosPhotos[0]?.imageUrl || null,
+      gallery: quartosPhotos.slice(1, 7), // Imagens 1-6 para a galeria
+      photoStory: {
+        beds: quartosPhotos[7]?.imageUrl || null, // Última imagem de experiencias-quartos
+        view: quartoPhotos[0]?.imageUrl || null,
+        modern: quartoPhotos[1]?.imageUrl || null,
+        shared: quartoPhotos[2]?.imageUrl || null,
+      },
+    };
+  }, [galleryPhotos]);
 
   useEffect(() => {
     async function fetchData() {
@@ -41,7 +95,7 @@ export default function RoomsPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={rooms[0]?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "quarto")?.imageUrl || ""}
+        image={rooms[0]?.imageUrl || quartosImages.hero || null}
         imageAlt="Quartos Hotel Sonata de Iracema"
         icon={<Bed className="h-16 w-16" />}
         badge="Conforto & Aconchego"
@@ -92,17 +146,16 @@ export default function RoomsPage() {
           
           <ImageGalleryGrid
             images={[
-              ...photoTracker.getUnusedPhotos(galleryPhotos, ["quarto", "recepcao"], 6)
-                .map((photo, index) => {
-                  const title = getGalleryImageTitle(photo, index + 1);
-                  return {
-                    src: photo.imageUrl,
-                    alt: title,
-                    title: title
-                  };
-                }),
+              ...quartosImages.gallery.map((photo, index) => {
+                const title = getGalleryImageTitle(photo, index + 1);
+                return {
+                  src: photo.imageUrl,
+                  alt: title,
+                  title: title
+                };
+              }),
               ...rooms.slice(0, 3).map(room => ({
-                src: room.imageUrl || "",
+                src: room.imageUrl || null,
                 alt: room.name || "",
                 title: room.name || ""
               }))
@@ -120,22 +173,22 @@ export default function RoomsPage() {
         backgroundColor="white"
         items={[
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "quarto")?.imageUrl || rooms[0]?.imageUrl || "",
+            image: quartosImages.photoStory.beds || rooms[0]?.imageUrl || null,
             title: t.photoStory.items.beds.title,
             description: t.photoStory.items.beds.description,
           },
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "quarto")?.imageUrl || rooms[1]?.imageUrl || "",
+            image: quartosImages.photoStory.view || rooms[1]?.imageUrl || null,
             title: t.photoStory.items.view.title,
             description: t.photoStory.items.view.description,
           },
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "quarto")?.imageUrl || rooms[2]?.imageUrl || "",
+            image: quartosImages.photoStory.modern || rooms[2]?.imageUrl || null,
             title: t.photoStory.items.modern.title,
             description: t.photoStory.items.modern.description,
           },
           {
-            image: photoTracker.getUnusedPhoto(galleryPhotos, "quarto")?.imageUrl || rooms[0]?.gallery?.[0] || "",
+            image: quartosImages.photoStory.shared || rooms[0]?.gallery?.[0] || null,
             title: t.photoStory.items.shared.title,
             description: t.photoStory.items.shared.description,
           },

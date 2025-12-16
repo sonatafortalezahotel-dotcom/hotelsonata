@@ -55,7 +55,14 @@ export function useLeisure(activeOnly: boolean = true, locale: string = "pt") {
  */
 export async function getLeisure(activeOnly: boolean = true, locale: string = "pt"): Promise<Leisure[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Detectar se está rodando no servidor ou cliente
+    const isServer = typeof window === 'undefined';
+    
+    // Usar a mesma lógica do useGallery: URL relativa no cliente, absoluta no servidor
+    const baseUrl = isServer 
+      ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+      : ""; // No cliente, usar URL relativa (funciona em dev e produção)
+    
     const params = new URLSearchParams();
     params.append("locale", locale);
     if (activeOnly) params.append("active", "true");

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
-import { CheckCircle2, Calendar, Users, Mail, Phone, FileText, ArrowLeft, Download } from "lucide-react";
+import { CheckCircle2, Calendar, Users, Mail, Phone, FileText, ArrowLeft, Download, CalendarPlus, Share2, QrCode } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useCurrency } from "@/lib/hooks/useCurrency";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { Loader2 } from "lucide-react";
 
@@ -28,6 +29,7 @@ interface ReservationData {
 
 export default function ConfirmacaoPage() {
   const { locale } = useLanguage();
+  const { formatPrice: formatPriceCurrency } = useCurrency();
   const router = useRouter();
   const searchParams = useSearchParams();
   const confirmationNumber = searchParams.get("confirmation");
@@ -50,6 +52,12 @@ export default function ConfirmacaoPage() {
       nextSteps: "Próximos Passos",
       emailSent: "Um email de confirmação foi enviado para",
       print: "Imprimir Confirmação",
+      downloadPDF: "Baixar PDF",
+      addToCalendar: "Adicionar ao Calendário",
+      share: "Compartilhar",
+      shareWhatsApp: "Compartilhar no WhatsApp",
+      shareEmail: "Enviar por Email",
+      qrCode: "QR Code para Check-in",
       backHome: "Voltar ao Início",
       error: "Reserva não encontrada",
       errorDescription: "Não foi possível encontrar a reserva com o número de confirmação fornecido.",
@@ -67,6 +75,12 @@ export default function ConfirmacaoPage() {
       nextSteps: "Próximos Pasos",
       emailSent: "Se ha enviado un correo de confirmación a",
       print: "Imprimir Confirmación",
+      downloadPDF: "Descargar PDF",
+      addToCalendar: "Agregar al Calendario",
+      share: "Compartir",
+      shareWhatsApp: "Compartir en WhatsApp",
+      shareEmail: "Enviar por Correo",
+      qrCode: "Código QR para Check-in",
       backHome: "Volver al Inicio",
       error: "Reserva no encontrada",
       errorDescription: "No se pudo encontrar la reserva con el número de confirmación proporcionado.",
@@ -84,6 +98,12 @@ export default function ConfirmacaoPage() {
       nextSteps: "Next Steps",
       emailSent: "A confirmation email has been sent to",
       print: "Print Confirmation",
+      downloadPDF: "Download PDF",
+      addToCalendar: "Add to Calendar",
+      share: "Share",
+      shareWhatsApp: "Share on WhatsApp",
+      shareEmail: "Send by Email",
+      qrCode: "QR Code for Check-in",
       backHome: "Back to Home",
       error: "Reservation not found",
       errorDescription: "Could not find the reservation with the provided confirmation number.",
@@ -128,17 +148,81 @@ export default function ConfirmacaoPage() {
   }, [confirmationNumber, searchParams, t.error]);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(
-      locale === "pt" ? "pt-BR" : locale === "es" ? "es-ES" : "en-US",
-      {
-        style: "currency",
-        currency: locale === "pt" ? "BRL" : locale === "es" ? "EUR" : "USD",
-      }
-    ).format(price / 100);
+    return formatPriceCurrency(price, locale);
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleAddToCalendar = () => {
+    if (!reservation) return;
+    
+    const checkInDate = new Date(reservation.checkIn);
+    const checkOutDate = new Date(reservation.checkOut);
+    
+    // Formato iCal
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+    
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Hotel Sonata//Reservation//EN",
+      "BEGIN:VEVENT",
+      `DTSTART:${formatDate(checkInDate)}`,
+      `DTEND:${formatDate(checkOutDate)}`,
+      `SUMMARY:Reserva Hotel Sonata - ${reservation.confirmationNumber}`,
+      `DESCRIPTION:Reserva confirmada. Número: ${reservation.confirmationNumber}`,
+      "LOCATION:Hotel Sonata de Iracema, Fortaleza, CE",
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].join("\r\n");
+    
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `reserva-${reservation.confirmationNumber}.ics`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!reservation) return;
+    
+    const message = encodeURIComponent(
+      locale === "en"
+        ? `My reservation at Hotel Sonata is confirmed! Confirmation number: ${reservation.confirmationNumber}`
+        : locale === "es"
+        ? `¡Mi reserva en Hotel Sonata está confirmada! Número de confirmación: ${reservation.confirmationNumber}`
+        : `Minha reserva no Hotel Sonata está confirmada! Número de confirmação: ${reservation.confirmationNumber}`
+    );
+    
+    window.open(`https://wa.me/?text=${message}`, "_blank");
+  };
+
+  const handleShareEmail = () => {
+    if (!reservation) return;
+    
+    const subject = encodeURIComponent(
+      locale === "en"
+        ? `Reservation Confirmation - ${reservation.confirmationNumber}`
+        : locale === "es"
+        ? `Confirmación de Reserva - ${reservation.confirmationNumber}`
+        : `Confirmação de Reserva - ${reservation.confirmationNumber}`
+    );
+    
+    const body = encodeURIComponent(
+      locale === "en"
+        ? `My reservation at Hotel Sonata is confirmed!\n\nConfirmation Number: ${reservation.confirmationNumber}\nCheck-in: ${format(new Date(reservation.checkIn), "dd/MM/yyyy")}\nCheck-out: ${format(new Date(reservation.checkOut), "dd/MM/yyyy")}\nTotal: ${formatPrice(reservation.totalPrice)}`
+        : locale === "es"
+        ? `¡Mi reserva en Hotel Sonata está confirmada!\n\nNúmero de Confirmación: ${reservation.confirmationNumber}\nEntrada: ${format(new Date(reservation.checkIn), "dd/MM/yyyy")}\nSalida: ${format(new Date(reservation.checkOut), "dd/MM/yyyy")}\nTotal: ${formatPrice(reservation.totalPrice)}`
+        : `Minha reserva no Hotel Sonata está confirmada!\n\nNúmero de Confirmação: ${reservation.confirmationNumber}\nCheck-in: ${format(new Date(reservation.checkIn), "dd/MM/yyyy")}\nCheck-out: ${format(new Date(reservation.checkOut), "dd/MM/yyyy")}\nTotal: ${formatPrice(reservation.totalPrice)}`
+    );
+    
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   if (loading) {
@@ -337,6 +421,31 @@ export default function ConfirmacaoPage() {
                     <Download className="mr-2 h-4 w-4" />
                     {t.print}
                   </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleAddToCalendar}
+                  >
+                    <CalendarPlus className="mr-2 h-4 w-4" />
+                    {t.addToCalendar}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleShareWhatsApp}
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    {t.shareWhatsApp}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleShareEmail}
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    {t.shareEmail}
+                  </Button>
+                  <Separator />
                   <Button
                     variant="default"
                     className="w-full"

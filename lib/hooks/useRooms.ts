@@ -58,14 +58,19 @@ export function useRooms(activeOnly: boolean = true, locale: string = "pt") {
 }
 
 /**
- * Função utilitária para buscar quartos no servidor (Server Components)
+ * Função utilitária para buscar quartos no servidor (Server Components) ou cliente
  */
 export async function getRooms(activeOnly: boolean = true, locale: string = "pt"): Promise<Room[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const params = new URLSearchParams();
     params.append("locale", locale);
     if (activeOnly) params.append("active", "true");
+
+    // Detectar se está rodando no servidor ou cliente
+    const isServer = typeof window === "undefined";
+    const baseUrl = isServer 
+      ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+      : ""; // No cliente, usar URL relativa
 
     const response = await fetch(`${baseUrl}/api/rooms?${params.toString()}`, {
       cache: "no-store",

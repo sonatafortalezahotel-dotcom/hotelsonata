@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,15 +12,69 @@ import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
 import { PhotoStory } from "@/components/PhotoStory";
 import { getSustainability } from "@/lib/hooks/useSustainability";
 import { getGallery } from "@/lib/hooks/useGallery";
-import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
 export default function ESGPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "esg");
-  const photoTracker = usePhotoTracker();
   const [sustainability, setSustainability] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Buscar todas as imagens usando useMemo
+  const esgImages = useMemo(() => {
+    if (!galleryPhotos || galleryPhotos.length === 0) {
+      return {
+        hero: null,
+        galeria: [],
+        photoStory: {
+          obrasLocais: null,
+          sustentabilidade: null,
+          sustentabilidade2: null,
+          acoesSociais: null,
+        },
+        acoesSociais: null,
+      };
+    }
+
+    const normalize = (value: any) =>
+      (value || "").toString().toLowerCase().trim();
+
+    const getPhotosBySection = (section: string, limit?: number) => {
+      const filtered = galleryPhotos
+        .filter((img: any) => {
+          if (!img?.active) return false;
+          if (!img.imageUrl || typeof img.imageUrl !== "string") return false;
+          if (!img.imageUrl.trim()) return false;
+
+          const page = normalize(img.page);
+          const sec = normalize(img.section);
+          return page === "esg" && sec === section.toLowerCase().trim();
+        })
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+      if (typeof limit === "number") {
+        return filtered.slice(0, limit);
+      }
+      return filtered;
+    };
+
+    const heroPhoto = getPhotosBySection("hero-esg", 1)[0] || null;
+    const galeriaPraticas = getPhotosBySection("galeria-praticas", 6);
+    const photoStoryPhotos = getPhotosBySection("photo-story-impacto", 4);
+    const acoesSociaisPhoto = getPhotosBySection("acoes-sociais", 1)[0] || null;
+
+    return {
+      hero: heroPhoto?.imageUrl || null,
+      galeria: galeriaPraticas,
+      photoStory: {
+        obrasLocais: photoStoryPhotos[0]?.imageUrl || null,
+        sustentabilidade: photoStoryPhotos[1]?.imageUrl || null,
+        sustentabilidade2: photoStoryPhotos[2]?.imageUrl || null,
+        acoesSociais: photoStoryPhotos[3]?.imageUrl || null,
+      },
+      acoesSociais: acoesSociaisPhoto?.imageUrl || null,
+    };
+  }, [galleryPhotos]);
 
   useEffect(() => {
     async function fetchData() {
@@ -84,10 +138,7 @@ export default function ESGPage() {
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={sustainability[0]?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "sustentabilidade", {
-          allowRelatedCategories: true,
-          relatedCategories: ["geral"]
-        })?.imageUrl || undefined}
+        image={sustainability[0]?.imageUrl || esgImages.hero || undefined}
         imageAlt={t.hero.imageAlt}
         icon={<Leaf className="h-16 w-16" />}
         badge={t.hero.badge}
@@ -108,10 +159,7 @@ export default function ESGPage() {
           </div>
           
           <ImageGalleryGrid
-            images={photoTracker.getUnusedPhotos(galleryPhotos, "sustentabilidade", 6, {
-              allowRelatedCategories: true,
-              relatedCategories: ["geral"]
-            })
+            images={esgImages.galeria
               .map((photo, index) => {
                 const galleryKeys = Object.keys(t.gallery) as Array<keyof typeof t.gallery>;
                 const key = galleryKeys[index % galleryKeys.length];
@@ -223,22 +271,22 @@ export default function ESGPage() {
         backgroundColor="white"
         items={[
           {
-            image: sustainability.find(s => s.category === "obras-locais")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "gastronomia")?.imageUrl || "",
+            image: sustainability.find(s => s.category === "obras-locais")?.imageUrl || esgImages.photoStory.obrasLocais || null,
             title: t.impactPhotoStory.localProd.title,
             description: t.impactPhotoStory.localProd.description,
           },
           {
-            image: sustainability.find(s => s.category === "sustentabilidade")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "lazer")?.imageUrl || "",
+            image: sustainability.find(s => s.category === "sustentabilidade")?.imageUrl || esgImages.photoStory.sustentabilidade || null,
             title: t.impactPhotoStory.mobility.title,
             description: t.impactPhotoStory.mobility.description,
           },
           {
-            image: sustainability.filter(s => s.category === "sustentabilidade")[1]?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || "",
+            image: sustainability.filter(s => s.category === "sustentabilidade")[1]?.imageUrl || esgImages.photoStory.sustentabilidade2 || null,
             title: t.impactPhotoStory.resources.title,
             description: t.impactPhotoStory.resources.description,
           },
           {
-            image: sustainability.find(s => s.category === "acoes-sociais")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || "",
+            image: sustainability.find(s => s.category === "acoes-sociais")?.imageUrl || esgImages.photoStory.acoesSociais || null,
             title: t.impactPhotoStory.team.title,
             description: t.impactPhotoStory.team.description,
           },
@@ -251,10 +299,7 @@ export default function ESGPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl">
               {(() => {
-                const imageUrl = sustainability.find(s => s.category === "acoes-sociais")?.imageUrl || photoTracker.getUnusedPhoto(galleryPhotos, "sustentabilidade", {
-                  allowRelatedCategories: true,
-                  relatedCategories: ["geral"]
-                })?.imageUrl;
+                const imageUrl = sustainability.find(s => s.category === "acoes-sociais")?.imageUrl || esgImages.acoesSociais;
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image
                     src={imageUrl}
