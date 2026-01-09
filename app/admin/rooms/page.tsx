@@ -315,7 +315,7 @@ function RoomForm({
         ...formData,
         gallery: formData.gallery.length > 0 ? formData.gallery : null,
         amenities: formData.amenities.length > 0 ? formData.amenities : null,
-        basePrice: formData.basePrice ? Math.round(formData.basePrice * 100) : null, // Converter para centavos
+        basePrice: formData.basePrice || null, // Já está em centavos (convertido no onChange)
         locale: "pt", // Sempre salvar em português primeiro
       };
 
