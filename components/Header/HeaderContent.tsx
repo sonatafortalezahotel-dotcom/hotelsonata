@@ -291,7 +291,8 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
               {isLanguageMenuOpen && (
                 <>
                   <div 
-                    className="fixed inset-0 z-40" 
+                    className="fixed inset-0" 
+                    style={{ zIndex: 9998 }}
                     onClick={() => setIsLanguageMenuOpen(false)}
                     aria-hidden="true"
                   />
@@ -305,7 +306,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "0.5rem",
                       boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                      zIndex: 50,
+                      zIndex: 9999,
                     }}
                   >
                     <div style={{ padding: "0.5rem 0" }}>
