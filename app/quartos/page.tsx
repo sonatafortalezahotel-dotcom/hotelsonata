@@ -147,7 +147,7 @@ export default function RoomsPage() {
             description: t.photoStory.items.shared.description,
           },
         ]
-          .filter(item => item.image)
+          .filter((item): item is typeof item & { image: string } => !!item.image)
           .map((item, index) => (
             <div key={index} className="relative w-full h-[500px] md:h-[600px] lg:h-[700px]">
               <Image
