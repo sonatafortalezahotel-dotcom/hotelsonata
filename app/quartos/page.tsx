@@ -75,14 +75,26 @@ export default function RoomsPage() {
     };
   }, [galleryPhotos]);
 
+  // Buscar quarto com vista ao mar para o Hero
+  const heroImage = useMemo(() => {
+    // Priorizar quarto com vista ao mar
+    const seaViewRoom = rooms.find(room => room.hasSeaView);
+    if (seaViewRoom?.imageUrl) return seaViewRoom.imageUrl;
+    
+    // Se não houver, usar primeira imagem de gallery ou rooms
+    if (rooms[0]?.imageUrl) return rooms[0].imageUrl;
+    
+    return quartosImages.hero || null;
+  }, [rooms, quartosImages.hero]);
+
   return (
     <>
       {/* Hero Section - Compensar header fixo */}
       <HeroWithImage
         title={t.hero.title}
         subtitle={t.hero.subtitle}
-        image={rooms[0]?.imageUrl || quartosImages.hero || null}
-        imageAlt="Quartos Hotel Sonata de Iracema"
+        image={heroImage}
+        imageAlt="Quartos Vista ao Mar - Hotel Sonata de Iracema"
         icon={<Bed className="h-16 w-16" />}
         badge="Conforto & Aconchego"
         height="large"
