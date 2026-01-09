@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar as CalendarIcon, Users, Baby, Tag, Search, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar as CalendarIcon, Users, Tag, Search, Loader2, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -38,36 +37,48 @@ export default function ReservationForm({
   const [children, setChildren] = useState("0");
   const [promoCode, setPromoCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state to prevent hydration mismatch with Radix UI IDs
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const labels = {
     pt: {
       checkIn: "Check-in",
       checkOut: "Check-out",
+      dates: "Datas",
+      guests: "Hóspedes",
       adults: "Adultos",
       children: "Crianças",
-      promoCode: "Código Promocional",
-      promoCodePlaceholder: "Digite o código",
-      reserve: "RESERVAR AGORA",
+      promoCode: "CUPOM",
+      promoCodePlaceholder: "CUPOM",
+      reserve: "PESQUISAR",
       selectDate: "Selecione a data",
     },
     es: {
       checkIn: "Entrada",
       checkOut: "Salida",
+      dates: "Fechas",
+      guests: "Huéspedes",
       adults: "Adultos",
       children: "Niños",
-      promoCode: "Código Promocional",
-      promoCodePlaceholder: "Ingrese el código",
-      reserve: "RESERVAR AHORA",
+      promoCode: "CUPÓN",
+      promoCodePlaceholder: "CUPÓN",
+      reserve: "BUSCAR",
       selectDate: "Seleccione la fecha",
     },
     en: {
       checkIn: "Check-in",
       checkOut: "Check-out",
+      dates: "Dates",
+      guests: "Guests",
       adults: "Adults",
       children: "Children",
-      promoCode: "Promotional Code",
-      promoCodePlaceholder: "Enter code",
-      reserve: "BOOK NOW",
+      promoCode: "COUPON",
+      promoCodePlaceholder: "COUPON",
+      reserve: "SEARCH",
       selectDate: "Select date",
     },
   };
@@ -143,6 +154,15 @@ export default function ReservationForm({
   // Locale para formatação de datas
   const dateLocale = locale === "pt" ? ptBR : undefined;
 
+  // Formatar hóspedes
+  const adultsCount = parseInt(adults);
+  const childrenCount = parseInt(children);
+  const formattedGuests = locale === "pt" 
+    ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "CRIANÇA" : "CRIANÇAS"}`
+    : locale === "es"
+    ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "NIÑO" : "NIÑOS"}`
+    : `${adultsCount} ${adultsCount === 1 ? "ADULT" : "ADULTS"}, ${childrenCount} ${childrenCount === 1 ? "CHILD" : "CHILDREN"}`;
+
   return (
     <section
       className={cn(
@@ -153,200 +173,252 @@ export default function ReservationForm({
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Card Simples e Elegante */}
-          <div className="bg-primary rounded-lg shadow-xl p-6 lg:p-8">
-            {/* Grid do Formulário */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-              {/* Check-in */}
-              <div className="space-y-1.5">
-                <Label 
-                  htmlFor="checkin" 
-                  className="text-sm font-medium text-primary-foreground"
-                >
-                  {t.checkIn}
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="checkin"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal h-10 bg-background border-background/20 hover:bg-background/90",
-                        !checkIn && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0 text-orange-500" />
-                      <span className="truncate">
-                        {checkIn ? (
-                          format(checkIn, "dd/MM/yyyy", { locale: dateLocale })
-                        ) : (
-                          t.selectDate
+          {/* Barra de Pesquisa Horizontal */}
+          <div className="bg-black/40 dark:bg-black/60 backdrop-blur-md rounded-lg shadow-2xl p-4 lg:p-5 border border-slate-800/50 dark:border-slate-700/60">
+            <div className="flex flex-col lg:flex-row items-stretch gap-0 lg:gap-0">
+              {/* Campo de Check-in */}
+              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+                {isMounted ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "text-sm lg:text-base"
                         )}
+                      >
+                        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                          <span className="text-xs text-white/70 uppercase font-medium">
+                            {t.checkIn}
+                          </span>
+                          <div className="flex items-center gap-2 w-full">
+                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                            <span className="truncate text-xs lg:text-sm">
+                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={checkIn}
+                        onSelect={setCheckIn}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                      "text-sm lg:text-base"
+                    )}
+                    disabled
+                  >
+                    <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                      <span className="text-xs text-white/70 uppercase font-medium">
+                        {t.checkIn}
                       </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={checkIn}
-                      onSelect={setCheckIn}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <div className="flex items-center gap-2 w-full">
+                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                        <span className="truncate text-xs lg:text-sm">
+                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                  </Button>
+                )}
               </div>
 
-              {/* Check-out */}
-              <div className="space-y-1.5">
-                <Label 
-                  htmlFor="checkout" 
-                  className="text-sm font-medium text-primary-foreground"
-                >
-                  {t.checkOut}
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="checkout"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal h-10 bg-background border-background/20 hover:bg-background/90",
-                        !checkOut && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0 text-orange-500" />
-                      <span className="truncate">
-                        {checkOut ? (
-                          format(checkOut, "dd/MM/yyyy", { locale: dateLocale })
-                        ) : (
-                          t.selectDate
+              {/* Campo de Check-out */}
+              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+                {isMounted ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "text-sm lg:text-base"
                         )}
+                      >
+                        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                          <span className="text-xs text-white/70 uppercase font-medium">
+                            {t.checkOut}
+                          </span>
+                          <div className="flex items-center gap-2 w-full">
+                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                            <span className="truncate text-xs lg:text-sm">
+                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={checkOut}
+                        onSelect={setCheckOut}
+                        disabled={(date) => {
+                          if (!checkIn) return date < new Date();
+                          return date <= checkIn;
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                      "text-sm lg:text-base"
+                    )}
+                    disabled
+                  >
+                    <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                      <span className="text-xs text-white/70 uppercase font-medium">
+                        {t.checkOut}
                       </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={checkOut}
-                      onSelect={setCheckOut}
-                      disabled={(date) => {
-                        if (!checkIn) return date < new Date();
-                        return date <= checkIn;
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <div className="flex items-center gap-2 w-full">
+                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                        <span className="truncate text-xs lg:text-sm">
+                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                  </Button>
+                )}
               </div>
 
-              {/* Adultos */}
-              <div className="space-y-1.5">
-                <Label 
-                  htmlFor="adults" 
-                  className="text-sm font-medium text-primary-foreground"
-                >
-                  {t.adults}
-                </Label>
-                <Select value={adults} onValueChange={setAdults}>
-                  <SelectTrigger 
-                    id="adults" 
-                    className="w-full h-10 bg-background border-background/20"
+              {/* Campo de Hóspedes */}
+              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+                {isMounted ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "text-sm lg:text-base"
+                        )}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                          <span className="truncate text-xs lg:text-sm">
+                            {formattedGuests}
+                          </span>
+                        </div>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-4" align="start">
+                      <div className="space-y-4 min-w-[200px]">
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">{t.adults}</label>
+                          <Select value={adults} onValueChange={setAdults}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                <SelectItem key={num} value={num.toString()}>
+                                  {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">{t.children}</label>
+                          <Select value={children} onValueChange={setChildren}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                                <SelectItem key={num} value={num.toString()}>
+                                  {num === 0 
+                                    ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
+                                    : `${num} ${num === 1 
+                                      ? (locale === "en" ? "child" : locale === "es" ? "niño" : "criança")
+                                      : (locale === "en" ? "children" : locale === "es" ? "niños" : "crianças")
+                                    }`
+                                  }
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                      "text-sm lg:text-base"
+                    )}
+                    disabled
                   >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                      <span className="truncate text-xs lg:text-sm">
+                        {formattedGuests}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                  </Button>
+                )}
               </div>
 
-              {/* Crianças */}
-              <div className="space-y-1.5">
-                <Label 
-                  htmlFor="children" 
-                  className="text-sm font-medium text-primary-foreground"
-                >
-                  {t.children}
-                </Label>
-                <Select value={children} onValueChange={setChildren}>
-                  <SelectTrigger 
-                    id="children" 
-                    className="w-full h-10 bg-background border-background/20"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[0, 1, 2, 3, 4, 5, 6].map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num === 0 
-                          ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
-                          : `${num} ${num === 1 
-                            ? (locale === "en" ? "child" : locale === "es" ? "niño" : "criança")
-                            : (locale === "en" ? "children" : locale === "es" ? "niños" : "crianças")
-                          }`
-                        }
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Campo de Cupom */}
+              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+                <div className="flex items-center h-12 lg:h-14 px-3">
+                  <Tag className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white mr-2" />
+                  <Input
+                    id="promoCode"
+                    type="text"
+                    placeholder={t.promoCode}
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs lg:text-sm"
+                    maxLength={20}
+                  />
+                </div>
               </div>
 
-              {/* Código Promocional */}
-              <div className="md:col-span-2 space-y-1.5">
-                <Label 
-                  htmlFor="promoCode" 
-                  className="text-sm font-medium text-primary-foreground"
-                >
-                  {t.promoCode} <span className="text-primary-foreground/70 text-xs">(opcional)</span>
-                </Label>
-                <Input
-                  id="promoCode"
-                  type="text"
-                  placeholder={t.promoCodePlaceholder}
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                  className="h-10 bg-background border-background/20"
-                  maxLength={20}
-                />
-              </div>
-
-              {/* Botão de Reserva */}
-              <div className="md:col-span-2 flex items-end">
+              {/* Botão de Pesquisa */}
+              <div className="flex-shrink-0">
                 <Button
                   onClick={handleReserve}
-                  size="lg"
-                  className="w-full h-10 font-semibold bg-orange-500 hover:bg-orange-600 text-white"
+                  className="w-full lg:w-auto h-12 lg:h-14 px-6 lg:px-8 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
                   disabled={isLoading}
                 >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin text-white" />
-                    {locale === "en" ? "Searching..." : locale === "es" ? "Buscando..." : "Buscando..."}
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-2 h-5 w-5 text-white" />
-                    {t.reserve}
-                  </>
-                )}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin text-white" />
+                      <span className="text-sm lg:text-base">{locale === "en" ? "Searching..." : locale === "es" ? "Buscando..." : "Buscando..."}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search className="mr-2 h-5 w-5 text-white" />
+                      <span className="text-sm lg:text-base">{t.reserve}</span>
+                    </>
+                  )}
                 </Button>
               </div>
-            </div>
-
-            {/* Informações adicionais */}
-            <div className="mt-5 pt-5 border-t border-primary-foreground/20">
-              <p className="text-xs text-primary-foreground/80 text-center">
-                {locale === "en" 
-                  ? "Best rate guaranteed. Free cancellation up to 24 hours before check-in." 
-                  : locale === "es" 
-                  ? "Mejor tarifa garantizada. Cancelación gratuita hasta 24 horas antes del check-in."
-                  : "Melhor tarifa garantida. Cancelamento gratuito até 24 horas antes do check-in."}
-              </p>
             </div>
           </div>
         </div>

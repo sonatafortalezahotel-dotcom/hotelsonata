@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown, Star } from "lucide-react";
@@ -22,11 +22,17 @@ interface HeaderContentProps {
 }
 
 export default function HeaderContent({ usePrimaryBackground = false }: HeaderContentProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const { isScrolled, scrollY } = useScrollBehavior(50);
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const { locale, setLocale, t } = useLanguage();
+
+  // Garantir que o componente seja montado apenas no cliente para evitar erro de hidratação
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Fecha dropdown de idioma ao clicar fora
   useEffect(() => {
@@ -148,8 +154,9 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
               className={cn(textColor, languageButtonHover)}
               size="icon"
             />
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
+            {isMounted ? (
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -213,8 +220,19 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                     ))}
                   </div>
                 </div>
-              </SheetContent>
-            </Sheet>
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(textColor, languageButtonHover)}
+                aria-label="Abrir menu"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            )}
           </div>
 
           {/* Desktop Navigation */}

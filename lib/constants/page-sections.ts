@@ -66,11 +66,11 @@ export const PAGE_SECTIONS: Record<PageType, PageSection[]> = {
     },
     {
       id: "experiencias-sustentabilidade",
-      name: "Card Experiências - Sustentabilidade",
-      description: "Imagens para o card de Sustentabilidade na seção Experiências Visuais",
-      whereAppears: "Homepage - Seção 'Experiências Visuais' - Card de Sustentabilidade (carrossel de 2 imagens)",
+      name: "Card Experiências - Pet Friendly",
+      description: "Imagens para o card de Pet Friendly na seção Experiências Visuais",
+      whereAppears: "Homepage - Seção 'Experiências Visuais' - Card de Pet Friendly (carrossel de 2 imagens)",
       recommendedImages: 2,
-      imageTypes: ["Sustentabilidade", "Ambiente", "Ações sociais"]
+      imageTypes: ["Pets", "Animais", "Pet Friendly", "Cães", "Gatos"]
     },
     {
       id: "photo-story",

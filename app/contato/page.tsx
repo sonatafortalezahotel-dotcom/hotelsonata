@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Clock, MessageCircle, Instagram, Facebook } from "lucide-react";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
+import { FullWidthGallery, AsymmetricGallery } from "@/components/HorizontalScroll";
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
@@ -127,10 +127,11 @@ export default function ContatoPage() {
         overlay="medium"
       />
 
-      {/* Galeria - Nossa Equipe Aguarda Você */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/5 to-primary/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 lg:mb-16">
+      {/* Nossa Equipe - GALERIA HORIZONTAL 1x3 FULLWIDTH */}
+      <section className="relative w-full bg-gradient-to-br from-primary/5 to-primary/10">
+        {/* Título antes da galeria */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24 pb-8">
+          <div className="text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t.team.title}
             </h2>
@@ -138,72 +139,79 @@ export default function ContatoPage() {
               {t.team.subtitle}
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
-              {(() => {
-                const imageUrl = contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl;
-                return imageUrl && imageUrl.trim() !== "" ? (
-                  <Image
-                    src={imageUrl}
-                    alt={t.team.images.receptionAlt}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                );
-              })()}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-xl font-bold mb-1">{t.team.reception.title}</h3>
-                <p className="text-white/90 text-sm">{t.team.reception.description}</p>
-              </div>
-            </div>
+        </div>
 
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
-              {(() => {
-                const imageUrl = contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl;
-                return imageUrl && imageUrl.trim() !== "" ? (
-                  <Image
-                    src={imageUrl}
-                    alt={t.team.images.gastronomyAlt}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                );
-              })()}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-xl font-bold mb-1">{t.team.gastronomy.title}</h3>
-                <p className="text-white/90 text-sm">{t.team.gastronomy.description}</p>
-              </div>
-            </div>
-
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl group">
-              {(() => {
-                const imageUrl = contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl;
-                return imageUrl && imageUrl.trim() !== "" ? (
-                  <Image
-                    src={imageUrl}
-                    alt={t.team.images.leisureAlt}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                );
-              })()}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-xl font-bold mb-1">{t.team.leisure.title}</h3>
-                <p className="text-white/90 text-sm">{t.team.leisure.description}</p>
-              </div>
+        {/* Galeria Horizontal 1x3 Fullwidth com texto sobreposto */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-[400px] md:h-[500px] lg:h-[600px]">
+          {/* Recepção */}
+          <div className="relative overflow-hidden group">
+            {(() => {
+              const imageUrl = contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl;
+              return imageUrl && imageUrl.trim() !== "" ? (
+                <Image
+                  src={imageUrl}
+                  alt={t.team.images.receptionAlt}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+              );
+            })()}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.reception.title}</h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.reception.description}</p>
             </div>
           </div>
 
+          {/* Gastronomia */}
+          <div className="relative overflow-hidden group">
+            {(() => {
+              const imageUrl = contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl;
+              return imageUrl && imageUrl.trim() !== "" ? (
+                <Image
+                  src={imageUrl}
+                  alt={t.team.images.gastronomyAlt}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+              );
+            })()}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.gastronomy.title}</h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.gastronomy.description}</p>
+            </div>
+          </div>
+
+          {/* Lazer */}
+          <div className="relative overflow-hidden group">
+            {(() => {
+              const imageUrl = contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl;
+              return imageUrl && imageUrl.trim() !== "" ? (
+                <Image
+                  src={imageUrl}
+                  alt={t.team.images.leisureAlt}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+              );
+            })()}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.leisure.title}</h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.leisure.description}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mensagem final */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pb-24">
           <div className="text-center bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg max-w-3xl mx-auto">
             <p className="text-lg text-muted-foreground mb-4">
               {t.team.message}
@@ -415,10 +423,10 @@ export default function ContatoPage() {
         </div>
       </section>
 
-      {/* Galeria - Como Chegar */}
+      {/* Como Chegar - Galeria Fullwidth Assimétrica */}
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 lg:mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t.location.title}
             </h2>
@@ -426,24 +434,23 @@ export default function ContatoPage() {
               {t.location.subtitle}
             </p>
           </div>
-          
-          <ImageGalleryGrid
-            images={contatoImages.galeriaLocalizacao
-              .map((photo, index) => {
-                const keys = Object.keys(t.locationGallery.items) as Array<keyof typeof t.locationGallery.items>;
-                const key = keys[index % keys.length];
-                const fallbackItem = key ? t.locationGallery.items[key] : null;
-                return {
-                  src: photo.imageUrl,
-                  alt: photo.title || fallbackItem?.alt || `Foto ${index + 1}`,
-                  title: photo.title || fallbackItem?.title || `Foto ${index + 1}`
-                };
-              })
-              .filter(img => img.src)}
-            columns={2}
-            aspectRatio="landscape"
-          />
+        </div>
 
+        {/* Galeria Assimétrica se tiver 5+ fotos, senão 1x4 */}
+        {contatoImages.galeriaLocalizacao.length >= 5 ? (
+          <AsymmetricGallery
+            images={contatoImages.galeriaLocalizacao.map((photo: any) => photo.imageUrl).filter((img: string) => img)}
+            interval={4500}
+          />
+        ) : contatoImages.galeriaLocalizacao.length >= 4 ? (
+          <FullWidthGallery
+            images={contatoImages.galeriaLocalizacao.map((photo: any) => photo.imageUrl).filter((img: string) => img)}
+            interval={4000}
+            height="h-[350px] md:h-[450px] lg:h-[550px]"
+          />
+        ) : null}
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mt-12 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <Card>
               <CardContent className="pt-6 text-center">

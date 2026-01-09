@@ -8,7 +8,7 @@ import { Leaf, Users, Heart, Recycle, Droplets, Sun } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
+import { MasonrySwap } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { getSustainability } from "@/lib/hooks/useSustainability";
 import { getGallery } from "@/lib/hooks/useGallery";
@@ -146,7 +146,7 @@ export default function ESGPage() {
         overlay="medium"
       />
 
-      {/* Galeria - Práticas Sustentáveis */}
+      {/* Galeria - Práticas Sustentáveis - MASONRY ANIMADO */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
@@ -158,22 +158,11 @@ export default function ESGPage() {
             </p>
           </div>
           
-          <ImageGalleryGrid
+          <MasonrySwap
             images={esgImages.galeria
-              .map((photo, index) => {
-                const galleryKeys = Object.keys(t.gallery) as Array<keyof typeof t.gallery>;
-                const key = galleryKeys[index % galleryKeys.length];
-                const galleryItem = key ? (t.gallery[key] as { alt?: string; title?: string }) : null;
-                const photoTitle = (photo as any).title;
-                return {
-                  src: photo.imageUrl,
-                  alt: photoTitle || galleryItem?.alt || `Foto ${index + 1}`,
-                  title: photoTitle || galleryItem?.title || `Foto ${index + 1}`
-                };
-              })
-              .filter(img => img.src)}
-            columns={3}
-            aspectRatio="landscape"
+              .map(photo => photo.imageUrl)
+              .filter(img => img && img.trim() !== '')}
+            interval={5000}
           />
         </div>
       </section>

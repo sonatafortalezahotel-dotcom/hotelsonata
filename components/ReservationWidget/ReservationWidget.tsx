@@ -71,6 +71,7 @@ export default function ReservationWidget({
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [showGuestForm, setShowGuestForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Dados do hóspede
   const [guestName, setGuestName] = useState("");
@@ -78,6 +79,11 @@ export default function ReservationWidget({
   const [guestPhone, setGuestPhone] = useState("");
   const [guestDocument, setGuestDocument] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
+
+  // Set mounted state to prevent hydration mismatch with Radix UI IDs
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const labels = {
     pt: {
@@ -400,78 +406,114 @@ export default function ReservationWidget({
         <div className="space-y-3">
           <div className="space-y-2">
             <Label>{t.checkIn}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !checkIn && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkIn ? (
-                    format(checkIn, "dd/MM/yyyy", { locale: dateLocale })
-                  ) : (
-                    <span>{t.selectDate}</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={checkIn || undefined}
-                  onSelect={(date) => {
-                    setCheckIn(date || null);
-                    if (date && checkOut && date >= checkOut) {
-                      setCheckOut(null);
-                    }
-                    setIsAvailable(null);
-                    setShowGuestForm(false);
-                  }}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            {isMounted ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !checkIn && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {checkIn ? (
+                      format(checkIn, "dd/MM/yyyy", { locale: dateLocale })
+                    ) : (
+                      <span>{t.selectDate}</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={checkIn || undefined}
+                    onSelect={(date) => {
+                      setCheckIn(date || null);
+                      if (date && checkOut && date >= checkOut) {
+                        setCheckOut(null);
+                      }
+                      setIsAvailable(null);
+                      setShowGuestForm(false);
+                    }}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !checkIn && "text-muted-foreground"
+                )}
+                disabled
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {checkIn ? (
+                  format(checkIn, "dd/MM/yyyy", { locale: dateLocale })
+                ) : (
+                  <span>{t.selectDate}</span>
+                )}
+              </Button>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label>{t.checkOut}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !checkOut && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkOut ? (
-                    format(checkOut, "dd/MM/yyyy", { locale: dateLocale })
-                  ) : (
-                    <span>{t.selectDate}</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={checkOut || undefined}
-                  onSelect={(date) => {
-                    setCheckOut(date || null);
-                    setIsAvailable(null);
-                    setShowGuestForm(false);
-                  }}
-                  disabled={(date) => {
-                    if (!checkIn) return date < new Date();
-                    return date <= checkIn;
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            {isMounted ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !checkOut && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {checkOut ? (
+                      format(checkOut, "dd/MM/yyyy", { locale: dateLocale })
+                    ) : (
+                      <span>{t.selectDate}</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={checkOut || undefined}
+                    onSelect={(date) => {
+                      setCheckOut(date || null);
+                      setIsAvailable(null);
+                      setShowGuestForm(false);
+                    }}
+                    disabled={(date) => {
+                      if (!checkIn) return date < new Date();
+                      return date <= checkIn;
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !checkOut && "text-muted-foreground"
+                )}
+                disabled
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {checkOut ? (
+                  format(checkOut, "dd/MM/yyyy", { locale: dateLocale })
+                ) : (
+                  <span>{t.selectDate}</span>
+                )}
+              </Button>
+            )}
           </div>
         </div>
 

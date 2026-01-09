@@ -4,9 +4,9 @@ import { useEffect, useState, useMemo } from "react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import RoomsPageContent from "./RoomsPageContent";
+import Image from "next/image";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
-import { PhotoStory } from "@/components/PhotoStory";
+import { EditorialCarousel } from "@/components/HorizontalScroll";
 import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";
 import { getGallery } from "@/lib/hooks/useGallery";
 import { getRooms } from "@/lib/hooks/useRooms";
@@ -132,46 +132,14 @@ export default function RoomsPage() {
         </div>
       </section>
 
-      {/* Galeria Visual de Quartos */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.gallery.title}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t.gallery.subtitle}
-            </p>
-          </div>
-          
-          <ImageGalleryGrid
-            images={[
-              ...quartosImages.gallery.map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title
-                };
-              }),
-              ...rooms.slice(0, 3).map(room => ({
-                src: room.imageUrl || null,
-                alt: room.name || "",
-                title: room.name || ""
-              }))
-            ].filter(img => img.src)}
-            columns={3}
-            aspectRatio="landscape"
-          />
-        </div>
-      </section>
-
-      {/* PhotoStory - Detalhes que Fazem Diferença */}
-      <PhotoStory
-        title={t.photoStory.title}
-        subtitle={t.photoStory.subtitle}
-        backgroundColor="white"
-        items={[
+      {/* Detalhes que Fazem Diferença - CARROSSEL FULLWIDTH */}
+      <EditorialCarousel
+        autoplay={true}
+        autoplayInterval={6000}
+        showNavigation={true}
+        showProgress={true}
+      >
+        {[
           {
             image: quartosImages.photoStory.beds || rooms[0]?.imageUrl || null,
             title: t.photoStory.items.beds.title,
@@ -192,8 +160,29 @@ export default function RoomsPage() {
             title: t.photoStory.items.shared.title,
             description: t.photoStory.items.shared.description,
           },
-        ].filter(item => item.image)}
-      />
+        ]
+          .filter(item => item.image)
+          .map((item, index) => (
+            <div key={index} className="relative w-full h-[500px] md:h-[600px] lg:h-[700px]">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-8 md:bottom-16 left-8 md:left-16 right-8 md:right-16 text-white">
+                <h3 className="text-2xl md:text-4xl font-bold mb-4 drop-shadow-2xl">
+                  {item.title}
+                </h3>
+                <p className="text-lg md:text-xl drop-shadow-lg max-w-3xl">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+      </EditorialCarousel>
 
       {/* Rooms Section */}
       <section className="py-16 lg:py-24">

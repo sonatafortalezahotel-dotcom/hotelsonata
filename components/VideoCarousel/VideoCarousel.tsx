@@ -91,7 +91,7 @@ export default function VideoCarousel({
   }, [videoInfo]);
 
   return (
-    <section className="relative h-[80vh] w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden">
       {/* Video/Image Background */}
       <div className="absolute inset-0 w-full overflow-hidden">
         {currentItem.videoUrl && videoInfo ? (
@@ -103,7 +103,7 @@ export default function VideoCarousel({
               style={{
                 width: '100vw',
                 height: '56.25vw', // Altura para manter proporção 16:9 (100vw * 9/16 = 56.25vw)
-                minHeight: '100%', // Garante que preenche pelo menos a altura do container (80vh)
+                minHeight: '100%', // Garante que preenche pelo menos a altura do container (100vh)
               }}
               allow="autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture"
               allowFullScreen

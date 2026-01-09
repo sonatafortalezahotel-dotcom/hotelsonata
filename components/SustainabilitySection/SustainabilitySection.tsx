@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { EditorialCarousel, EditorialSlide } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
 import { useLanguage } from "@/lib/context/LanguageContext";
 
@@ -49,33 +50,24 @@ export default function SustainabilitySection({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-6xl mx-auto">
-          {displayItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              {item.imageUrl && (
-                <div className="relative w-full">
-                  <AspectRatio ratio={16 / 9}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                    />
-                  </AspectRatio>
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="text-xl lg:text-2xl">{item.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  {item.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+        {/* Carrossel Editorial Fullwidth */}
+        <EditorialCarousel
+          autoplay={false}
+          showNavigation={true}
+          showProgress={true}
+        >
+          {displayItems.map((item, index) => (
+            <EditorialSlide
+              key={item.id}
+              image={item.imageUrl || "/placeholder-sustainability.jpg"}
+              title={item.title}
+              subtitle="Sustentabilidade e Inclusão"
+              description={item.description}
+              textPosition={index % 2 === 0 ? "bottom-left" : "bottom-right"}
+              overlay="medium"
+            />
           ))}
-        </div>
+        </EditorialCarousel>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface HeroProps {
@@ -29,15 +29,21 @@ export default function Hero({
   overlayOpacity = 0.3,
 }: HeroProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [useAPI, setUseAPI] = useState(true); // Tentar usar API primeiro
-  // Usar useId() para gerar ID consistente entre servidor e cliente
-  const generatedId = useId();
-  const containerId = `youtube-player-${generatedId.replace(/:/g, '-')}`;
+  // Use a stable ID to avoid hydration mismatches
+  const containerIdRef = useRef(`youtube-player-${Math.random().toString(36).substr(2, 9)}`);
+  const containerId = containerIdRef.current;
+
+  // Set mounted state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!videoId) return;
+    if (!videoId || !isMounted) return;
 
     const initializePlayer = () => {
       const element = document.getElementById(containerId);
@@ -151,7 +157,7 @@ export default function Hero({
         playerRef.current = null;
       }
     };
-  }, [videoId, containerId]);
+  }, [videoId, containerId, isMounted]);
 
   const heightClasses = {
     full: "h-full",

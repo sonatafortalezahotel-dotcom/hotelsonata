@@ -729,10 +729,10 @@ export const pageTranslations = {
             cta: "Saber Mais"
           },
           sustainability: {
-            title: "Hotel Sustentável",
-            description: "Práticas sustentáveis certificadas, produtos locais e compromisso com o meio ambiente e comunidade.",
-            badge: "ESG",
-            cta: "Nossas Práticas"
+            title: "Pet Friendly",
+            description: "Seu melhor amigo é bem-vindo! Ambiente acolhedor para você e seu pet, com áreas específicas e cuidados especiais.",
+            badge: "Pet Friendly",
+            cta: "Saber Mais"
           }
         }
       },
@@ -1577,10 +1577,10 @@ export const pageTranslations = {
             cta: "Saber Más"
           },
           sustainability: {
-            title: "Hotel Sostenible",
-            description: "Práticas sostenibles certificadas, productos locales y compromiso con el medio ambiente y comunidad.",
-            badge: "ESG",
-            cta: "Nuestras Prácticas"
+            title: "Pet Friendly",
+            description: "¡Tu mejor amigo es bienvenido! Ambiente acogedor para ti y tu mascota, con áreas específicas y cuidados especiales.",
+            badge: "Pet Friendly",
+            cta: "Saber Más"
           }
         }
       },
@@ -2425,10 +2425,10 @@ export const pageTranslations = {
             cta: "Learn More"
           },
           sustainability: {
-            title: "Sustainable Hotel",
-            description: "Certified sustainable practices, local products and commitment to the environment and community.",
-            badge: "ESG",
-            cta: "Our Practices"
+            title: "Pet Friendly",
+            description: "Your best friend is welcome! Welcoming environment for you and your pet, with specific areas and special care.",
+            badge: "Pet Friendly",
+            cta: "Learn More"
           }
         }
       },

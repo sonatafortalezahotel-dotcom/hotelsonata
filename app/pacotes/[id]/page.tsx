@@ -19,6 +19,8 @@ import { Separator } from "@/components/ui/separator";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
+import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
+import { Waves, UtensilsCrossed, Dumbbell, Sparkles } from "lucide-react";
 
 interface Package {
   id: number;
@@ -40,6 +42,8 @@ export default function PackageDetailPage() {
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+  const [heroImage, setHeroImage] = useState<string>("");
 
   const id = params?.id as string;
 
@@ -62,11 +66,19 @@ export default function PackageDetailPage() {
           return;
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        // No cliente, usar URL relativa; no servidor, usar baseUrl
+        const isServer = typeof window === "undefined";
+        const baseUrl = isServer 
+          ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+          : "";
+        
+        console.log('Buscando pacote ID:', packageId, 'Locale:', locale);
         const response = await fetch(
           `${baseUrl}/api/packages/${packageId}?locale=${locale}`,
           { cache: "no-store" }
         );
+        
+        console.log('Resposta da API:', response.status, response.statusText);
 
         let responseData;
         try {
@@ -99,6 +111,54 @@ export default function PackageDetailPage() {
         }
 
         setPkg(responseData);
+        
+        // Se for Day Use, buscar imagens do hotel para o hero e galeria
+        if (responseData.category === "day-use" || responseData.name?.toLowerCase().includes("day use")) {
+          // Buscar imagens do hotel (piscina, lazer, atividades)
+          try {
+            const galleryRes = await fetch('/api/gallery?active=true', {
+              cache: 'no-store'
+            });
+            
+            if (galleryRes.ok) {
+              const galleryData = await galleryRes.json();
+              const hotelImages = Array.isArray(galleryData) ? galleryData.filter((img: any) => {
+                const page = (img.page || "").toLowerCase();
+                const section = (img.section || "").toLowerCase();
+                const category = (img.category || "").toLowerCase();
+                
+                // Buscar imagens de piscina, lazer, atividades, spa, academia
+                return (
+                  page === "lazer" || 
+                  page === "hotel" ||
+                  section.includes("piscina") ||
+                  section.includes("lazer") ||
+                  section.includes("atividades") ||
+                  section.includes("spa") ||
+                  section.includes("academia") ||
+                  category === "piscina" ||
+                  category === "lazer" ||
+                  category === "atividades"
+                );
+              }) : [];
+              
+              setGalleryPhotos(hotelImages);
+              
+              // Usar primeira imagem de piscina ou lazer para o hero, senão usar imagem do hotel
+              const heroPhoto = hotelImages.find((img: any) => 
+                (img.section || "").toLowerCase().includes("piscina") ||
+                (img.section || "").toLowerCase().includes("hero")
+              ) || hotelImages[0];
+              
+              setHeroImage(heroPhoto?.imageUrl || responseData.imageUrl);
+            }
+          } catch (galleryError) {
+            console.error("Erro ao buscar imagens da galeria:", galleryError);
+            setHeroImage(responseData.imageUrl);
+          }
+        } else {
+          setHeroImage(responseData.imageUrl);
+        }
       } catch (err) {
         console.error("Erro ao buscar pacote:", err);
         setError("Erro ao carregar informações do pacote");
@@ -231,7 +291,7 @@ export default function PackageDetailPage() {
       <HeroWithImage
         title={pkg.name}
         subtitle={pkg.description || ""}
-        image={pkg.imageUrl}
+        image={heroImage || pkg.imageUrl}
         imageAlt={pkg.name}
         height="large"
         overlay="medium"
@@ -267,14 +327,6 @@ export default function PackageDetailPage() {
                         </Badge>
                       )}
                     </div>
-                    {pkg.price && (
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">{t.price}</p>
-                        <p className="text-3xl font-bold text-primary">
-                          {formatPrice(pkg.price)}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -287,29 +339,120 @@ export default function PackageDetailPage() {
                       </p>
                     </div>
                   )}
-
-                  <Separator />
-
-                  {/* Período de Validade */}
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">{t.validPeriod}</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Calendar className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t.from}</p>
-                        <p className="font-medium">{formatDate(pkg.startDate)}</p>
-                      </div>
-                      <div className="mx-4 text-muted-foreground">→</div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t.to}</p>
-                        <p className="font-medium">{formatDate(pkg.endDate)}</p>
-                      </div>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
+
+              {/* Galeria de Imagens do Hotel - Apenas para Day Use */}
+              {(pkg.category === "day-use" || pkg.name?.toLowerCase().includes("day use")) && galleryPhotos.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">
+                      {locale === "en" 
+                        ? "Hotel Facilities & Activities" 
+                        : locale === "es" 
+                        ? "Instalaciones y Actividades del Hotel"
+                        : "Instalações e Atividades do Hotel"}
+                    </CardTitle>
+                    <CardDescription>
+                      {locale === "en"
+                        ? "Discover what our hotel has to offer during your day use"
+                        : locale === "es"
+                        ? "Descubra lo que nuestro hotel tiene para ofrecer durante su día de uso"
+                        : "Descubra o que nosso hotel tem a oferecer durante seu day use"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ImageGalleryGrid
+                      images={galleryPhotos.slice(0, 6).map((photo: any) => ({
+                        src: photo.imageUrl,
+                        alt: photo.title || photo.description || "Imagem do hotel",
+                        title: photo.title || "Hotel Sonata"
+                      }))}
+                      columns={3}
+                      aspectRatio="landscape"
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Atividades Disponíveis - Apenas para Day Use */}
+              {(pkg.category === "day-use" || pkg.name?.toLowerCase().includes("day use")) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">
+                      {locale === "en"
+                        ? "Available Activities"
+                        : locale === "es"
+                        ? "Actividades Disponibles"
+                        : "Atividades Disponíveis"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                        <Waves className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold mb-1">
+                            {locale === "en" ? "Pool & Beach Access" : locale === "es" ? "Piscina y Playa" : "Piscina e Praia"}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {locale === "en"
+                              ? "Access to our pool with sea view and nearby beach"
+                              : locale === "es"
+                              ? "Acceso a nuestra piscina con vista al mar y playa cercana"
+                              : "Acesso à nossa piscina com vista para o mar e praia próxima"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                        <UtensilsCrossed className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold mb-1">
+                            {locale === "en" ? "Restaurant & Bar" : locale === "es" ? "Restaurante y Bar" : "Restaurante e Bar"}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {locale === "en"
+                              ? "Enjoy our restaurant and bar services"
+                              : locale === "es"
+                              ? "Disfrute de nuestros servicios de restaurante y bar"
+                              : "Aproveite nossos serviços de restaurante e bar"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                        <Dumbbell className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold mb-1">
+                            {locale === "en" ? "Fitness Center" : locale === "es" ? "Centro de Fitness" : "Academia"}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {locale === "en"
+                              ? "Access to our fully equipped gym"
+                              : locale === "es"
+                              ? "Acceso a nuestro gimnasio completamente equipado"
+                              : "Acesso à nossa academia totalmente equipada"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                        <Sparkles className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-semibold mb-1">
+                            {locale === "en" ? "Leisure Areas" : locale === "es" ? "Áreas de Ocio" : "Áreas de Lazer"}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {locale === "en"
+                              ? "Relax in our leisure and recreation areas"
+                              : locale === "es"
+                              ? "Relájese en nuestras áreas de ocio y recreación"
+                              : "Relaxe em nossas áreas de lazer e recreação"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar - Reserva */}
@@ -319,20 +462,11 @@ export default function PackageDetailPage() {
                   <CardTitle>{t.reserve}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {pkg.price ? (
-                    <div className="text-center py-4 border-b">
-                      <p className="text-sm text-muted-foreground mb-1">{t.price}</p>
-                      <p className="text-3xl font-bold text-primary">
-                        {formatPrice(pkg.price)}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 border-b">
-                      <p className="text-3xl font-bold text-primary">
-                        {t.consult}
-                      </p>
-                    </div>
-                  )}
+                  <div className="text-center py-4 border-b">
+                    <p className="text-3xl font-bold text-primary">
+                      {t.consult}
+                    </p>
+                  </div>
 
                   <Button asChild size="lg" className="w-full">
                     <Link href={`/reservas?package=${pkg.id}`}>

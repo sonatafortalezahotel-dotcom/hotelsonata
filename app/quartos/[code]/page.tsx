@@ -47,8 +47,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
-import { PhotoStory } from "@/components/PhotoStory";
+import { AsymmetricGallery, FullWidthGallery } from "@/components/HorizontalScroll";
 import { ReservationWidget } from "@/components/ReservationWidget";
 import { Lightbox } from "@/components/Lightbox";
 import { RoomHighlights } from "@/components/RoomHighlights";
@@ -432,25 +431,6 @@ export default function RoomDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Galeria */}
-              {galleryImages.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{tPage.gallery}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ImageGalleryGrid
-                      images={galleryImages.map((img, index) => ({
-                        src: img,
-                        alt: `${room.name} - Foto ${index + 1}`,
-                        title: `${room.name} - Foto ${index + 1}`,
-                      }))}
-                      columns={2}
-                      aspectRatio="landscape"
-                    />
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* Sidebar - Widget de Reserva */}
@@ -472,6 +452,32 @@ export default function RoomDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Galeria 1: Horizontal 1x4 (primeiras 4 fotos) */}
+      {galleryImages.length >= 4 && (
+        <FullWidthGallery
+          images={galleryImages.slice(0, 4)}
+          interval={4000}
+          height="h-[350px] md:h-[450px] lg:h-[550px]"
+        />
+      )}
+
+      {/* Galeria 2: Assimétrica Fullwidth (próximas 5 fotos) */}
+      {galleryImages.length >= 9 && (
+        <AsymmetricGallery
+          images={galleryImages.slice(4, 9)}
+          interval={5000}
+        />
+      )}
+
+      {/* Se tiver entre 4-8 fotos, usa só a horizontal com todas */}
+      {galleryImages.length >= 4 && galleryImages.length < 9 && (
+        <FullWidthGallery
+          images={galleryImages.slice(4)}
+          interval={4500}
+          height="h-[350px] md:h-[450px] lg:h-[550px]"
+        />
+      )}
 
       {/* Lightbox */}
       <Lightbox

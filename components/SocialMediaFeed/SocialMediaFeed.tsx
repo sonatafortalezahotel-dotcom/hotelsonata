@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { EditorialCarousel, EditorialSlide } from "@/components/HorizontalScroll";
 import { useLanguage } from "@/lib/context/LanguageContext";
 
 interface SocialMediaPost {
@@ -40,30 +41,41 @@ export default function SocialMediaFeed({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
-          {displayPosts.map((post) => (
+        {/* Carrossel Editorial de Social Media */}
+        <EditorialCarousel
+          autoplay={true}
+          autoplayInterval={4000}
+          showNavigation={true}
+          showProgress={true}
+        >
+          {displayPosts.map((post, index) => (
             <Link
               key={post.id}
               href={post.link || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl"
+              className="block"
             >
-              <AspectRatio ratio={1}>
+              <div className="relative w-full h-[500px] md:h-[600px]">
                 <Image
                   src={post.imageUrl}
                   alt={`Post do ${post.platform}`}
                   fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
                   className="object-cover"
+                  sizes="100vw"
                 />
-              </AspectRatio>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                <Instagram className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Overlay com logo Instagram */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute bottom-8 left-8 md:left-16">
+                  <div className="flex items-center gap-3 text-white">
+                    <Instagram className="h-8 w-8 md:h-10 md:w-10" />
+                    <span className="text-xl md:text-2xl font-bold">@hotelsonata</span>
+                  </div>
+                </div>
               </div>
             </Link>
           ))}
-        </div>
+        </EditorialCarousel>
 
         <div className="text-center mt-8 lg:mt-12">
           <Button

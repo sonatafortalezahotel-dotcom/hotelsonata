@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 interface FeatureImageSectionProps {
   title: string;
   description: string | ReactNode;
-  image: string;
+  image: string | null;
   imageAlt: string;
   badge?: string;
   imagePosition?: "left" | "right";
@@ -77,13 +77,19 @@ export function FeatureImageSection({
           {/* Imagem */}
           <div className={`relative ${imagePosition === "left" ? "lg:order-1" : "order-2"}`}>
             <div className="relative aspect-[4/5] lg:aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl">
-              <Image
-                src={image}
-                alt={imageAlt}
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-700"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+              {image && image.trim() !== "" ? (
+                <Image
+                  src={image}
+                  alt={imageAlt}
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-700"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                  <p className="text-muted-foreground text-sm">Carregando imagem...</p>
+                </div>
+              )}
             </div>
             
             {/* Elemento Decorativo */}
@@ -94,6 +100,7 @@ export function FeatureImageSection({
     </section>
   );
 }
+
 
 
 

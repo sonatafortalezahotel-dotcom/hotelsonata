@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Award, Coffee, UtensilsCrossed, ChefHat } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import Image from "next/image";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
+import { MasonrySwap } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { getGastronomy } from "@/lib/hooks/useGastronomy";
 import { getGallery } from "@/lib/hooks/useGallery";
@@ -188,7 +189,7 @@ export default function GastronomiaPage() {
         </div>
       </section>
 
-      {/* Galeria de Pratos - Café da Manhã */}
+      {/* Galeria de Pratos - Café da Manhã - GRID 1x4 */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
@@ -203,26 +204,46 @@ export default function GastronomiaPage() {
               {t.gallery.breakfast.subtitle}
             </p>
           </div>
-          
-          <ImageGalleryGrid
-            images={gastronomiaImages.galeriaCafe
-              .map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title,
-                };
-              })
-              .filter(
-                (img) =>
-                  img.src &&
-                  typeof img.src === "string" &&
-                  img.src.trim() !== "",
-              )}
-            columns={3}
-            aspectRatio="square"
-          />
+        </div>
+
+        {/* Mobile: Stack */}
+        <div className="grid grid-cols-1 gap-0 lg:hidden">
+          {gastronomiaImages.galeriaCafe
+            .slice(0, 4)
+            .map((photo, index) => (
+              <div key={index} className="group relative overflow-hidden">
+                <div className="relative w-full h-[400px]">
+                  <Image
+                    src={photo.imageUrl}
+                    alt={`Café da manhã ${index + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="100vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {/* Desktop: 4 colunas */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-0">
+          {gastronomiaImages.galeriaCafe
+            .slice(0, 4)
+            .map((photo, index) => (
+              <div key={index} className="group relative overflow-hidden">
+                <div className="relative w-full h-[500px]">
+                  <Image
+                    src={photo.imageUrl}
+                    alt={`Café da manhã ${index + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                </div>
+              </div>
+            ))}
         </div>
       </section>
 
@@ -255,7 +276,7 @@ export default function GastronomiaPage() {
         ]}
       />
 
-      {/* Galeria do Restaurante e Pratos */}
+      {/* Galeria do Restaurante e Pratos - MASONRY ANIMADO */}
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
@@ -271,24 +292,11 @@ export default function GastronomiaPage() {
             </p>
           </div>
           
-          <ImageGalleryGrid
+          <MasonrySwap
             images={gastronomiaImages.galeriaRestaurante
-              .map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title,
-                };
-              })
-              .filter(
-                (img) =>
-                  img.src &&
-                  typeof img.src === "string" &&
-                  img.src.trim() !== "",
-              )}
-            columns={3}
-            aspectRatio="landscape"
+              .map(photo => photo.imageUrl)
+              .filter(img => img && typeof img === "string" && img.trim() !== "")}
+            interval={4500}
           />
         </div>
       </section>

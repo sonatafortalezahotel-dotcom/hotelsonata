@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import RoomCard from "@/components/RoomCard";
 import { RoomCardSkeleton } from "@/components/LoadingStates";
+import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface Room {
   id: number;
@@ -81,11 +82,28 @@ export default function RoomsPageContent() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-      {rooms.map((room) => (
-        <RoomCard key={room.id} room={room} />
-      ))}
-    </div>
+    <>
+      {/* Mobile: Scroll Horizontal */}
+      <div className="lg:hidden">
+        <HorizontalScroll 
+          itemWidth="85" 
+          showArrows={false} 
+          showDots={true}
+          gap={4}
+        >
+          {rooms.map((room) => (
+            <RoomCard key={room.id} room={room} />
+          ))}
+        </HorizontalScroll>
+      </div>
+
+      {/* Desktop: Grid Normal */}
+      <div className="hidden lg:grid lg:grid-cols-3 gap-6 md:gap-8">
+        {rooms.map((room) => (
+          <RoomCard key={room.id} room={room} />
+        ))}
+      </div>
+    </>
   );
 }
 

@@ -9,9 +9,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br"
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }> | { id: string };
 }): Promise<Metadata> {
-  const packageId = parseInt(params.id);
+  // Next.js 15+ pode retornar params como Promise
+  const resolvedParams = params instanceof Promise ? await params : params;
+  const packageId = parseInt(resolvedParams.id);
   
   if (isNaN(packageId)) {
     return {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ElegantCarousel } from "@/components/HorizontalScroll";
 import { useLanguage } from "@/lib/context/LanguageContext";
 
 interface Certification {
@@ -38,7 +39,47 @@ export default function CertificationsSection({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto">
+        {/* Mobile/Tablet: Carrossel Elegante */}
+        <div className="lg:hidden group">
+          <ElegantCarousel
+            itemWidth="small"
+            showNavigation={true}
+            showProgress={true}
+            progressType="minimal"
+            centerMode={false}
+            gap={4}
+          >
+            {items.map((cert) => (
+              <Card key={cert.id} className="flex flex-col items-center text-center hover:shadow-lg transition-all duration-300 h-full">
+                <CardHeader className="pb-4">
+                  <div className="relative w-24 h-24 mx-auto">
+                    <AspectRatio ratio={1}>
+                      <Image
+                        src={cert.imageUrl}
+                        alt={cert.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </AspectRatio>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <CardTitle className="text-base mb-2">
+                    {cert.name}
+                  </CardTitle>
+                  {cert.description && (
+                    <CardDescription className="text-sm">
+                      {cert.description}
+                    </CardDescription>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </ElegantCarousel>
+        </div>
+
+        {/* Desktop: Grid */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {items.map((cert) => (
             <Card key={cert.id} className="flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="pb-4">

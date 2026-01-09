@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface ImageGalleryGridProps {
   images: Array<{
@@ -59,7 +60,46 @@ export function ImageGalleryGrid({
 
   return (
     <>
-      <div className={`grid ${columnsClass[columns]} gap-4`}>
+      {/* Mobile: Scroll Horizontal */}
+      <div className="lg:hidden">
+        <HorizontalScroll 
+          itemWidth="85" 
+          showArrows={false} 
+          showDots={true}
+          gap={4}
+        >
+          {validImages.map((image, index) => (
+            <div
+              key={index}
+              className="group relative overflow-hidden rounded-lg cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 h-full"
+              onClick={() => openLightbox(index)}
+            >
+              <div className={`relative ${aspectRatioClass[aspectRatio]} w-full`}>
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  sizes="85vw"
+                />
+                {/* Overlay com efeito hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-4 left-4 right-4">
+                    {image.title && (
+                      <p className="text-white font-semibold text-sm drop-shadow-lg">
+                        {image.title}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </HorizontalScroll>
+      </div>
+
+      {/* Desktop: Grid Normal */}
+      <div className={`hidden lg:grid ${columnsClass[columns]} gap-4`}>
         {validImages.map((image, index) => (
           <div
             key={index}

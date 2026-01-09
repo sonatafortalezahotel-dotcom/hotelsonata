@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Users, Heart, PartyPopper, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat } from "lucide-react";
 import { RoomCapacityTable } from "@/components/RoomCapacityTable";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
+import { MasonrySwap } from "@/components/HorizontalScroll";
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
@@ -171,7 +171,7 @@ export default function EventosPage() {
         overlay="dark"
       />
 
-      {/* Galeria Visual de Espaços */}
+      {/* Galeria Visual de Espaços - MASONRY ANIMADO */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
@@ -187,19 +187,11 @@ export default function EventosPage() {
             </p>
           </div>
           
-          <ImageGalleryGrid
+          <MasonrySwap
             images={eventosImages.gallery
-              .map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title
-                };
-              })
-              .filter(img => img.src && typeof img.src === 'string' && img.src.trim() !== '')}
-            columns={3}
-            aspectRatio="landscape"
+              .map(photo => photo.imageUrl)
+              .filter(img => img && typeof img === 'string' && img.trim() !== '')}
+            interval={5000}
           />
         </div>
       </section>

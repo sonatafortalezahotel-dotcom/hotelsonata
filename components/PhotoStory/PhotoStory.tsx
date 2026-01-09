@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { ElegantCarousel } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
 
 interface PhotoStoryItem {
@@ -71,10 +72,74 @@ export function PhotoStory({
           )}
         </div>
 
-        {/* Grid de Histórias */}
+        {/* Mobile: Carrossel Elegante */}
+        <div className="lg:hidden group">
+          <ElegantCarousel
+            itemWidth="full"
+            showNavigation={true}
+            showProgress={true}
+            progressType="minimal"
+            centerMode={true}
+            autoplay={false}
+            gap={6}
+          >
+            {items.map((item, index) => (
+              <div
+                key={index}
+                className="group/item relative px-2"
+              >
+                {/* Imagem */}
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl mb-6">
+                  {item.image && item.image.trim() !== "" ? (
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                      sizes="100vw"
+                      priority={index === 0}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                      <span className="text-muted-foreground/50 text-sm">{item.title}</span>
+                    </div>
+                  )}
+                  
+                  {/* Overlay com horário */}
+                  {item.time && (
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1.5 bg-black/70 text-white rounded-full text-xs font-semibold backdrop-blur-sm">
+                        {item.time}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Número do Item */}
+                  <div className="absolute top-4 right-4">
+                    <span className="w-8 h-8 rounded-full bg-primary/90 text-white flex items-center justify-center text-sm font-bold">
+                      {index + 1}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Conteúdo */}
+                <div className="space-y-3 px-2">
+                  <h3 className="text-xl font-bold text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </ElegantCarousel>
+        </div>
+
+        {/* Desktop: Grid com Scroll Progressivo */}
         <div 
           ref={containerRef}
-          className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto"
+          className="hidden lg:grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto"
         >
           {items.map((item, index) => (
             <div
@@ -90,7 +155,7 @@ export function PhotoStory({
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    sizes="50vw"
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
