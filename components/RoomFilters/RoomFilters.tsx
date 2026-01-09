@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Waves, Eye, X } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
@@ -48,7 +47,6 @@ export default function RoomFilters({
       seaView: "Vista Mar",
       balcony: "Varanda",
       clear: "Limpar Filtros",
-      apply: "Aplicar",
     },
     es: {
       title: "Filtros",
@@ -58,7 +56,6 @@ export default function RoomFilters({
       seaView: "Vista al Mar",
       balcony: "Balcón",
       clear: "Limpiar Filtros",
-      apply: "Aplicar",
     },
     en: {
       title: "Filters",
@@ -68,45 +65,46 @@ export default function RoomFilters({
       seaView: "Ocean View",
       balcony: "Balcony",
       clear: "Clear Filters",
-      apply: "Apply",
     },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.pt;
 
   const handlePriceChange = (values: number[]) => {
-    setLocalFilters({
+    const newFilters = {
       ...localFilters,
       minPrice: values[0],
       maxPrice: values[1],
-    });
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters); // Aplicar automaticamente
   };
 
   const handleFeatureChange = (feature: "hasSeaView" | "hasBalcony", checked: boolean) => {
-    setLocalFilters({
+    const newFilters = {
       ...localFilters,
       [feature]: checked ? true : undefined,
-    });
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters); // Aplicar automaticamente
   };
 
   const handleAmenityChange = (amenity: string, checked: boolean) => {
     const currentAmenities = localFilters.amenities || [];
-    setLocalFilters({
+    const newFilters = {
       ...localFilters,
       amenities: checked
         ? [...currentAmenities, amenity]
         : currentAmenities.filter((a) => a !== amenity),
-    });
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters); // Aplicar automaticamente
   };
 
   const handleClear = () => {
     const cleared: RoomFilters = {};
     setLocalFilters(cleared);
     onFiltersChange(cleared);
-  };
-
-  const handleApply = () => {
-    onFiltersChange(localFilters);
   };
 
   const hasActiveFilters = 
@@ -227,15 +225,6 @@ export default function RoomFilters({
                 ))}
               </div>
             </div>
-          </>
-        )}
-
-        {hasActiveFilters && (
-          <>
-            <Separator />
-            <Button onClick={handleApply} className="w-full">
-              {t.apply}
-            </Button>
           </>
         )}
       </CardContent>
