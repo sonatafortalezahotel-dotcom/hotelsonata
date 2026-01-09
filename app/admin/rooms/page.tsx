@@ -30,6 +30,7 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { GalleryUpload } from "@/components/admin/GalleryUpload";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ImagePreview } from "@/components/admin/ImagePreview";
+import { AmenitiesCombobox } from "@/components/admin/AmenitiesCombobox";
 import {
   Tooltip,
   TooltipContent,
@@ -244,7 +245,6 @@ function RoomForm({
     active: item?.active ?? true,
     order: item?.order || 0,
   });
-  const [newAmenity, setNewAmenity] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Atualizar formData quando o item mudar
@@ -285,23 +285,6 @@ function RoomForm({
       });
     }
   }, [item]);
-
-  const addAmenity = () => {
-    if (newAmenity.trim() && !formData.amenities.includes(newAmenity.trim())) {
-      setFormData({
-        ...formData,
-        amenities: [...formData.amenities, newAmenity.trim()],
-      });
-      setNewAmenity("");
-    }
-  };
-
-  const removeAmenity = (index: number) => {
-    setFormData({
-      ...formData,
-      amenities: formData.amenities.filter((_, i) => i !== index),
-    });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -491,54 +474,12 @@ function RoomForm({
         </div>
 
         {/* Amenidades */}
-        <div className="space-y-2">
-          <Label htmlFor="amenities">Amenidades</Label>
-          <div className="flex gap-2">
-            <Input
-              id="amenities"
-              value={newAmenity}
-              onChange={(e) => setNewAmenity(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addAmenity();
-                }
-              }}
-              placeholder="Ex: WiFi, Ar Condicionado, TV Smart..."
-            />
-            <Button
-              type="button"
-              onClick={addAmenity}
-              variant="outline"
-              disabled={!newAmenity.trim()}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-          {formData.amenities.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2 p-3 border rounded-lg bg-muted/50">
-              {formData.amenities.map((amenity, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="flex items-center gap-1 pr-1"
-                >
-                  {amenity}
-                  <button
-                    type="button"
-                    onClick={() => removeAmenity(index)}
-                    className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-          <p className="text-xs text-muted-foreground">
-            Adicione as amenidades do quarto. Pressione Enter ou clique no botão + para adicionar.
-          </p>
-        </div>
+        <AmenitiesCombobox
+          value={formData.amenities}
+          onChange={(amenities) => setFormData({ ...formData, amenities })}
+          label="Amenidades"
+          placeholder="Buscar ou adicionar amenidade..."
+        />
 
         {/* Ordem */}
         <div className="space-y-2">
