@@ -16,7 +16,7 @@ import { useGallery } from "@/lib/hooks/useGallery";
 export default function ESGPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "esg");
-  const { sustainability, loading: sustainabilityLoading } = useSustainability(true, locale);
+  const { sustainability, loading: sustainabilityLoading } = useSustainability(true);
   const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
   const loading = sustainabilityLoading || galleryLoading;
 
