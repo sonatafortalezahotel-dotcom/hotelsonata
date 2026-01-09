@@ -63,8 +63,8 @@ export default function RoomsPageContent() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        {[...Array(8)].map((_, i) => (
           <RoomCardSkeleton key={i} />
         ))}
       </div>
@@ -98,7 +98,7 @@ export default function RoomsPageContent() {
       </div>
 
       {/* Desktop: Grid Normal */}
-      <div className="hidden lg:grid lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="hidden lg:grid lg:grid-cols-4 gap-6 md:gap-8">
         {rooms.map((room) => (
           <RoomCard key={room.id} room={room} />
         ))}
