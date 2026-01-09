@@ -156,8 +156,6 @@ export default function RoomFilters({
           </div>
         </div>
 
-        <Separator />
-
         {/* Características */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">{t.features}</Label>
@@ -199,9 +197,7 @@ export default function RoomFilters({
 
         {/* Amenidades */}
         {availableAmenities.length > 0 && (
-          <>
-            <Separator />
-            <div className="space-y-3">
+          <div className="space-y-3">
               <Label className="text-base font-semibold">{t.amenities}</Label>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {availableAmenities.map((amenity) => (
@@ -224,8 +220,7 @@ export default function RoomFilters({
                   </div>
                 ))}
               </div>
-            </div>
-          </>
+          </div>
         )}
       </CardContent>
     </Card>
