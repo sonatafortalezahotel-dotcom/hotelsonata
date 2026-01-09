@@ -15,9 +15,6 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   
-  // Otimizar compilação
-  swcMinify: true,
-  
   // Otimizar imports de pacotes grandes
   experimental: {
     optimizePackageImports: [
