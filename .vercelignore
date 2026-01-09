@@ -1,0 +1,44 @@
+# Arquivos de documentação
+*.md
+!README.md
+
+# Scripts de desenvolvimento
+scripts/
+
+# Arquivos de análise
+ANALISE_*.md
+RELATORIO_*.md
+RESUMO_*.md
+GUIA_*.md
+IMPLEMENTACAO_*.md
+MIGRACAO_*.md
+PLANO_*.md
+SISTEMA_*.md
+DOCUMENTACAO_*.md
+DESIGN_*.md
+IDENTIDADE_*.md
+IMAGENS_*.md
+ORIGEM_*.md
+PRIORIDADE_*.md
+REFATORACAO_*.md
+REVISAO_*.md
+CARROSEIS_*.md
+FOTOS_*.md
+MAPEAMENTO_*.md
+MELHORIAS_*.md
+PROGRESSO_*.md
+
+# Arquivos de configuração local
+.env.local
+.env*.local
+envlocal.md
+
+# Drizzle
+drizzle/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*

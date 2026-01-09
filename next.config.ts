@@ -14,6 +14,21 @@ const nextConfig: NextConfig = {
   // Otimizações de performance
   compress: true,
   poweredByHeader: false,
+  
+  // Otimizar compilação
+  swcMinify: true,
+  
+  // Otimizar imports de pacotes grandes
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-select',
+      '@radix-ui/react-command',
+      'date-fns',
+    ],
+  },
 };
 
 export default nextConfig;
