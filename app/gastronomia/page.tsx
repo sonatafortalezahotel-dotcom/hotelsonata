@@ -10,16 +10,16 @@ import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { MasonrySwap } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
-import { getGastronomy } from "@/lib/hooks/useGastronomy";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useGastronomy } from "@/lib/hooks/useGastronomy";
+import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 
 export default function GastronomiaPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "gastronomy");
-  const [gastronomy, setGastronomy] = useState<any[]>([]);
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { gastronomy, loading: gastronomyLoading } = useGastronomy(true, locale);
+  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const loading = gastronomyLoading || galleryLoading;
 
   // Buscar todas as imagens usando useMemo
   const gastronomiaImages = useMemo(() => {
@@ -67,20 +67,6 @@ export default function GastronomiaPage() {
       },
     };
   }, [galleryPhotos]);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const [gastronomyData, galleryData] = await Promise.all([
-        getGastronomy(true, locale),
-        getGallery()
-      ]);
-      setGastronomy(gastronomyData);
-      setGalleryPhotos(galleryData);
-      setLoading(false);
-    }
-    fetchData();
-  }, [locale]);
 
   return (
     <>

@@ -10,15 +10,15 @@ import { getPageTranslation } from "@/lib/translations/pages";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { MasonrySwap } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
-import { getSustainability } from "@/lib/hooks/useSustainability";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useSustainability } from "@/lib/hooks/useSustainability";
+import { useGallery } from "@/lib/hooks/useGallery";
 
 export default function ESGPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "esg");
-  const [sustainability, setSustainability] = useState<any[]>([]);
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { sustainability, loading: sustainabilityLoading } = useSustainability(true, locale);
+  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const loading = sustainabilityLoading || galleryLoading;
 
   // Buscar todas as imagens usando useMemo
   const esgImages = useMemo(() => {
@@ -75,20 +75,6 @@ export default function ESGPage() {
       acoesSociais: acoesSociaisPhoto?.imageUrl || null,
     };
   }, [galleryPhotos]);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const [sustainabilityData, galleryData] = await Promise.all([
-        getSustainability(true),
-        getGallery()
-      ]);
-      setSustainability(sustainabilityData);
-      setGalleryPhotos(galleryData);
-      setLoading(false);
-    }
-    fetchData();
-  }, []);
 
   const sustainabilityActions = [
     {

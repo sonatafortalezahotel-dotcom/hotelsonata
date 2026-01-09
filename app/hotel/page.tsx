@@ -14,7 +14,7 @@ import { HeroWithImage } from "@/components/HeroWithImage";
 import { FeatureImageSection } from "@/components/FeatureImageSection";
 import { AsymmetricGallery } from "@/components/HorizontalScroll";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
@@ -22,8 +22,7 @@ export default function HotelPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "hotel");
   const photoTracker = usePhotoTracker();
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { photos: galleryPhotos, loading } = useGallery();
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const [currentTimelineIndex, setCurrentTimelineIndex] = useState(0);
 
@@ -52,16 +51,6 @@ export default function HotelPage() {
       })(),
     };
   }, [galleryPhotos, photoTracker]);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const galleryData = await getGallery();
-      setGalleryPhotos(galleryData);
-      setLoading(false);
-    }
-    fetchData();
-  }, []);
 
   const diferenciais = [
     {

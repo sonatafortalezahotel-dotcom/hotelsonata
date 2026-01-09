@@ -13,17 +13,17 @@ import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { EditorialCarousel } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
-import { getLeisure } from "@/lib/hooks/useLeisure";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useLeisure } from "@/lib/hooks/useLeisure";
+import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 
 export default function LazerPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "leisure");
   const tServices = getPageTranslation(locale, "leisureServices");
-  const [leisure, setLeisure] = useState<any[]>([]);
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { leisure, loading: leisureLoading } = useLeisure(true, locale);
+  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const loading = leisureLoading || galleryLoading;
 
   // Buscar todas as imagens usando useMemo
   const lazerImages = useMemo(() => {
@@ -128,20 +128,6 @@ export default function LazerPage() {
       },
     };
   }, [lazerImages]);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const [leisureData, galleryData] = await Promise.all([
-        getLeisure(true, locale),
-        getGallery()
-      ]);
-      setLeisure(leisureData);
-      setGalleryPhotos(galleryData);
-      setLoading(false);
-    }
-    fetchData();
-  }, [locale]);
 
   // Mapear dados do banco para o formato esperado
   const leisureActivities = useMemo(() => {

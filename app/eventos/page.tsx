@@ -15,16 +15,16 @@ import { MasonrySwap } from "@/components/HorizontalScroll";
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
-import { getEvents } from "@/lib/hooks/useEvents";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useEvents } from "@/lib/hooks/useEvents";
+import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 
 export default function EventosPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "events");
-  const [events, setEvents] = useState<any[]>([]);
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { events, loading: eventsLoading } = useEvents(true, locale);
+  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const loading = eventsLoading || galleryLoading;
   const [mounted, setMounted] = useState(false);
 
   // Buscar todas as imagens usando useMemo para evitar múltiplas chamadas
@@ -80,18 +80,7 @@ export default function EventosPage() {
 
   useEffect(() => {
     setMounted(true);
-    async function fetchData() {
-      setLoading(true);
-      const [eventsData, galleryData] = await Promise.all([
-        getEvents(true, locale),
-        getGallery()
-      ]);
-      setEvents(eventsData);
-      setGalleryPhotos(galleryData);
-      setLoading(false);
-    }
-    fetchData();
-  }, [locale]);
+  }, []);
 
   const facilities = [
     {

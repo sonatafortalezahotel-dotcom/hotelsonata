@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { useEffect, useState, useMemo } from "react";
-import { getGallery } from "@/lib/hooks/useGallery";
+import { useGallery } from "@/lib/hooks/useGallery";
 
 // Função para buscar informações de contato
 async function getContactInfo() {
@@ -57,7 +57,7 @@ export default function ContatoPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "contact");
   const [contactInfo, setContactInfo] = useState<any>(null);
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+  const { photos: galleryPhotos } = useGallery();
 
   // Buscar todas as imagens usando useMemo
   const contatoImages = useMemo(() => {
@@ -103,15 +103,33 @@ export default function ContatoPage() {
   }, [galleryPhotos]);
 
   useEffect(() => {
-    async function fetchData() {
-      const [info, gallery] = await Promise.all([
-        getContactInfo(),
-        getGallery()
-      ]);
-      setContactInfo(info);
-      setGalleryPhotos(gallery);
+    async function fetchContactData() {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          // Converter array de settings em objeto
+          if (Array.isArray(data)) {
+            const settingsMap = data.reduce((acc: any, item: any) => {
+              acc[item.key] = item.value;
+              return acc;
+            }, {});
+            
+            setContactInfo({
+              address: settingsMap.address || '',
+              phone: settingsMap.phone || '',
+              whatsapp: settingsMap.whatsapp || '',
+              email: settingsMap.email || '',
+              instagram: settingsMap.instagram || '',
+              facebook: settingsMap.facebook || '',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar informações de contato:', error);
+      }
     }
-    fetchData();
+    fetchContactData();
   }, []);
 
   return (

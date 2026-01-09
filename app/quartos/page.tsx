@@ -8,16 +8,16 @@ import Image from "next/image";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { EditorialCarousel } from "@/components/HorizontalScroll";
 import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";
-import { getGallery } from "@/lib/hooks/useGallery";
-import { getRooms } from "@/lib/hooks/useRooms";
+import { useGallery } from "@/lib/hooks/useGallery";
+import { useRooms } from "@/lib/hooks/useRooms";
 import { getGalleryImageTitle } from "@/lib/utils";
 
 export default function RoomsPage() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "rooms");
-  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const { rooms, loading: roomsLoading } = useRooms(true, locale);
+  const loading = galleryLoading || roomsLoading;
 
   // Buscar todas as imagens usando useMemo para evitar múltiplas chamadas
   const quartosImages = useMemo(() => {
@@ -74,20 +74,6 @@ export default function RoomsPage() {
       },
     };
   }, [galleryPhotos]);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const [galleryData, roomsData] = await Promise.all([
-        getGallery(),
-        getRooms(true, locale)
-      ]);
-      setGalleryPhotos(galleryData);
-      setRooms(roomsData);
-      setLoading(false);
-    }
-    fetchData();
-  }, [locale]);
 
   return (
     <>
