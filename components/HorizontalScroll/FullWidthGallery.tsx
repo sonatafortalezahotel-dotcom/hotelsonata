@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface FullWidthGalleryProps {
   images: string[];
@@ -50,29 +51,26 @@ export function FullWidthGallery({
     return null;
   }
 
-  if (images.length < 4) {
-    return (
-      <div className="grid grid-cols-2 gap-0">
-        {images.map((img, i) => (
-          <div key={i} className={cn("relative", height)}>
-            <Image src={img} alt="" fill className="object-cover" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  // Preparar todas as imagens (mapear para formato usado no carrossel)
+  const allImages = images.length >= 4 
+    ? positions.map((imageIndex) => images[imageIndex % images.length])
+    : images;
 
   return (
     <section className={cn("relative w-full", className)}>
-      {/* Mobile: Grid 2x2 */}
-      <div className="grid grid-cols-2 gap-0 lg:hidden">
-        {positions.map((imageIndex, positionIndex) => {
-          const imageSrc = images[imageIndex % images.length];
-          return (
+      {/* Mobile: Carrossel Horizontal */}
+      <div className="lg:hidden">
+        <HorizontalScroll 
+          itemWidth="85" 
+          showArrows={false} 
+          showDots={true}
+          gap={4}
+        >
+          {allImages.map((imageSrc, index) => (
             <div
-              key={`${positionIndex}-${imageIndex}`}
+              key={index}
               className={cn(
-                "relative overflow-hidden group cursor-pointer",
+                "relative overflow-hidden group cursor-pointer rounded-lg",
                 "h-[40vh]",
                 "transition-all duration-500",
                 isAnimating && "opacity-80 scale-95"
@@ -80,23 +78,24 @@ export function FullWidthGallery({
             >
               <Image
                 src={imageSrc}
-                alt={`Imagem ${imageIndex + 1}`}
+                alt={`Imagem ${index + 1}`}
                 fill
                 className={cn(
-                  "object-cover",
+                  "object-cover rounded-lg",
                   "transition-transform duration-700",
                   "group-hover:scale-110"
                 )}
-                sizes="50vw"
+                sizes="85vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
             </div>
-          );
-        })}
+          ))}
+        </HorizontalScroll>
       </div>
 
-      {/* Desktop: Horizontal 1x4 */}
-      <div className={cn("hidden lg:grid lg:grid-cols-4 gap-0", height)}>
+      {/* Desktop: Grid Horizontal 1x4 */}
+      {images.length >= 4 ? (
+        <div className={cn("hidden lg:grid lg:grid-cols-4 gap-0", height)}>
         {positions.map((imageIndex, positionIndex) => {
           const imageSrc = images[imageIndex % images.length];
           return (
@@ -124,7 +123,21 @@ export function FullWidthGallery({
             </div>
           );
         })}
-      </div>
+        </div>
+      ) : (
+        <div className={cn("hidden lg:grid lg:grid-cols-2 gap-0", height)}>
+          {images.map((img, i) => (
+            <div key={i} className={cn("relative overflow-hidden group cursor-pointer")}>
+              <Image 
+                src={img} 
+                alt={`Imagem ${i + 1}`} 
+                fill 
+                className="object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

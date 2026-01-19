@@ -464,51 +464,58 @@ export default function Home() {
 
       {/* PhotoStory - Um Dia no Hotel - GRID 1x4 FULLWIDTH */}
       <section className="relative overflow-hidden">
-        {/* Mobile: Stack vertical */}
-        <div className="grid grid-cols-1 gap-0 lg:hidden">
-          {homeImages.photoStoryPhotos
-            .slice(0, 4)
-          .map((photo, index) => {
-            const items = [
-              { title: t.photoStory.items.sunrise.title, description: t.photoStory.items.sunrise.description, time: t.photoStory.items.sunrise.time },
-              { title: t.photoStory.items.breakfast.title, description: t.photoStory.items.breakfast.description, time: t.photoStory.items.breakfast.time },
-              { title: t.photoStory.items.bike.title, description: t.photoStory.items.bike.description, time: t.photoStory.items.bike.time },
-                { title: t.photoStory.items.beachTennis.title, description: t.photoStory.items.beachTennis.description, time: t.photoStory.items.beachTennis.time }
-            ];
-            const item = items[index] || items[0];
-              
-              if (!photo.imageUrl || photo.imageUrl.trim() === '') return null;
-              
-              return (
-                <div key={index} className="group relative overflow-hidden">
-                  <div className="relative w-full h-[400px]">
-                    <Image
-                      src={photo.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="100vw"
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    
-                    {/* Texto */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-6">
-                      <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">
-                        {item.time}
-                      </span>
-                      <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">
-                        {item.title}
-                      </h3>
-                      <p className="text-white/90 text-sm leading-relaxed">
-                        {item.description}
-                      </p>
+        {/* Mobile: Carrossel Horizontal */}
+        <div className="lg:hidden">
+          <HorizontalScroll 
+            itemWidth="full" 
+            showArrows={false} 
+            showDots={true}
+            gap={0}
+          >
+            {homeImages.photoStoryPhotos
+              .slice(0, 4)
+              .map((photo, index) => {
+                const items = [
+                  { title: t.photoStory.items.sunrise.title, description: t.photoStory.items.sunrise.description, time: t.photoStory.items.sunrise.time },
+                  { title: t.photoStory.items.breakfast.title, description: t.photoStory.items.breakfast.description, time: t.photoStory.items.breakfast.time },
+                  { title: t.photoStory.items.bike.title, description: t.photoStory.items.bike.description, time: t.photoStory.items.bike.time },
+                  { title: t.photoStory.items.beachTennis.title, description: t.photoStory.items.beachTennis.description, time: t.photoStory.items.beachTennis.time }
+                ];
+                const item = items[index] || items[0];
+                
+                if (!photo.imageUrl || photo.imageUrl.trim() === '') return null;
+                
+                return (
+                  <div key={index} className="group relative overflow-hidden">
+                    <div className="relative w-full h-[400px]">
+                      <Image
+                        src={photo.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="100vw"
+                      />
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      
+                      {/* Texto */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-6">
+                        <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">
+                          {item.time}
+                        </span>
+                        <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">
+                          {item.title}
+                        </h3>
+                        <p className="text-white/90 text-sm leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-            .filter(item => item !== null)}
+                );
+              })
+              .filter(item => item !== null)}
+          </HorizontalScroll>
         </div>
 
         {/* Desktop: 4 colunas lado a lado sem espaço */}

@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface Photo {
   id: number;
@@ -93,10 +94,59 @@ export default function MasonryGallery({
             )}
           </div>
 
-          {/* Masonry Grid - Layout moderno com colunas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-fr">
+          {/* Mobile: Carrossel Horizontal */}
+          <div className="lg:hidden">
+            <HorizontalScroll 
+              itemWidth="85" 
+              showArrows={false} 
+              showDots={true}
+              gap={4}
+            >
+              {validPhotos.map((photo, index) => (
+                <div
+                  key={photo.id}
+                  className="group relative overflow-hidden rounded-xl cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                  onClick={() => openLightbox(index)}
+                >
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src={photo.imageUrl}
+                      alt={photo.title || `Foto ${index + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="85vw"
+                      loading="lazy"
+                    />
+                    {/* Overlay com efeito hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        {photo.title && (
+                          <p className="text-white font-semibold text-base drop-shadow-lg mb-2">
+                            {photo.title}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 text-white/90 text-sm">
+                          <ZoomIn className="h-4 w-4" />
+                          <span>
+                            {locale === "pt" 
+                              ? "Clique para ampliar" 
+                              : locale === "es" 
+                              ? "Haz clic para ampliar" 
+                              : "Click to enlarge"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </HorizontalScroll>
+          </div>
+
+          {/* Desktop: Masonry Grid - Layout moderno com colunas */}
+          <div className="hidden lg:grid lg:grid-cols-3 gap-6 auto-rows-fr">
             {columns.map((columnPhotos, columnIndex) => (
-              <div key={columnIndex} className="flex flex-col gap-4 lg:gap-6">
+              <div key={columnIndex} className="flex flex-col gap-6">
                 {columnPhotos.map((photo, photoIndex) => {
                   const globalIndex = columnIndex + photoIndex * 3;
                   const heightMultiplier = getImageHeight(globalIndex);
@@ -115,14 +165,14 @@ export default function MasonryGallery({
                           alt={photo.title || `Foto ${globalIndex + 1}`}
                           fill
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          sizes="33vw"
                           loading="lazy"
                         />
                         {/* Overlay com efeito hover */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
+                          <div className="absolute bottom-0 left-0 right-0 p-6">
                             {photo.title && (
-                              <p className="text-white font-semibold text-base lg:text-lg drop-shadow-lg mb-2">
+                              <p className="text-white font-semibold text-lg drop-shadow-lg mb-2">
                                 {photo.title}
                               </p>
                             )}

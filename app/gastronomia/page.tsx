@@ -8,7 +8,7 @@ import { getPageTranslation } from "@/lib/translations/pages";
 import Image from "next/image";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { MasonrySwap } from "@/components/HorizontalScroll";
+import { MasonrySwap, HorizontalScroll } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { useGastronomy } from "@/lib/hooks/useGastronomy";
 import { useGallery } from "@/lib/hooks/useGallery";
@@ -192,24 +192,31 @@ export default function GastronomiaPage() {
           </div>
         </div>
 
-        {/* Mobile: Stack */}
-        <div className="grid grid-cols-1 gap-0 lg:hidden">
-          {gastronomiaImages.galeriaCafe
-            .slice(0, 4)
-            .map((photo, index) => (
-              <div key={index} className="group relative overflow-hidden">
-                <div className="relative w-full h-[400px]">
-                  <Image
-                    src={photo.imageUrl}
-                    alt={`Café da manhã ${index + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Mobile: Carrossel Horizontal */}
+        <div className="lg:hidden">
+          <HorizontalScroll 
+            itemWidth="full" 
+            showArrows={false} 
+            showDots={true}
+            gap={0}
+          >
+            {gastronomiaImages.galeriaCafe
+              .slice(0, 4)
+              .map((photo, index) => (
+                <div key={index} className="group relative overflow-hidden">
+                  <div className="relative w-full h-[400px]">
+                    <Image
+                      src={photo.imageUrl}
+                      alt={`Café da manhã ${index + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="100vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+          </HorizontalScroll>
         </div>
 
         {/* Desktop: 4 colunas */}

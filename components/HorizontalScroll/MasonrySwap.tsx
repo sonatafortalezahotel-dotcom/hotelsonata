@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface MasonrySwapProps {
   images: string[];
@@ -45,14 +46,37 @@ export function MasonrySwap({
     return () => clearInterval(timer);
   }, [images.length, interval]);
 
+  // Preparar todas as imagens para o carrossel mobile
+  const allImages = images.length >= 4 
+    ? positions.map((imageIndex) => images[imageIndex % images.length])
+    : images;
+
   if (images.length < 4) {
     return (
-      <div className="grid grid-cols-2 gap-0">
-        {images.map((img, i) => (
-          <div key={i} className="relative aspect-square">
-            <Image src={img} alt="" fill className="object-cover" />
-          </div>
-        ))}
+      <div>
+        {/* Mobile: Carrossel */}
+        <div className="lg:hidden">
+          <HorizontalScroll 
+            itemWidth="85" 
+            showArrows={false} 
+            showDots={true}
+            gap={4}
+          >
+            {images.map((img, i) => (
+              <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
+                <Image src={img} alt={`Imagem ${i + 1}`} fill className="object-cover rounded-lg" sizes="85vw" />
+              </div>
+            ))}
+          </HorizontalScroll>
+        </div>
+        {/* Desktop: Grid 2x2 */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-0">
+          {images.map((img, i) => (
+            <div key={i} className="relative aspect-square">
+              <Image src={img} alt={`Imagem ${i + 1}`} fill className="object-cover" sizes="50vw" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -68,12 +92,49 @@ export function MasonrySwap({
   ];
 
   return (
-    <div 
-      className={cn(
-        "grid grid-cols-2 grid-rows-3 gap-0 w-full h-[600px] md:h-[700px] lg:h-[800px]",
-        className
-      )}
-    >
+    <>
+      {/* Mobile: Carrossel Horizontal */}
+      <div className="lg:hidden">
+        <HorizontalScroll 
+          itemWidth="85" 
+          showArrows={false} 
+          showDots={true}
+          gap={4}
+        >
+          {allImages.map((imageSrc, index) => (
+            <div
+              key={index}
+              className={cn(
+                "relative overflow-hidden group cursor-pointer rounded-lg",
+                "aspect-[4/3]",
+                "transition-all duration-500",
+                isAnimating && "opacity-80 scale-95"
+              )}
+            >
+              <Image
+                src={imageSrc}
+                alt={`Imagem ${index + 1}`}
+                fill
+                className={cn(
+                  "object-cover rounded-lg",
+                  "transition-transform duration-700",
+                  "group-hover:scale-110"
+                )}
+                sizes="85vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+            </div>
+          ))}
+        </HorizontalScroll>
+      </div>
+
+      {/* Desktop: Grid Masonry */}
+      <div 
+        className={cn(
+          "hidden lg:grid lg:grid-cols-2 lg:grid-rows-3 gap-0 w-full h-[700px] lg:h-[800px]",
+          className
+        )}
+      >
       {positions.map((imageIndex, positionIndex) => {
         const layout = layouts[positionIndex];
         const imageSrc = images[imageIndex % images.length];
@@ -105,6 +166,7 @@ export function MasonrySwap({
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }

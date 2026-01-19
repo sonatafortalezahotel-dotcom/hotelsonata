@@ -8,6 +8,7 @@ import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { StructuredData } from "@/components/SEO/StructuredData";
 import { generateBreadcrumbStructuredData } from "@/lib/utils/seo";
 import { capitalizeKeywords } from "@/lib/utils/slug";
+import { GallerySection } from "@/components/GallerySection/GallerySection";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 
@@ -438,146 +439,71 @@ export default async function LandingPage({ params }: PageProps) {
             )}
 
             {/* Galerias Organizadas por Categoria */}
-            {galleryQuartos.length > 0 && (
-              <section className="mt-12 mb-12">
-                <h2 className="text-2xl font-bold mb-6">
-                  {locale === "en"
-                    ? "Rooms & Accommodations"
-                    : locale === "es"
-                    ? "Habitaciones y Alojamientos"
-                    : "Quartos e Acomodações"}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {galleryQuartos.map((img, index) => (
-                    <div
-                      key={img.id}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
-                    >
-                      <Image
-                        src={img.imageUrl}
-                        alt={img.title || img.description || `${page.h1 || page.title} - Quarto ${index + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <GallerySection
+              images={galleryQuartos}
+              title={
+                locale === "en"
+                  ? "Rooms & Accommodations"
+                  : locale === "es"
+                  ? "Habitaciones y Alojamientos"
+                  : "Quartos e Acomodações"
+              }
+              altPrefix={`${page.h1 || page.title} - Quarto`}
+              columns={4}
+            />
 
-            {galleryGastronomia.length > 0 && (
-              <section className="mt-12 mb-12">
-                <h2 className="text-2xl font-bold mb-6">
-                  {locale === "en"
-                    ? "Gastronomy"
-                    : locale === "es"
-                    ? "Gastronomía"
-                    : "Gastronomia"}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {galleryGastronomia.map((img, index) => (
-                    <div
-                      key={img.id}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
-                    >
-                      <Image
-                        src={img.imageUrl}
-                        alt={img.title || img.description || `${page.h1 || page.title} - Gastronomia ${index + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <GallerySection
+              images={galleryGastronomia}
+              title={
+                locale === "en"
+                  ? "Gastronomy"
+                  : locale === "es"
+                  ? "Gastronomía"
+                  : "Gastronomia"
+              }
+              altPrefix={`${page.h1 || page.title} - Gastronomia`}
+              columns={4}
+            />
 
-            {galleryLazer.length > 0 && (
-              <section className="mt-12 mb-12">
-                <h2 className="text-2xl font-bold mb-6">
-                  {locale === "en"
-                    ? "Leisure & Activities"
-                    : locale === "es"
-                    ? "Ocio y Actividades"
-                    : "Lazer e Atividades"}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {galleryLazer.map((img, index) => (
-                    <div
-                      key={img.id}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
-                    >
-                      <Image
-                        src={img.imageUrl}
-                        alt={img.title || img.description || `${page.h1 || page.title} - Lazer ${index + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <GallerySection
+              images={galleryLazer}
+              title={
+                locale === "en"
+                  ? "Leisure & Activities"
+                  : locale === "es"
+                  ? "Ocio y Actividades"
+                  : "Lazer e Atividades"
+              }
+              altPrefix={`${page.h1 || page.title} - Lazer`}
+              columns={4}
+            />
 
-            {galleryLocalizacao.length > 0 && (
-              <section className="mt-12 mb-12">
-                <h2 className="text-2xl font-bold mb-6">
-                  {locale === "en"
-                    ? "Location & Surroundings"
-                    : locale === "es"
-                    ? "Ubicación y Alrededores"
-                    : "Localização e Arredores"}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {galleryLocalizacao.map((img, index) => (
-                    <div
-                      key={img.id}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
-                    >
-                      <Image
-                        src={img.imageUrl}
-                        alt={img.title || img.description || `${page.h1 || page.title} - Localização ${index + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 33vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <GallerySection
+              images={galleryLocalizacao}
+              title={
+                locale === "en"
+                  ? "Location & Surroundings"
+                  : locale === "es"
+                  ? "Ubicación y Alrededores"
+                  : "Localização e Arredores"
+              }
+              altPrefix={`${page.h1 || page.title} - Localização`}
+              columns={3}
+            />
 
             {/* Galeria Geral (fallback ou complemento) */}
-            {galleryGeral.length > 0 && (
-              <section className="mt-12 mb-12">
-                <h2 className="text-2xl font-bold mb-6">
-                  {locale === "en"
-                    ? "Hotel Gallery"
-                    : locale === "es"
-                    ? "Galería del Hotel"
-                    : "Galeria do Hotel"}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {galleryGeral.map((img, index) => (
-                    <div
-                      key={img.id}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
-                    >
-                      <Image
-                        src={img.imageUrl}
-                        alt={img.title || img.description || `${page.h1 || page.title} - Imagem ${index + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 33vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <GallerySection
+              images={galleryGeral}
+              title={
+                locale === "en"
+                  ? "Hotel Gallery"
+                  : locale === "es"
+                  ? "Galería del Hotel"
+                  : "Galeria do Hotel"
+              }
+              altPrefix={`${page.h1 || page.title} - Imagem`}
+              columns={3}
+            />
 
             {/* Quartos Relacionados */}
             {relatedRooms.length > 0 && (

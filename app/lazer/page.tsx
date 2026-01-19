@@ -11,7 +11,7 @@ import { ContentSection } from "@/components/ui/ContentSection";
 import { FullWidthGallery } from "@/components/ui/FullWidthGallery";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { EditorialCarousel } from "@/components/HorizontalScroll";
+import { EditorialCarousel, HorizontalScroll } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { useLeisure } from "@/lib/hooks/useLeisure";
 import { useGallery } from "@/lib/hooks/useGallery";
@@ -355,35 +355,42 @@ export default function LazerPage() {
 
       {/* 5. Galeria - Spa & Relaxamento - GRID 1x4 */}
       <section className="relative overflow-hidden">
-        {/* Mobile: Stack */}
-        <div className="grid grid-cols-1 gap-0 lg:hidden">
-          {lazerImagesWithDistributed.spa.galeria
-            .slice(0, 4)
-            .map((photo, index) => (
-              <div key={index} className="group relative overflow-hidden">
-                <div className="relative w-full h-[400px]">
-                  <Image
-                    src={photo.imageUrl}
-                    alt={t.gallery.spa.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  {index === 0 && (
-                    <div className="absolute bottom-8 left-8 text-white">
-                      <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
-                        <Sparkles className="h-4 w-4 mr-2 inline" />
-                        {t.gallery.spa.badge}
-                      </Badge>
-                      <h2 className="text-2xl font-bold drop-shadow-2xl">
-                        {t.gallery.spa.title}
-                      </h2>
-                    </div>
-                  )}
+        {/* Mobile: Carrossel Horizontal */}
+        <div className="lg:hidden">
+          <HorizontalScroll 
+            itemWidth="full" 
+            showArrows={false} 
+            showDots={true}
+            gap={0}
+          >
+            {lazerImagesWithDistributed.spa.galeria
+              .slice(0, 4)
+              .map((photo, index) => (
+                <div key={index} className="group relative overflow-hidden">
+                  <div className="relative w-full h-[400px]">
+                    <Image
+                      src={photo.imageUrl}
+                      alt={t.gallery.spa.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="100vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    {index === 0 && (
+                      <div className="absolute bottom-8 left-8 text-white">
+                        <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
+                          <Sparkles className="h-4 w-4 mr-2 inline" />
+                          {t.gallery.spa.badge}
+                        </Badge>
+                        <h2 className="text-2xl font-bold drop-shadow-2xl">
+                          {t.gallery.spa.title}
+                        </h2>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+          </HorizontalScroll>
         </div>
 
         {/* Desktop: 4 colunas */}
