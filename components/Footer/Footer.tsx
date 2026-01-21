@@ -81,6 +81,7 @@ export default function Footer() {
     { label: { pt: "Eventos", es: "Eventos", en: "Events" }, href: "/eventos" },
     { label: { pt: "ESG", es: "ESG", en: "ESG" }, href: "/esg" },
     { label: { pt: "Contatos", es: "Contactos", en: "Contact" }, href: "/contato" },
+    { label: { pt: "Trabalhe conosco", es: "Trabaja con nosotros", en: "Work with us" }, href: "/trabalhe-conosco" },
   ];
 
   // Construir endereço completo

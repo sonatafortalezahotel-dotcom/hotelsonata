@@ -507,7 +507,7 @@ Captação de leads corporativos para eventos.
 
 ### Validações:
 - ✅ Tipos permitidos: Imagens e Vídeos
-- ✅ Tamanho máximo: 10MB (imagens) / 100MB (vídeos)
+- ✅ Tamanho máximo: 50MB (imagens) / 100MB (vídeos)
 - ✅ Nomes únicos gerados automaticamente
 
 📄 **Documentação completa:** Ver `DOCUMENTACAO_UPLOAD.md`

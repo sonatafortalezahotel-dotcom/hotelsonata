@@ -259,7 +259,7 @@ Senha: [configure no banco]
 ### Especificações
 
 - **Formatos:** JPG, PNG, WebP
-- **Tamanho máximo:** 10MB (imagens), 100MB (vídeos)
+- **Tamanho máximo:** 50MB (imagens), 100MB (vídeos)
 - **Armazenamento:** Vercel Blob
 - **CDN:** Automático
 
@@ -350,7 +350,7 @@ https://console.neon.tech/
 
 ### "Upload falhou"
 - Verifique o `BLOB_READ_WRITE_TOKEN`
-- Confirme o tamanho do arquivo (max 10MB)
+- Confirme o tamanho do arquivo (max 50MB)
 
 ### "Não consigo fazer login"
 - Verifique se o usuário existe no banco

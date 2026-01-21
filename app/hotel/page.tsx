@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Heart, Eye, MapPin, Users, Clock, Bike } from "lucide-react";
+import { Award, Heart, Eye, MapPin, Users, Clock, Bike, Leaf } from "lucide-react";
 import { AccommodationsSection } from "@/components/AccommodationsSection";
 import { LeisureServicesSection } from "@/components/LeisureServicesSection";
 import { useLanguage } from "@/lib/context/LanguageContext";
@@ -72,6 +72,11 @@ export default function HotelPage() {
       icon: Award,
       title: t.differentials.breakfast.title,
       description: t.differentials.breakfast.description
+    },
+    {
+      icon: Leaf,
+      title: t.differentials.sustainability.title,
+      description: t.differentials.sustainability.description
     }
   ];
 
@@ -320,7 +325,7 @@ export default function HotelPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {diferenciais.map((item, index) => {
               const Icon = item.icon;
               return (
@@ -356,7 +361,7 @@ export default function HotelPage() {
         }
         image={hotelImages.familia || galleryPhotos[2]?.imageUrl || null}
         imageAlt={t.family.imageAlt}
-        badge="Hospitalidade Familiar"
+        badge="Acolhimento Nordestino"
         imagePosition="left"
         backgroundColor="primary"
       />

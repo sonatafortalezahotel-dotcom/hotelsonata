@@ -27,17 +27,16 @@ export default function PackagesSection({
 }: PackagesSectionProps) {
   const { locale } = useLanguage();
   
-  // Filtrar apenas os quartos que queremos mostrar: suite-luxo, standard, e day-use
-  // Excluir suite-master
+  // Filtrar apenas os quartos que queremos mostrar: suite-master (Superior), luxo, e standard
   const filteredRooms = rooms.filter(room => 
-    (room.code === "suite-luxo" || room.code === "luxo") ||
-    room.code === "standard" ||
-    room.code === "day-use"
+    room.code === "suite-master" ||
+    room.code === "luxo" ||
+    room.code === "standard"
   );
 
-  // Ordenar: Suite Luxo, Suite Standard, Day Use
+  // Ordenar: Quarto Superior (suite-master), Quarto Luxo, Quarto Standard
   const sortedItems = [...filteredRooms].sort((a, b) => {
-    const order = ["suite-luxo", "luxo", "standard", "day-use"];
+    const order = ["suite-master", "luxo", "standard"];
     const aIndex = order.indexOf(a.code);
     const bIndex = order.indexOf(b.code);
     return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
@@ -68,7 +67,7 @@ export default function PackagesSection({
             {sortedItems.map((room, index) => (
               <Link
                 key={room.id}
-                href={room.code === "day-use" ? `/pacotes/${room.id}` : `/quartos/${room.code}`}
+                href={`/quartos/${room.code}`}
                 className="group relative overflow-hidden"
               >
                 {/* Imagem de Fundo */}

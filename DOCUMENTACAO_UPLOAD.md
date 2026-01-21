@@ -231,7 +231,7 @@ Valida o tamanho do arquivo.
 ```typescript
 import { validateFileSize } from "@/lib/upload";
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 50 * 1024 * 1024; // 50MB
 if (validateFileSize(file, MAX_SIZE)) {
   // Tamanho válido
 }
@@ -246,7 +246,7 @@ if (validateFileSize(file, MAX_SIZE)) {
 - ✅ Vídeos: `video/*` (mp4, webm, mov, etc)
 
 ### Tamanhos Máximos
-- **Imagens:** 10MB
+- **Imagens:** 50MB
 - **Vídeos:** 100MB
 
 ### Pastas Recomendadas
@@ -387,7 +387,7 @@ const UploadGallery = () => {
    - Apenas imagens e vídeos são permitidos
 
 3. **"Arquivo muito grande"**
-   - Imagens: máximo 10MB
+   - Imagens: máximo 50MB
    - Vídeos: máximo 100MB
 
 4. **"Erro ao fazer upload do arquivo"**

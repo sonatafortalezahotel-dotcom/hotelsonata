@@ -53,7 +53,7 @@ export const pageTranslations = {
         subtitle: "Sabores autênticos, ingredientes locais e a melhor vista de Fortaleza"
       },
       breakfast: {
-        badge: "Premiado",
+        badge: "Gastronomia Regional",
         title: "Café da Manhã Premiado",
         description: "Comece seu dia com um café da manhã inesquecível. Nossa seleção especial inclui frutas tropicais frescas, pães artesanais, tapiocas preparadas na hora, e o melhor café regional.",
         scheduleTitle: "Horário",
@@ -472,16 +472,20 @@ export const pageTranslations = {
           description: "Coração da Praia de Iracema, centro cultural de Fortaleza."
         },
         family: {
-          title: "Atendimento Familiar",
-          description: "Gestão familiar que garante acolhimento genuíno."
+          title: "Acolhimento nordestino",
+          description: "Acolhimento genuíno que reflete a hospitalidade do Nordeste."
         },
         breakfast: {
-          title: "Café Premiado",
-          description: "Café da manhã reconhecido pelos hóspedes e crítica."
+          title: "Gastronomia Regional",
+          description: "O melhor da gastronomia regional."
+        },
+        sustainability: {
+          title: "Projetos de Sustentabilidade e ESG",
+          description: "Compromisso com práticas sustentáveis e responsabilidade social."
         }
       },
       family: {
-        title: "Gestão Familiar",
+        title: "Acolhimento nordestino",
         imageAlt: "Família Bezerra",
         paragraph1: "O Hotel Sonata de Iracema é orgulhosamente um hotel de gestão familiar. A Família Bezerra está presente no dia a dia do hotel, garantindo que cada hóspede receba o atendimento personalizado e acolhedor que se espera de uma verdadeira casa.",
         paragraph2: "Essa proximidade com nossos hóspedes nos permite entender e antecipar necessidades, criar laços duradouros e transformar estadias em experiências memoráveis."
@@ -707,7 +711,7 @@ export const pageTranslations = {
           gastronomy: {
             title: "Gastronomia Regional",
             description: "Saboreie o melhor da culinária cearense com café da manhã regional premiado e restaurante com frutos do mar frescos.",
-            badge: "Café Premiado",
+            badge: "Gastronomia Regional",
             cta: "Ver Cardápio"
           },
           rooms: {
@@ -901,7 +905,7 @@ export const pageTranslations = {
         subtitle: "Sabores auténticos, ingredientes locales y la mejor vista de Fortaleza"
       },
       breakfast: {
-        badge: "Premiado",
+        badge: "Gastronomía Regional",
         title: "Desayuno Premiado",
         description: "Comienza tu día con un desayuno inolvidable. Nuestra selección especial incluye frutas tropicales frescas, panes artesanales, tapiocas preparadas al momento y el mejor café regional.",
         scheduleTitle: "Horario",
@@ -1320,16 +1324,20 @@ export const pageTranslations = {
           description: "Corazón de la Playa de Iracema, centro cultural de Fortaleza."
         },
         family: {
-          title: "Atención Familiar",
-          description: "Gestión familiar que garantiza acogida genuina."
+          title: "Acolhimento nordestino",
+          description: "Acolhimento genuíno que refleja la hospitalidad del Nordeste."
         },
         breakfast: {
-          title: "Desayuno Premiado",
-          description: "Desayuno reconocido por los huéspedes y la crítica."
+          title: "Gastronomía Regional",
+          description: "Lo mejor de la gastronomía regional."
+        },
+        sustainability: {
+          title: "Proyectos de Sostenibilidad y ESG",
+          description: "Compromiso con prácticas sostenibles y responsabilidad social."
         }
       },
       family: {
-        title: "Gestión Familiar",
+        title: "Acolhimento nordestino",
         imageAlt: "Familia Bezerra",
         paragraph1: "El Hotel Sonata de Iracema es orgullosamente un hotel de gestión familiar. La Familia Bezerra está presente en el día a día del hotel, garantizando que cada huésped reciba la atención personalizada y acogedora que se espera de una verdadera casa.",
         paragraph2: "Esta proximidad con nuestros huéspedes nos permite entender y anticipar necesidades, crear lazos duraderos y transformar estadías en experiencias memorables."
@@ -1555,7 +1563,7 @@ export const pageTranslations = {
           gastronomy: {
             title: "Gastronomía Regional",
             description: "Saborea lo mejor de la cocina cearense con desayuno regional premiado y restaurante con mariscos frescos.",
-            badge: "Café Premiado",
+            badge: "Gastronomía Regional",
             cta: "Ver Menú"
           },
           rooms: {
@@ -1749,7 +1757,7 @@ export const pageTranslations = {
         subtitle: "Authentic flavors, local ingredients and the best view in Fortaleza"
       },
       breakfast: {
-        badge: "Award-winning",
+        badge: "Regional Gastronomy",
         title: "Award-winning Breakfast",
         description: "Start your day with an unforgettable breakfast. Our special selection includes fresh tropical fruits, artisan breads, tapiocas prepared to order, and the best regional coffee.",
         scheduleTitle: "Schedule",
@@ -2168,16 +2176,20 @@ export const pageTranslations = {
           description: "Heart of Iracema Beach, cultural center of Fortaleza."
         },
         family: {
-          title: "Family Service",
-          description: "Family management that guarantees genuine hospitality."
+          title: "Nordestino Hospitality",
+          description: "Genuine hospitality that reflects the warmth of the Northeast."
         },
         breakfast: {
-          title: "Award-winning Breakfast",
-          description: "Breakfast recognized by guests and critics."
+          title: "Regional Gastronomy",
+          description: "The best of regional gastronomy."
+        },
+        sustainability: {
+          title: "Sustainability and ESG Projects",
+          description: "Commitment to sustainable practices and social responsibility."
         }
       },
       family: {
-        title: "Family Management",
+        title: "Nordestino Hospitality",
         imageAlt: "Bezerra Family",
         paragraph1: "Hotel Sonata de Iracema is proudly a family-run hotel. The Bezerra Family is present in the hotel's daily life, ensuring that each guest receives the personalized and welcoming service expected from a true home.",
         paragraph2: "This closeness with our guests allows us to understand and anticipate needs, create lasting bonds and transform stays into memorable experiences."
@@ -2403,7 +2415,7 @@ export const pageTranslations = {
           gastronomy: {
             title: "Regional Gastronomy",
             description: "Savor the best of Ceará cuisine with award-winning regional breakfast and restaurant with fresh seafood.",
-            badge: "Award-winning Breakfast",
+            badge: "Regional Gastronomy",
             cta: "View Menu"
           },
           rooms: {

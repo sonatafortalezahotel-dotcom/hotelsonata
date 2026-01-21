@@ -27,7 +27,7 @@ export function ImageUpload({
   label = "Imagem",
   required = false,
   accept = "image/*",
-  maxSizeMB = 10,
+  maxSizeMB = 50,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);

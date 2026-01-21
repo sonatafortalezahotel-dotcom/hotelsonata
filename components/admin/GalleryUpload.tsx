@@ -25,7 +25,7 @@ export function GalleryUpload({
   folder = "hotel-sonata",
   label = "Galeria de Imagens",
   maxImages = 20,
-  maxSizeMB = 10,
+  maxSizeMB = 50,
 }: GalleryUploadProps) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

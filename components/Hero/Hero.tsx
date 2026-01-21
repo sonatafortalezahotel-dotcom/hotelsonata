@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface HeroProps {
@@ -33,9 +33,9 @@ export default function Hero({
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [useAPI, setUseAPI] = useState(true); // Tentar usar API primeiro
-  // Use a stable ID to avoid hydration mismatches
-  const containerIdRef = useRef(`youtube-player-${Math.random().toString(36).substr(2, 9)}`);
-  const containerId = containerIdRef.current;
+  // Use useId() to generate a stable ID that's consistent between server and client
+  const uniqueId = useId();
+  const containerId = `youtube-player-${uniqueId.replace(/:/g, '-')}`;
 
   // Set mounted state to prevent hydration mismatch
   useEffect(() => {
