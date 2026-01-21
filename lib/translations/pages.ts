@@ -612,6 +612,74 @@ export const pageTranslations = {
       excellenceAwards: "Prêmios de Excelência",
       otherCertifications: "Outras Certificações"
     },
+    // Página Trabalhe Conosco
+    careers: {
+      hero: {
+        title: "Trabalhe Conosco",
+        subtitle: "Faça parte de uma equipe apaixonada por hospitalidade e excelência",
+        badge: "Oportunidades"
+      },
+      form: {
+        title: "Envie sua Candidatura",
+        subtitle: "Estamos sempre em busca de talentos para fazer parte da nossa equipe",
+        cardTitle: "Formulário de Candidatura",
+        fields: {
+          name: "Nome Completo *",
+          email: "Email *",
+          phone: "Telefone *",
+          position: "Cargo de Interesse *",
+          message: "Mensagem",
+          resume: "Currículo (PDF, DOC ou DOCX)"
+        },
+        placeholders: {
+          name: "Seu nome completo",
+          email: "seu@email.com",
+          phone: "(85) 99999-9999",
+          position: "Selecione o cargo",
+          message: "Conte-nos um pouco sobre você e sua experiência..."
+        },
+        positions: [
+          "Recepcionista",
+          "Camareira",
+          "Garçom/Garçonete",
+          "Cozinheiro/Cozinheira",
+          "Auxiliar de Cozinha",
+          "Segurança",
+          "Manutenção",
+          "Gerente de Recepção",
+          "Gerente de Restaurante",
+          "Supervisor de Lazer",
+          "Outro"
+        ],
+        resumeHint: "Formatos aceitos: PDF, DOC, DOCX (máximo 5MB)",
+        button: "Enviar Candidatura",
+        sending: "Enviando...",
+        success: "Candidatura enviada com sucesso! Entraremos em contato em breve.",
+        privacy: "Ao enviar este formulário, você concorda com nossa política de privacidade.",
+        errors: {
+          invalidFile: "Formato de arquivo inválido. Use PDF, DOC ou DOCX.",
+          fileTooLarge: "Arquivo muito grande. Tamanho máximo: 5MB.",
+          submit: "Erro ao enviar candidatura. Tente novamente."
+        }
+      },
+      info: {
+        process: {
+          title: "Processo Seletivo",
+          description: "Analisamos todas as candidaturas e entramos em contato com os candidatos selecionados em até 15 dias úteis."
+        },
+        benefits: {
+          title: "Benefícios",
+          items: [
+            "Vale-refeição",
+            "Vale-transporte",
+            "Plano de saúde",
+            "Ambiente de trabalho acolhedor",
+            "Oportunidades de crescimento",
+            "Treinamento contínuo"
+          ]
+        }
+      }
+    },
     // Página Contato
     contact: {
       hero: {
@@ -1703,6 +1771,74 @@ export const pageTranslations = {
         title: "Certificaciones",
         trust: "Hotel Certificado y Seguro"
       }
+    },
+    // Página Trabalhe Conosco
+    careers: {
+      hero: {
+        title: "Trabaja con Nosotros",
+        subtitle: "Forma parte de un equipo apasionado por la hospitalidad y la excelencia",
+        badge: "Oportunidades"
+      },
+      form: {
+        title: "Envía tu Candidatura",
+        subtitle: "Siempre estamos buscando talentos para formar parte de nuestro equipo",
+        cardTitle: "Formulario de Candidatura",
+        fields: {
+          name: "Nombre Completo *",
+          email: "Email *",
+          phone: "Teléfono *",
+          position: "Cargo de Interés *",
+          message: "Mensaje",
+          resume: "Currículum (PDF, DOC o DOCX)"
+        },
+        placeholders: {
+          name: "Tu nombre completo",
+          email: "tu@email.com",
+          phone: "(85) 99999-9999",
+          position: "Selecciona el cargo",
+          message: "Cuéntanos un poco sobre ti y tu experiencia..."
+        },
+        positions: [
+          "Recepcionista",
+          "Camarera",
+          "Camarero/Camarera",
+          "Cocinero/Cocinera",
+          "Ayudante de Cocina",
+          "Seguridad",
+          "Mantenimiento",
+          "Gerente de Recepción",
+          "Gerente de Restaurante",
+          "Supervisor de Ocio",
+          "Otro"
+        ],
+        resumeHint: "Formatos aceptados: PDF, DOC, DOCX (máximo 5MB)",
+        button: "Enviar Candidatura",
+        sending: "Enviando...",
+        success: "¡Candidatura enviada con éxito! Nos pondremos en contacto pronto.",
+        privacy: "Al enviar este formulario, aceptas nuestra política de privacidad.",
+        errors: {
+          invalidFile: "Formato de archivo inválido. Usa PDF, DOC o DOCX.",
+          fileTooLarge: "Archivo muy grande. Tamaño máximo: 5MB.",
+          submit: "Error al enviar candidatura. Intenta nuevamente."
+        }
+      },
+      info: {
+        process: {
+          title: "Proceso de Selección",
+          description: "Analizamos todas las candidaturas y contactamos a los candidatos seleccionados en hasta 15 días hábiles."
+        },
+        benefits: {
+          title: "Beneficios",
+          items: [
+            "Vale de comida",
+            "Vale de transporte",
+            "Plan de salud",
+            "Ambiente de trabajo acogedor",
+            "Oportunidades de crecimiento",
+            "Capacitación continua"
+          ]
+        }
+      }
     }
   },
   en: {
@@ -2554,6 +2690,216 @@ export const pageTranslations = {
       credibility: {
         title: "Certifications",
         trust: "Certified and Secure Hotel"
+      }
+    }
+  },
+  es: {
+    // ... existing es translations ...
+    careers: {
+      hero: {
+        title: "Trabaja con Nosotros",
+        subtitle: "Forma parte de un equipo apasionado por la hospitalidad y la excelencia",
+        badge: "Oportunidades"
+      },
+      form: {
+        title: "Envie sua Candidatura",
+        subtitle: "Estamos sempre em busca de talentos para fazer parte da nossa equipe",
+        cardTitle: "Formulário de Candidatura",
+        fields: {
+          name: "Nome Completo *",
+          email: "Email *",
+          phone: "Telefone *",
+          position: "Cargo de Interesse *",
+          message: "Mensagem",
+          resume: "Currículo (PDF, DOC ou DOCX)"
+        },
+        placeholders: {
+          name: "Seu nome completo",
+          email: "seu@email.com",
+          phone: "(85) 99999-9999",
+          position: "Selecione o cargo",
+          message: "Conte-nos um pouco sobre você e sua experiência..."
+        },
+        positions: [
+          "Recepcionista",
+          "Camareira",
+          "Garçom/Garçonete",
+          "Cozinheiro/Cozinheira",
+          "Auxiliar de Cozinha",
+          "Segurança",
+          "Manutenção",
+          "Gerente de Recepção",
+          "Gerente de Restaurante",
+          "Supervisor de Lazer",
+          "Outro"
+        ],
+        resumeHint: "Formatos aceitos: PDF, DOC, DOCX (máximo 5MB)",
+        button: "Enviar Candidatura",
+        sending: "Enviando...",
+        success: "Candidatura enviada com sucesso! Entraremos em contato em breve.",
+        privacy: "Ao enviar este formulário, você concorda com nossa política de privacidade.",
+        errors: {
+          invalidFile: "Formato de arquivo inválido. Use PDF, DOC ou DOCX.",
+          fileTooLarge: "Arquivo muito grande. Tamanho máximo: 5MB.",
+          submit: "Erro ao enviar candidatura. Tente novamente."
+        }
+      },
+      info: {
+        process: {
+          title: "Processo Seletivo",
+          description: "Analisamos todas as candidaturas e entramos em contato com os candidatos selecionados em até 15 dias úteis."
+        },
+        benefits: {
+          title: "Benefícios",
+          items: [
+            "Vale-refeição",
+            "Vale-transporte",
+            "Plano de saúde",
+            "Ambiente de trabalho acolhedor",
+            "Oportunidades de crescimento",
+            "Treinamento contínuo"
+          ]
+        }
+      }
+    }
+  },
+  es: {
+    // ... existing es translations ...
+    careers: {
+      hero: {
+        title: "Trabaja con Nosotros",
+        subtitle: "Forma parte de un equipo apasionado por la hospitalidad y la excelencia",
+        badge: "Oportunidades"
+      },
+      form: {
+        title: "Envía tu Candidatura",
+        subtitle: "Siempre estamos buscando talentos para formar parte de nuestro equipo",
+        cardTitle: "Formulario de Candidatura",
+        fields: {
+          name: "Nombre Completo *",
+          email: "Email *",
+          phone: "Teléfono *",
+          position: "Cargo de Interés *",
+          message: "Mensaje",
+          resume: "Currículum (PDF, DOC o DOCX)"
+        },
+        placeholders: {
+          name: "Tu nombre completo",
+          email: "tu@email.com",
+          phone: "(85) 99999-9999",
+          position: "Selecciona el cargo",
+          message: "Cuéntanos un poco sobre ti y tu experiencia..."
+        },
+        positions: [
+          "Recepcionista",
+          "Camarera",
+          "Camarero/Camarera",
+          "Cocinero/Cocinera",
+          "Ayudante de Cocina",
+          "Seguridad",
+          "Mantenimiento",
+          "Gerente de Recepción",
+          "Gerente de Restaurante",
+          "Supervisor de Ocio",
+          "Otro"
+        ],
+        resumeHint: "Formatos aceptados: PDF, DOC, DOCX (máximo 5MB)",
+        button: "Enviar Candidatura",
+        sending: "Enviando...",
+        success: "¡Candidatura enviada con éxito! Nos pondremos en contacto pronto.",
+        privacy: "Al enviar este formulario, aceptas nuestra política de privacidad.",
+        errors: {
+          invalidFile: "Formato de archivo inválido. Usa PDF, DOC o DOCX.",
+          fileTooLarge: "Archivo muy grande. Tamaño máximo: 5MB.",
+          submit: "Error al enviar candidatura. Intenta nuevamente."
+        }
+      },
+      info: {
+        process: {
+          title: "Proceso de Selección",
+          description: "Analizamos todas las candidaturas y contactamos a los candidatos seleccionados en hasta 15 días hábiles."
+        },
+        benefits: {
+          title: "Beneficios",
+          items: [
+            "Vale de comida",
+            "Vale de transporte",
+            "Plan de salud",
+            "Ambiente de trabajo acogedor",
+            "Oportunidades de crecimiento",
+            "Capacitación continua"
+          ]
+        }
+      }
+    }
+  },
+  en: {
+    // ... existing en translations ...
+    careers: {
+      hero: {
+        title: "Work with Us",
+        subtitle: "Join a team passionate about hospitality and excellence",
+        badge: "Opportunities"
+      },
+      form: {
+        title: "Submit Your Application",
+        subtitle: "We are always looking for talent to join our team",
+        cardTitle: "Application Form",
+        fields: {
+          name: "Full Name *",
+          email: "Email *",
+          phone: "Phone *",
+          position: "Position of Interest *",
+          message: "Message",
+          resume: "Resume (PDF, DOC or DOCX)"
+        },
+        placeholders: {
+          name: "Your full name",
+          email: "your@email.com",
+          phone: "(85) 99999-9999",
+          position: "Select position",
+          message: "Tell us a little about yourself and your experience..."
+        },
+        positions: [
+          "Receptionist",
+          "Housekeeper",
+          "Waiter/Waitress",
+          "Cook/Chef",
+          "Kitchen Assistant",
+          "Security",
+          "Maintenance",
+          "Reception Manager",
+          "Restaurant Manager",
+          "Leisure Supervisor",
+          "Other"
+        ],
+        resumeHint: "Accepted formats: PDF, DOC, DOCX (max 5MB)",
+        button: "Submit Application",
+        sending: "Sending...",
+        success: "Application submitted successfully! We will contact you soon.",
+        privacy: "By submitting this form, you agree to our privacy policy.",
+        errors: {
+          invalidFile: "Invalid file format. Use PDF, DOC or DOCX.",
+          fileTooLarge: "File too large. Maximum size: 5MB.",
+          submit: "Error submitting application. Please try again."
+        }
+      },
+      info: {
+        process: {
+          title: "Selection Process",
+          description: "We review all applications and contact selected candidates within 15 business days."
+        },
+        benefits: {
+          title: "Benefits",
+          items: [
+            "Meal voucher",
+            "Transport voucher",
+            "Health plan",
+            "Welcoming work environment",
+            "Growth opportunities",
+            "Continuous training"
+          ]
+        }
       }
     }
   }

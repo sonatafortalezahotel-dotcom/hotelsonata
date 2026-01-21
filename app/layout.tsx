@@ -123,7 +123,7 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <StructuredData data={hotelStructuredData} />
         <Providers>
           <PublicLayout>
