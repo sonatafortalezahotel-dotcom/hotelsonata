@@ -412,3 +412,33 @@ body > section:last-of-type + div {
   clip: auto;
   white-space: normal;
 }
+
+/* Imagens no conteúdo do blog: sempre visíveis e responsivas */
+.blog-post-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+.blog-post-content img[data-size="small"] {
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+}
+.blog-post-content img[data-size="medium"] {
+  max-width: 560px;
+  width: 100%;
+  height: auto;
+}
+.blog-post-content img[data-size="large"] {
+  max-width: 800px;
+  width: 100%;
+  height: auto;
+}
+.blog-post-content img[data-size="full"],
+.blog-post-content img:not([data-size]) {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}

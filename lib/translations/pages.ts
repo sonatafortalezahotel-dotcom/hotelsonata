@@ -175,6 +175,13 @@ export const pageTranslations = {
         text: "Para mais informações sobre nossos serviços, entre em contato com o setor de reservas ou recepção",
         button: "Falar com a Recepção"
       },
+      activities: {
+        pool: { title: "Área de Piscina", description: "Cadeiras de sol, chuveirão e vista para o mar. Você também pode contar com o atendimento do nosso restaurante nessa área.", schedule: "6:00 às 20:00 hrs", badge: "Vista Mar", tags: ["Restaurante", "Água de Coco", "Relaxamento"] },
+        fitness: { title: "Espaço Fitness", description: "Ambiente reservado, climatizado e com vista para o mar para você se exercitar.", schedule: "6:00 às 22:00 hrs", badge: "Climatizado", tags: ["Vista Mar", "Equipamentos Modernos"] },
+        bikes: { title: "Disponibilização de Bicicletas", description: "Serviço gratuito para que os nossos hóspedes desfrutem de passeios e conheçam a cidade.", badge: "Gratuito", tags: ["Passeio", "Orla", "Sustentável"] },
+        beachTennis: { title: "Aulas de Beach Tennis", description: "Sua estada ganha ainda mais energia e diversão. Aulas gratuitas com professor especializado.", badge: "Gratuito", tags: ["Professor Especializado", "Material Incluso"] },
+        massage: { title: "Sessões de Massagem", description: "Relaxe e renove suas energias com nossas sessões de massagem com horário marcado.", badge: "Com Agendamento", tags: ["Relaxamento", "Bem-estar"] },
+      },
       locationPrivileged: {
         title: "Localização Privilegiada",
         near: "A poucos passos",
@@ -287,7 +294,8 @@ export const pageTranslations = {
       },
       certifications: {
         title: "Reconhecimentos e Certificações",
-        subtitle: "Nosso compromisso é reconhecido por organizações nacionais e internacionais"
+        subtitle: "Nosso compromisso é reconhecido por organizações nacionais e internacionais",
+        pending: "Certificações em processo..."
       },
       cta: {
         title: "Hospede-se com Propósito",
@@ -329,9 +337,10 @@ export const pageTranslations = {
       },
       capacity: {
         badge: "8 Salas Disponíveis",
-        title: "Capacidades por Configuração",
-        subtitle: "Compare rapidamente todas as salas e escolha a configuração ideal para o seu evento. Todas com ar-condicionado independente e iluminação natural.",
-        note: "* As capacidades podem variar de acordo com a configuração escolhida e necessidades específicas do evento"
+        title: "Tabela Comparativa de Capacidades",
+        subtitle: "Compare rapidamente a capacidade de todas as salas em cada configuração",
+        note: "* As capacidades podem variar de acordo com a configuração escolhida e necessidades específicas do evento",
+        tip: "Role horizontalmente para ver todas as configurações em dispositivos móveis"
       },
       configurations: {
         title: "Configurações para Cada Ocasião",
@@ -607,10 +616,18 @@ export const pageTranslations = {
         excellent: "Excelente",
         location: "Localização",
         walkable: "Ótimo para pedestres",
-        score: "Nota: 99 de 100"
+        score: "Nota: 99 de 100",
+        rating: "4,5",
+        locationScore: "99"
       },
       excellenceAwards: "Prêmios de Excelência",
       otherCertifications: "Outras Certificações"
+    },
+    reservations: {
+      hero: { title: "Reservas", subtitle: "Confirme sua estadia" },
+    },
+    packages: {
+      hero: { title: "Pacotes", subtitle: "Ofertas especiais" },
     },
     // Página Trabalhe Conosco
     careers: {
@@ -854,6 +871,30 @@ export const pageTranslations = {
           }
         }
       },
+      packagesSection: {
+        title: "Fique no Sonata!",
+        subtitle: "Escolha a experiência perfeita para sua estadia",
+        empty: "Em breve teremos opções disponíveis!",
+        cta: "Ver Detalhes →",
+      },
+      socialMedia: {
+        title: "Nos Acompanhe nas Redes Sociais",
+        subtitle: "Veja o que está acontecendo no Hotel Sonata de Iracema",
+        instagramHandle: "@hotelsonata",
+        instagramUrl: "https://instagram.com/hotelsonata",
+        buttonText: "Seguir no Instagram",
+      },
+      sustainabilitySection: {
+        title: "Sustentabilidade e Inclusão",
+        subtitle: "Comprometidos com um futuro melhor para todos",
+      },
+      certificationsSection: {
+        title: "Certificações e Selos",
+        subtitle: "Reconhecimentos que comprovam nossa qualidade e compromisso",
+      },
+      highlights: {
+        cta: "Saiba Mais",
+      },
       gallery: {
         title: "Momentos Inesquecíveis",
         subtitle: "Cada canto do Hotel Sonata foi pensado para criar memórias especiais",
@@ -908,6 +949,83 @@ export const pageTranslations = {
         }
       }
     },
+    // Global (header, footer, booking bar, reservation form, awards)
+    global: {
+      header: {
+        nav: {
+          hotel: "Hotel",
+          lazer: "Lazer",
+          quartos: "Quartos",
+          gastronomia: "Gastronomia",
+          eventos: "Eventos",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contatos",
+          trabalhe: "Trabalhe conosco",
+        },
+      },
+      footer: {
+        description: "Sua casa em Fortaleza. A tradição de acolher, o prazer de se renovar.",
+        quickMenu: "Menu Rápido",
+        contact: "Contato",
+        address: "Praia de Iracema, Fortaleza - CE",
+        copyright: "Todos os direitos reservados.",
+        developedBy: "Desenvolvido pela Kommu",
+        credibility: {
+          title: "Certificações",
+          trust: "Hotel Certificado e Seguro",
+        },
+        nav: {
+          hotel: "Hotel",
+          lazer: "Lazer",
+          quartos: "Quartos",
+          gastronomia: "Gastronomia",
+          eventos: "Eventos",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contatos",
+          trabalhe: "Trabalhe conosco",
+        },
+      },
+      bookingBar: {
+        checkIn: "Check-in",
+        checkOut: "Check-out",
+        adults: "Adultos",
+        children: "Crianças",
+        guests: "Hóspedes",
+        promoCode: "CUPOM",
+        reserve: "PESQUISAR",
+        selectDate: "Selecione a data",
+      },
+      reservationForm: {
+        checkIn: "Check-in",
+        checkOut: "Check-out",
+        dates: "Datas",
+        guests: "Hóspedes",
+        adults: "Adultos",
+        children: "Crianças",
+        promoCode: "CUPOM",
+        promoCodePlaceholder: "CUPOM",
+        reserve: "PESQUISAR",
+        selectDate: "Selecione a data",
+      },
+      awards: {
+        badge: "Reconhecimentos",
+        titleHighlight: "Suas experiências",
+        titleRest: "nos impulsionam",
+        subtitle: "Certificações e prêmios que comprovam nossa qualidade e compromisso com a excelência",
+        tripadvisor: {
+          excellent: "Excelente",
+          location: "Localização",
+          walkable: "Ótimo para pedestres",
+          score: "Nota: 99 de 100",
+          rating: "4,5",
+          locationScore: "99"
+        },
+        excellenceAwards: "Prêmios de Excelência",
+        otherCertifications: "Outras Certificações",
+      },
+    },
     // Footer
     footer: {
       description: "Sua casa em Fortaleza. A tradição de acolher, o prazer de se renovar.",
@@ -915,6 +1033,7 @@ export const pageTranslations = {
       contact: "Contato",
       address: "Praia de Iracema, Fortaleza - CE",
       copyright: "Todos os direitos reservados.",
+      developedBy: "Desenvolvido pela Kommu",
       credibility: {
         title: "Certificações",
         trust: "Hotel Certificado e Seguro"
@@ -1095,6 +1214,13 @@ export const pageTranslations = {
         text: "Para más información sobre nuestros servicios, contacta con el departamento de reservas o recepción",
         button: "Hablar con Recepción"
       },
+      activities: {
+        pool: { title: "Área de Piscina", description: "Sillas de sol, duchas y vista al mar. También servicio del restaurante.", schedule: "6:00 a 20:00", badge: "Vista Mar", tags: ["Restaurante", "Agua de Coco"] },
+        fitness: { title: "Espacio Fitness", description: "Ambiente climatizado con vista al mar para ejercitarse.", schedule: "6:00 a 22:00", badge: "Climatizado", tags: ["Vista Mar", "Equipos Modernos"] },
+        bikes: { title: "Bicicletas", description: "Servicio gratuito para recorrer la ciudad.", badge: "Gratuito", tags: ["Paseo", "Orla"] },
+        beachTennis: { title: "Clases de Beach Tennis", description: "Clases gratuitas con profesor especializado.", badge: "Gratuito", tags: ["Profesor", "Material Incluso"] },
+        massage: { title: "Sesiones de Masaje", description: "Relaje y renueve energías con masajes.", badge: "Con Cita", tags: ["Relajación", "Bienestar"] },
+      },
       locationPrivileged: {
         title: "Ubicación Privilegiada",
         near: "A pocos pasos",
@@ -1207,7 +1333,8 @@ export const pageTranslations = {
       },
       certifications: {
         title: "Reconocimientos y Certificaciones",
-        subtitle: "Nuestro compromiso es reconocido por organizaciones nacionales e internacionales"
+        subtitle: "Nuestro compromiso es reconocido por organizaciones nacionales e internacionales",
+        pending: "Certificaciones en proceso..."
       },
       cta: {
         title: "Hospédate con Propósito",
@@ -1249,9 +1376,10 @@ export const pageTranslations = {
       },
       capacity: {
         badge: "8 Salas Disponibles",
-        title: "Capacidades por Configuración",
-        subtitle: "Compara rápidamente todas las salas y elige la configuración ideal para tu evento. Todas con aire acondicionado independiente e iluminación natural.",
-        note: "* Las capacidades pueden variar según la configuración elegida y necesidades específicas del evento"
+        title: "Tabla Comparativa de Capacidades",
+        subtitle: "Compara rápidamente la capacidad de todas las salas en cada configuración",
+        note: "* Las capacidades pueden variar según la configuración elegida y necesidades específicas del evento",
+        tip: "Desplázate horizontalmente para ver todas las configuraciones en dispositivos móviles"
       },
       configurations: {
         title: "Configuraciones para Cada Ocasión",
@@ -1527,7 +1655,9 @@ export const pageTranslations = {
         excellent: "Excelente",
         location: "Ubicación",
         walkable: "Excelente para peatones",
-        score: "Puntuación: 99 de 100"
+        score: "Puntuación: 99 de 100",
+        rating: "4,5",
+        locationScore: "99"
       },
       excellenceAwards: "Premios de Excelencia",
       otherCertifications: "Otras Certificaciones"
@@ -1706,6 +1836,30 @@ export const pageTranslations = {
           }
         }
       },
+      packagesSection: {
+        title: "¡Quédate en el Sonata!",
+        subtitle: "Elige la experiencia perfecta para tu estancia",
+        empty: "Pronto tendremos opciones disponibles!",
+        cta: "Ver Detalles →",
+      },
+      socialMedia: {
+        title: "Síguenos en Redes Sociales",
+        subtitle: "Mira lo que está pasando en el Hotel Sonata de Iracema",
+        instagramHandle: "@hotelsonata",
+        instagramUrl: "https://instagram.com/hotelsonata",
+        buttonText: "Seguir en Instagram",
+      },
+      sustainabilitySection: {
+        title: "Sostenibilidad e Inclusión",
+        subtitle: "Comprometidos con un futuro mejor para todos",
+      },
+      certificationsSection: {
+        title: "Certificaciones y Sellos",
+        subtitle: "Reconocimientos que demuestran nuestra calidad y compromiso",
+      },
+      highlights: {
+        cta: "Saber Más",
+      },
       gallery: {
         title: "Momentos Inolvidables",
         subtitle: "Cada rincón del Hotel Sonata fue pensado para crear recuerdos especiales",
@@ -1760,6 +1914,83 @@ export const pageTranslations = {
         }
       }
     },
+    // Global (header, footer, booking bar, reservation form, awards)
+    global: {
+      header: {
+        nav: {
+          hotel: "Hotel",
+          lazer: "Ocio",
+          quartos: "Habitaciones",
+          gastronomia: "Gastronomía",
+          eventos: "Eventos",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contactos",
+          trabalhe: "Trabaja con nosotros",
+        },
+      },
+      footer: {
+        description: "Tu casa en Fortaleza. La tradición de acoger, el placer de renovarse.",
+        quickMenu: "Menú Rápido",
+        contact: "Contacto",
+        address: "Playa de Iracema, Fortaleza - CE",
+        copyright: "Todos los derechos reservados.",
+        developedBy: "Desarrollado por Kommu",
+        credibility: {
+          title: "Certificaciones",
+          trust: "Hotel Certificado y Seguro",
+        },
+        nav: {
+          hotel: "Hotel",
+          lazer: "Ocio",
+          quartos: "Habitaciones",
+          gastronomia: "Gastronomía",
+          eventos: "Eventos",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contactos",
+          trabalhe: "Trabaja con nosotros",
+        },
+      },
+      bookingBar: {
+        checkIn: "Entrada",
+        checkOut: "Salida",
+        adults: "Adultos",
+        children: "Niños",
+        guests: "Huéspedes",
+        promoCode: "CUPÓN",
+        reserve: "BUSCAR",
+        selectDate: "Seleccione la fecha",
+      },
+      reservationForm: {
+        checkIn: "Entrada",
+        checkOut: "Salida",
+        dates: "Fechas",
+        guests: "Huéspedes",
+        adults: "Adultos",
+        children: "Niños",
+        promoCode: "CUPÓN",
+        promoCodePlaceholder: "CUPÓN",
+        reserve: "BUSCAR",
+        selectDate: "Seleccione la fecha",
+      },
+      awards: {
+        badge: "Reconocimientos",
+        titleHighlight: "Tus experiencias",
+        titleRest: "nos impulsan",
+        subtitle: "Certificaciones y premios que demuestran nuestra calidad y compromiso con la excelencia",
+        tripadvisor: {
+          excellent: "Excelente",
+          location: "Ubicación",
+          walkable: "Perfecto para peatones",
+          score: "Nota: 99 de 100",
+          rating: "4,5",
+          locationScore: "99"
+        },
+        excellenceAwards: "Premios de Excelencia",
+        otherCertifications: "Otras Certificaciones",
+      },
+    },
     // Footer
     footer: {
       description: "Tu casa en Fortaleza. La tradición de acoger, el placer de renovarse.",
@@ -1767,10 +1998,17 @@ export const pageTranslations = {
       contact: "Contacto",
       address: "Playa de Iracema, Fortaleza - CE",
       copyright: "Todos los derechos reservados.",
+      developedBy: "Desarrollado por Kommu",
       credibility: {
         title: "Certificaciones",
         trust: "Hotel Certificado y Seguro"
       }
+    },
+    reservations: {
+      hero: { title: "Reservas", subtitle: "Confirma tu estancia" },
+    },
+    packages: {
+      hero: { title: "Paquetes", subtitle: "Ofertas especiales" },
     },
     // Página Trabalhe Conosco
     careers: {
@@ -1839,6 +2077,21 @@ export const pageTranslations = {
           ]
         }
       }
+    },
+    blog: {
+      readMore: "Leer más",
+      publishedOn: "Publicado el",
+      noPosts: "No se encontraron publicaciones.",
+      categories: "Categorías",
+      tags: "Etiquetas",
+      recentPosts: "Publicaciones recientes",
+      search: "Buscar",
+      searchPlaceholder: "Buscar en el blog...",
+      sort: "Ordenar",
+      sortRecent: "Más recientes",
+      sortOldest: "Más antiguos",
+      clearFilters: "Limpiar filtros",
+      updatedOn: "Actualizado el"
     }
   },
   en: {
@@ -2015,6 +2268,13 @@ export const pageTranslations = {
         text: "For more information about our services, contact the reservations or reception department",
         button: "Contact Reception"
       },
+      activities: {
+        pool: { title: "Pool Area", description: "Sun loungers, showers and sea view. Restaurant service available.", schedule: "6:00 to 20:00", badge: "Sea View", tags: ["Restaurant", "Coconut Water"] },
+        fitness: { title: "Fitness Space", description: "Air-conditioned environment with sea view for workouts.", schedule: "6:00 to 22:00", badge: "Air Conditioned", tags: ["Sea View", "Modern Equipment"] },
+        bikes: { title: "Bicycles", description: "Free service to explore the city.", badge: "Free", tags: ["Tour", "Waterfront"] },
+        beachTennis: { title: "Beach Tennis Lessons", description: "Free lessons with specialized instructor.", badge: "Free", tags: ["Instructor", "Equipment Included"] },
+        massage: { title: "Massage Sessions", description: "Relax and recharge with massage sessions.", badge: "By Appointment", tags: ["Relaxation", "Wellness"] },
+      },
       locationPrivileged: {
         title: "Privileged Location",
         near: "Just steps away",
@@ -2127,7 +2387,8 @@ export const pageTranslations = {
       },
       certifications: {
         title: "Recognition and Certifications",
-        subtitle: "Our commitment is recognized by national and international organizations"
+        subtitle: "Our commitment is recognized by national and international organizations",
+        pending: "Certifications in progress..."
       },
       cta: {
         title: "Stay with Purpose",
@@ -2169,9 +2430,10 @@ export const pageTranslations = {
       },
       capacity: {
         badge: "8 Rooms Available",
-        title: "Capacity by Configuration",
-        subtitle: "Quickly compare all rooms and choose the ideal configuration for your event. All with independent air conditioning and natural lighting.",
-        note: "* Capacities may vary according to the chosen configuration and specific event needs"
+        title: "Comparative Capacity Table",
+        subtitle: "Quickly compare the capacity of all rooms in each configuration",
+        note: "* Capacities may vary according to the chosen configuration and specific event needs",
+        tip: "Scroll horizontally to see all configurations on mobile devices"
       },
       configurations: {
         title: "Configurations for Every Occasion",
@@ -2447,7 +2709,9 @@ export const pageTranslations = {
         excellent: "Excellent",
         location: "Location",
         walkable: "Great for pedestrians",
-        score: "Score: 99 out of 100"
+        score: "Score: 99 out of 100",
+        rating: "4,5",
+        locationScore: "99"
       },
       excellenceAwards: "Excellence Awards",
       otherCertifications: "Other Certifications"
@@ -2626,6 +2890,30 @@ export const pageTranslations = {
           }
         }
       },
+      packagesSection: {
+        title: "Stay at Sonata!",
+        subtitle: "Choose the perfect experience for your stay",
+        empty: "We will have options available soon!",
+        cta: "View Details →",
+      },
+      socialMedia: {
+        title: "Follow Us on Social Media",
+        subtitle: "See what's happening at Hotel Sonata de Iracema",
+        instagramHandle: "@hotelsonata",
+        instagramUrl: "https://instagram.com/hotelsonata",
+        buttonText: "Follow on Instagram",
+      },
+      sustainabilitySection: {
+        title: "Sustainability and Inclusion",
+        subtitle: "Committed to a better future for everyone",
+      },
+      certificationsSection: {
+        title: "Certifications and Awards",
+        subtitle: "Recognition that proves our quality and commitment",
+      },
+      highlights: {
+        cta: "Learn More",
+      },
       gallery: {
         title: "Unforgettable Moments",
         subtitle: "Every corner of Hotel Sonata was thought to create special memories",
@@ -2680,6 +2968,83 @@ export const pageTranslations = {
         }
       }
     },
+    // Global (header, footer, booking bar, reservation form, awards)
+    global: {
+      header: {
+        nav: {
+          hotel: "Hotel",
+          lazer: "Leisure",
+          quartos: "Rooms",
+          gastronomia: "Gastronomy",
+          eventos: "Events",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contact",
+          trabalhe: "Work with us",
+        },
+      },
+      footer: {
+        description: "Your home in Fortaleza. The tradition of welcoming, the pleasure of renewal.",
+        quickMenu: "Quick Menu",
+        contact: "Contact",
+        address: "Iracema Beach, Fortaleza - CE",
+        copyright: "All rights reserved.",
+        developedBy: "Developed by Kommu",
+        credibility: {
+          title: "Certifications",
+          trust: "Certified and Secure Hotel",
+        },
+        nav: {
+          hotel: "Hotel",
+          lazer: "Leisure",
+          quartos: "Rooms",
+          gastronomia: "Gastronomy",
+          eventos: "Events",
+          blog: "Blog",
+          esg: "ESG",
+          contato: "Contact",
+          trabalhe: "Work with us",
+        },
+      },
+      bookingBar: {
+        checkIn: "Check-in",
+        checkOut: "Check-out",
+        adults: "Adults",
+        children: "Children",
+        guests: "Guests",
+        promoCode: "COUPON",
+        reserve: "SEARCH",
+        selectDate: "Select date",
+      },
+      reservationForm: {
+        checkIn: "Check-in",
+        checkOut: "Check-out",
+        dates: "Dates",
+        guests: "Guests",
+        adults: "Adults",
+        children: "Children",
+        promoCode: "COUPON",
+        promoCodePlaceholder: "COUPON",
+        reserve: "SEARCH",
+        selectDate: "Select date",
+      },
+      awards: {
+        badge: "Recognition",
+        titleHighlight: "Your experiences",
+        titleRest: "drive us",
+        subtitle: "Certifications and awards that prove our quality and commitment to excellence",
+        tripadvisor: {
+          excellent: "Excellent",
+          location: "Location",
+          walkable: "Great for pedestrians",
+          score: "Score: 99 out of 100",
+          rating: "4,5",
+          locationScore: "99"
+        },
+        excellenceAwards: "Excellence Awards",
+        otherCertifications: "Other Certifications",
+      },
+    },
     // Footer
     footer: {
       description: "Your home in Fortaleza. The tradition of welcoming, the pleasure of renewal.",
@@ -2687,10 +3052,17 @@ export const pageTranslations = {
       contact: "Contact",
       address: "Iracema Beach, Fortaleza - CE",
       copyright: "All rights reserved.",
+      developedBy: "Developed by Kommu",
       credibility: {
         title: "Certifications",
         trust: "Certified and Secure Hotel"
       }
+    },
+    reservations: {
+      hero: { title: "Reservations", subtitle: "Confirm your stay" },
+    },
+    packages: {
+      hero: { title: "Packages", subtitle: "Special offers" },
     },
     // Página Trabalhe Conosco
     careers: {
@@ -2759,6 +3131,21 @@ export const pageTranslations = {
           ]
         }
       }
+    },
+    blog: {
+      readMore: "Read more",
+      publishedOn: "Published on",
+      noPosts: "No posts found.",
+      categories: "Categories",
+      tags: "Tags",
+      recentPosts: "Recent posts",
+      search: "Search",
+      searchPlaceholder: "Search blog...",
+      sort: "Sort",
+      sortRecent: "Newest",
+      sortOldest: "Oldest",
+      clearFilters: "Clear filters",
+      updatedOn: "Updated on"
     }
   }
 };

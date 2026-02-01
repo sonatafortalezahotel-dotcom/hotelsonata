@@ -35,10 +35,14 @@ export default function LoginPage() {
         return;
       }
 
-      // Salva token
-      localStorage.setItem("admin_token", data.token);
-      
-      // Redireciona para dashboard
+      // Salva token (protegido: storage pode estar indisponível em alguns contextos)
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          window.localStorage.setItem("admin_token", data.token);
+        }
+      } catch {
+        // Storage indisponível (iframe, modo privado, etc.) – continua com redirect
+      }
       router.push("/admin");
     } catch (error) {
       setError("Erro ao conectar com o servidor");

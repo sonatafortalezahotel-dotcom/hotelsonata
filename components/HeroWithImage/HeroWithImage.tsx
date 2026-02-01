@@ -5,12 +5,14 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 
 interface HeroWithImageProps {
-  title: string;
-  subtitle?: string;
+  title: string | ReactNode;
+  subtitle?: string | ReactNode;
   image?: string | null;
   imageAlt: string;
+  /** Quando informado (ex.: modo edição), renderiza no lugar da imagem estática */
+  imageNode?: ReactNode;
   icon?: ReactNode;
-  badge?: string;
+  badge?: string | ReactNode;
   height?: "small" | "medium" | "large" | "full";
   overlay?: "light" | "medium" | "dark";
   alignment?: "left" | "center" | "right";
@@ -21,6 +23,7 @@ export function HeroWithImage({
   subtitle,
   image,
   imageAlt,
+  imageNode,
   icon,
   badge,
   height = "large",
@@ -49,13 +52,27 @@ export function HeroWithImage({
 
   // Validar se a imagem existe antes de renderizar
   const hasImage = image && image.trim() !== "";
+  const hasImageNode = imageNode != null;
 
   return (
     <section 
       className={`relative ${heightClasses[height]} -mt-20 lg:-mt-28 pt-36 lg:pt-52 flex items-center justify-center overflow-hidden`}
     >
       {/* Imagem de Fundo com Parallax */}
-      {hasImage && (
+      {hasImageNode ? (
+        <div className="absolute inset-0 z-0">
+          {/* Camada da imagem: z-0 para ficar abaixo do overlay e receber cliques */}
+          <div className="absolute inset-0 z-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full [&>div]:absolute [&>div]:inset-0 [&>div]:z-0">
+            {imageNode}
+          </div>
+          {/* Overlay gradiente: z-10 por cima visualmente, pointer-events-none para não bloquear cliques na imagem */}
+          <div
+            className={`absolute inset-0 z-10 pointer-events-none ${overlayClasses[overlay]}`}
+            style={{ pointerEvents: "none" }}
+            aria-hidden
+          />
+        </div>
+      ) : hasImage ? (
         <div className="absolute inset-0 z-0">
           <Image
             src={image}
@@ -70,8 +87,7 @@ export function HeroWithImage({
           {/* Overlay gradiente */}
           <div className={`absolute inset-0 ${overlayClasses[overlay]}`} />
         </div>
-      )}
-      {!hasImage && (
+      ) : (
         <div className={`absolute inset-0 z-0 bg-gradient-to-br from-primary/20 to-primary/40 ${overlayClasses[overlay]}`} />
       )}
 
@@ -93,7 +109,7 @@ export function HeroWithImage({
           {title}
         </h1>
         
-        {subtitle && (
+        {subtitle != null && subtitle !== "" && (
           <p className="text-lg sm:text-xl lg:text-2xl max-w-3xl drop-shadow-xl">
             {subtitle}
           </p>

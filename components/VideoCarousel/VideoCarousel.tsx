@@ -5,6 +5,11 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getVideoUrlType, extractYouTubeVideoId, extractVimeoVideoId } from "@/lib/utils";
+import { useEditor } from "@/lib/context/EditorContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
+import { PageText, PageImage } from "@/components/PageEditor";
+import { getPageContent } from "@/lib/utils/pageContent";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 interface Highlight {
   id: number;
@@ -17,19 +22,50 @@ interface Highlight {
   endDate: string;
 }
 
+interface GalleryPhoto {
+  id: number;
+  imageUrl: string;
+  page?: string | null;
+  section?: string | null;
+  order?: number;
+}
+
 interface VideoCarouselProps {
   highlights?: Highlight[];
   locale?: string;
+  galleryPhotos?: GalleryPhoto[];
 }
 
 export default function VideoCarousel({
   highlights = [],
   locale = "pt",
+  galleryPhotos = [],
 }: VideoCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const editor = useEditor();
+  const overrides = editor?.overrides ?? {};
 
   const items = highlights;
+
+  const getTitle = (index: number) =>
+    editor?.editMode ? (
+      <PageText page="home" section="highlights" fieldKey={`${index}.title`} locale={locale as "pt" | "es" | "en"} as="span" />
+    ) : (
+      getPageContent("home", "highlights", `${index}.title`, locale as "pt" | "es" | "en", overrides) || items[index]?.title
+    );
+  const getDescription = (index: number) =>
+    editor?.editMode ? (
+      <PageText page="home" section="highlights" fieldKey={`${index}.description`} locale={locale as "pt" | "es" | "en"} as="span" />
+    ) : (
+      getPageContent("home", "highlights", `${index}.description`, locale as "pt" | "es" | "en", overrides) || items[index]?.description
+    );
+  const getCta = () =>
+    editor?.editMode ? (
+      <PageText page="home" section="highlights" fieldKey="cta" locale={locale as "pt" | "es" | "en"} as="span" />
+    ) : (
+      getPageContent("home", "highlights", "cta", locale as "pt" | "es" | "en", overrides) || "Saiba Mais"
+    );
 
   useEffect(() => {
     if (items.length <= 1) return;
@@ -133,59 +169,83 @@ export default function VideoCarousel({
             </video>
           ) : (
             // Fallback para imagem se não conseguir processar
-            currentItem.imageUrl ? (
-              <Image
-                src={currentItem.imageUrl}
-                alt={currentItem.title || `Imagem do destaque ${currentIndex + 1}`}
-                fill
-                className="object-cover"
-                priority
-              />
+            (currentItem.imageUrl || editor?.editMode) ? (
+              editor?.editMode ? (
+                <div className="absolute inset-0 [&>div]:absolute [&>div]:inset-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full">
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, `gallery:home:highlights:${currentIndex}`) || currentItem.imageUrl || ""}
+                    path={`gallery:home:highlights:${currentIndex}`}
+                    aspectRatio="auto"
+                    className="absolute inset-0 w-full h-full"
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={currentItem.imageUrl ?? ""}
+                  alt={currentItem.title || `Imagem do destaque ${currentIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
             )
           )
         ) : (
           // Sem vídeo - mostrar imagem ou fallback
-          currentItem.imageUrl ? (
-            <Image
-              src={currentItem.imageUrl}
-              alt={currentItem.title}
-              fill
-              className="object-cover"
-              priority
-            />
+          (currentItem.imageUrl || editor?.editMode) ? (
+            editor?.editMode ? (
+              <div className="absolute inset-0 [&>div]:absolute [&>div]:inset-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full">
+                <PageImage
+                  src={getGalleryImageByPath(galleryPhotos, `gallery:home:highlights:${currentIndex}`) || currentItem.imageUrl || ""}
+                  path={`gallery:home:highlights:${currentIndex}`}
+                  aspectRatio="auto"
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            ) : (
+              <Image
+                src={currentItem.imageUrl ?? ""}
+                alt={currentItem.title ?? "Destaque"}
+                fill
+                className="object-cover"
+                priority
+              />
+            )
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
           )
         )}
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        {/* Overlay gradient - pointer-events-none para permitir clicar na imagem no modo edição */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8">
-        {currentItem.title && (
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-lg">
-            {currentItem.title}
-          </h1>
-        )}
-        {currentItem.description && (
-          <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mb-6 sm:mb-8 drop-shadow-md">
-            {currentItem.description}
-          </p>
-        )}
-        {currentItem.link && (
-          <Button
-            asChild
-            size="lg"
-            className="mt-4 sm:mt-6 shadow-lg"
-          >
-            <a href={currentItem.link}>
-              Saiba Mais
-            </a>
-          </Button>
-        )}
+      {/* Content - pointer-events-none para cliques na imagem; pointer-events-auto só no bloco de texto/CTA */}
+      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8 pointer-events-none">
+        <div className="pointer-events-auto">
+          {(currentItem.title || editor?.editMode) && (
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-lg">
+              {getTitle(currentIndex)}
+            </h1>
+          )}
+          {(currentItem.description || editor?.editMode) && (
+            <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mb-6 sm:mb-8 drop-shadow-md">
+              {getDescription(currentIndex)}
+            </p>
+          )}
+          {(currentItem.link || editor?.editMode) && (
+            <Button
+              asChild
+              size="lg"
+              className="mt-4 sm:mt-6 shadow-lg"
+            >
+              <a href={currentItem.link || "#"}>
+                {getCta()}
+              </a>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Navigation Dots */}

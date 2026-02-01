@@ -3,6 +3,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { useEditor } from "@/lib/context/EditorContext";
+import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
+import { getIcon } from "@/lib/icon-registry";
+import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import RoomsPageContent from "./RoomsPageContent";
 import Image from "next/image";
 import { HeroWithImage } from "@/components/HeroWithImage";
@@ -11,10 +15,12 @@ import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { useRooms } from "@/lib/hooks/useRooms";
 import { getGalleryImageTitle } from "@/lib/utils";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
-export default function RoomsPage() {
+function RoomsPageContentWrapper() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "rooms");
+  const editor = useEditor();
   const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
   const { rooms, loading: roomsLoading } = useRooms(true, locale);
   const loading = galleryLoading || roomsLoading;
@@ -75,29 +81,42 @@ export default function RoomsPage() {
     };
   }, [galleryPhotos]);
 
-  // Usar a mesma foto do banner de quartos da home
+  // Usar a mesma foto do banner de quartos da home (priorizar path do editor para persistir após edição)
   const heroImage = useMemo(() => {
-    // Priorizar a imagem de experiencias-quartos (mesma da home)
+    const byPath = galleryPhotos?.length ? getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-quartos:0") : null;
+    if (byPath) return byPath;
     if (quartosImages.hero) return quartosImages.hero;
-    
-    // Fallback: buscar quarto com vista ao mar
     const seaViewRoom = rooms.find(room => room.hasSeaView);
     if (seaViewRoom?.imageUrl) return seaViewRoom.imageUrl;
-    
-    // Última opção: primeira imagem disponível
     return rooms[0]?.imageUrl || null;
-  }, [quartosImages.hero, rooms]);
+  }, [galleryPhotos, quartosImages.hero, rooms]);
+
+  const overrides = editor?.overrides ?? {};
+  const heroTitle = editor?.editMode ? <PageText page="quartos" section="hero" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("quartos", "hero", "title", locale, overrides) || t.hero.title);
+  const heroSubtitle = editor?.editMode ? <PageText page="quartos" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("quartos", "hero", "subtitle", locale, overrides) || t.hero.subtitle);
+  const heroIconName = getPageContentIcon("hero", "icon", overrides, "Bed");
+  const QuartosHeroIconComponent = getIcon(heroIconName) ?? Bed;
+  const heroIcon = editor?.editMode
+    ? <EditableIcon page="quartos" section="hero" fieldKey="icon" locale={locale} defaultIconName="Bed" defaultIcon={Bed} iconClassName="h-16 w-16" />
+    : <QuartosHeroIconComponent className="h-16 w-16" />;
 
   return (
     <>
       {/* Hero Section - Compensar header fixo */}
       <HeroWithImage
-        title={t.hero.title}
-        subtitle={t.hero.subtitle}
+        title={heroTitle}
+        subtitle={heroSubtitle}
         image={heroImage}
+        imageNode={editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-quartos:0") || heroImage || ""} alt="Hero" path="gallery:home:experiencias-quartos:0" className="absolute inset-0 w-full h-full" /> : undefined}
         imageAlt="Quartos Vista ao Mar - Hotel Sonata de Iracema"
-        icon={<Bed className="h-16 w-16" />}
-        badge="Conforto & Aconchego"
+        icon={heroIcon}
+        badge={
+          editor?.editMode ? (
+            <PageText page="quartos" section="hero" fieldKey="badge" locale={locale} as="span" />
+          ) : (
+            getPageContent("quartos", "hero", "badge", locale, overrides) || "Conforto & Aconchego"
+          )
+        }
         height="large"
         overlay="medium"
       />
@@ -148,4 +167,8 @@ export default function RoomsPage() {
       </section>
     </>
   );
+}
+
+export default function RoomsPage() {
+  return <RoomsPageContentWrapper />;
 }

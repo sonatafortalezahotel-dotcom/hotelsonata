@@ -10,6 +10,8 @@ interface EditorialCarouselProps {
   autoplay?: boolean;
   autoplayInterval?: number;
   showNavigation?: boolean;
+  /** Quando true, setas ficam sempre visíveis (útil em editMode para rolar sem esperar) */
+  navigationAlwaysVisible?: boolean;
   showProgress?: boolean;
 }
 
@@ -26,19 +28,17 @@ export function EditorialCarousel({
   autoplay = false,
   autoplayInterval = 5000,
   showNavigation = true,
+  navigationAlwaysVisible = false,
   showProgress = true,
 }: EditorialCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const totalItems = Array.isArray(children) ? children.length : children ? 1 : 0;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    setTotalItems(container.children.length);
-  }, [children]);
+    if (currentIndex >= totalItems && totalItems > 0) setCurrentIndex(0);
+  }, [totalItems, currentIndex]);
 
   // Autoplay
   useEffect(() => {
@@ -89,7 +89,7 @@ export function EditorialCarousel({
 
   return (
     <div 
-      className={cn("relative w-full overflow-hidden", className)}
+      className={cn("relative w-full overflow-hidden group", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -120,7 +120,7 @@ export function EditorialCarousel({
         )}
       </div>
 
-      {/* Navegação - Setas Minimalistas */}
+      {/* Navegação - Setas < > (sempre visíveis em editMode, senão no hover) */}
       {showNavigation && totalItems > 1 && (
         <>
           <button
@@ -133,7 +133,7 @@ export function EditorialCarousel({
               "border border-white/20",
               "flex items-center justify-center",
               "transition-all duration-300",
-              "opacity-0 group-hover:opacity-100",
+              navigationAlwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
               "hover:scale-110 active:scale-95"
             )}
             aria-label="Anterior"
@@ -151,7 +151,7 @@ export function EditorialCarousel({
               "border border-white/20",
               "flex items-center justify-center",
               "transition-all duration-300",
-              "opacity-0 group-hover:opacity-100",
+              navigationAlwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
               "hover:scale-110 active:scale-95"
             )}
             aria-label="Próximo"

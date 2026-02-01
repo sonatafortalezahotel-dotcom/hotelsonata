@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { useEditor } from "@/lib/context/EditorContext";
+import { PageText } from "@/components/PageEditor";
+import { getPageContent } from "@/lib/utils/pageContent";
 import { useEffect, useState } from "react";
 
 interface SiteSettings {
@@ -73,16 +76,31 @@ export default function Footer() {
     loadSettings();
   }, []);
   
+  const editor = useEditor();
+  const globalOverrides = editor?.globalOverrides ?? {};
   const menuItems = [
-    { label: { pt: "Hotel", es: "Hotel", en: "Hotel" }, href: "/hotel" },
-    { label: { pt: "Lazer", es: "Ocio", en: "Leisure" }, href: "/lazer" },
-    { label: { pt: "Quartos", es: "Habitaciones", en: "Rooms" }, href: "/quartos" },
-    { label: { pt: "Gastronomia", es: "Gastronomía", en: "Gastronomy" }, href: "/gastronomia" },
-    { label: { pt: "Eventos", es: "Eventos", en: "Events" }, href: "/eventos" },
-    { label: { pt: "ESG", es: "ESG", en: "ESG" }, href: "/esg" },
-    { label: { pt: "Contatos", es: "Contactos", en: "Contact" }, href: "/contato" },
-    { label: { pt: "Trabalhe conosco", es: "Trabaja con nosotros", en: "Work with us" }, href: "/trabalhe-conosco" },
+    { fieldKey: "nav.hotel", href: "/hotel" },
+    { fieldKey: "nav.lazer", href: "/lazer" },
+    { fieldKey: "nav.quartos", href: "/quartos" },
+    { fieldKey: "nav.gastronomia", href: "/gastronomia" },
+    { fieldKey: "nav.eventos", href: "/eventos" },
+    { fieldKey: "nav.blog", href: "/blog" },
+    { fieldKey: "nav.esg", href: "/esg" },
+    { fieldKey: "nav.contato", href: "/contato" },
+    { fieldKey: "nav.trabalhe", href: "/trabalhe-conosco" },
   ];
+  const getFooterNavLabel = (fieldKey: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="footer" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "footer", fieldKey, locale, globalOverrides) || "";
+  };
+  const getFooterText = (fieldKey: string, fallback: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="footer" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "footer", fieldKey, locale, globalOverrides) || fallback;
+  };
 
   // Construir endereço completo
   const fullAddress = `${settings.address}, ${settings.city} - ${settings.state}, ${settings.zipCode}`;
@@ -120,7 +138,7 @@ export default function Footer() {
             <div className="col-span-1 md:col-span-2 lg:col-span-3">
               <h3 className="text-2xl font-bold mb-4">Hotel Sonata de Iracema</h3>
               <p className="text-primary-foreground/80 mb-6 leading-relaxed text-sm">
-                {t.description}
+                {getFooterText("description", t.description)}
               </p>
               <div className="flex items-center gap-3">
                 {socialLinks.map((social) => {
@@ -149,7 +167,7 @@ export default function Footer() {
 
             {/* Menu Rápido */}
             <div className="col-span-1 md:col-span-1 lg:col-span-2">
-              <h4 className="text-lg font-semibold mb-4">{t.quickMenu}</h4>
+              <h4 className="text-lg font-semibold mb-4">{getFooterText("quickMenu", t.quickMenu)}</h4>
               <ul className="space-y-3">
                 {menuItems.map((item) => (
                   <li key={item.href}>
@@ -157,7 +175,7 @@ export default function Footer() {
                       href={item.href}
                       className="text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm"
                     >
-                      {item.label[locale as keyof typeof item.label] || item.label.pt}
+                      {getFooterNavLabel(item.fieldKey)}
                     </Link>
                   </li>
                 ))}
@@ -166,7 +184,7 @@ export default function Footer() {
 
             {/* Contato */}
             <div className="col-span-1 md:col-span-1 lg:col-span-3">
-              <h4 className="text-lg font-semibold mb-4">{t.contact}</h4>
+              <h4 className="text-lg font-semibold mb-4">{getFooterText("contact", t.contact)}</h4>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-3 text-primary-foreground/80">
                   <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
@@ -199,7 +217,7 @@ export default function Footer() {
             <div className="col-span-1 md:col-span-2 lg:col-span-4">
               <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Award className="h-5 w-5" />
-                {t.credibility?.title || "Certificações"}
+                {getFooterText("credibility.title", t.credibility?.title || "Certificações")}
               </h4>
               <div className="space-y-4">
                 {/* TripAdvisor */}
@@ -272,7 +290,19 @@ export default function Footer() {
 
           <div className="text-center text-sm text-primary-foreground/60">
             <p>
-              © {new Date().getFullYear()} Hotel Sonata de Iracema. {t.copyright}
+              © {new Date().getFullYear()} Hotel Sonata de Iracema. {t.copyright} {t.developedBy && (
+                <>
+                  {" "}{t.developedBy}{" "}
+                  <a
+                    href="https://www.kommu.com.br"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    (www.kommu.com.br)
+                  </a>
+                </>
+              )}
             </p>
           </div>
         </div>

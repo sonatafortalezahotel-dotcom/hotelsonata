@@ -1,20 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import { ElegantCarousel } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
 
 interface PhotoStoryItem {
-  image: string | null;
-  title: string;
-  description: string;
-  time?: string;
+  image: string | ReactNode | null;
+  title: string | ReactNode;
+  description: string | ReactNode;
+  time?: string | ReactNode;
 }
 
 interface PhotoStoryProps {
-  title: string;
-  subtitle?: string;
+  title: string | ReactNode;
+  subtitle?: string | ReactNode;
   items: PhotoStoryItem[];
   backgroundColor?: "white" | "muted" | "primary";
 }
@@ -90,15 +90,25 @@ export function PhotoStory({
               >
                 {/* Imagem */}
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl mb-6">
-                  {item.image && item.image.trim() !== "" ? (
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="100vw"
-                      priority={index === 0}
-                    />
+                  {typeof item.image === "string" ? (
+                    item.image && item.image.trim() !== "" ? (
+                      <Image
+                        src={item.image}
+                        alt={typeof item.title === "string" ? item.title : "Slide"}
+                        fill
+                        className="object-cover"
+                        sizes="100vw"
+                        priority={index === 0}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                        <span className="text-muted-foreground/50 text-sm">{item.title}</span>
+                      </div>
+                    )
+                  ) : item.image != null ? (
+                    <div className="absolute inset-0 [&>div]:absolute [&>div]:inset-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full">
+                      {item.image}
+                    </div>
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                       <span className="text-muted-foreground/50 text-sm">{item.title}</span>
@@ -149,14 +159,24 @@ export function PhotoStory({
             >
               {/* Imagem */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl mb-6">
-                {item.image && item.image.trim() !== "" ? (
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="50vw"
-                  />
+                {typeof item.image === "string" ? (
+                  item.image && item.image.trim() !== "" ? (
+                    <Image
+                      src={item.image}
+                      alt={typeof item.title === "string" ? item.title : "Slide"}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="50vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                      <span className="text-muted-foreground/50 text-sm">{item.title}</span>
+                    </div>
+                  )
+                ) : item.image != null ? (
+                  <div className="absolute inset-0 [&>div]:absolute [&>div]:inset-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full">
+                    {item.image}
+                  </div>
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                     <span className="text-muted-foreground/50 text-sm">{item.title}</span>

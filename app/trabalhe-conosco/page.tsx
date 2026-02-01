@@ -11,11 +11,21 @@ import { HeroWithImage } from "@/components/HeroWithImage";
 import { Briefcase, Upload, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { useEditor } from "@/lib/context/EditorContext";
+import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
+import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
+import { getIcon } from "@/lib/icon-registry";
+import { useGallery } from "@/lib/hooks/useGallery";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { toast } from "sonner";
 
 export default function TrabalheConoscoPage() {
   const { locale } = useLanguage();
+  const editor = useEditor();
+  const overrides = editor?.overrides ?? {};
   const t = getPageTranslation(locale, "careers");
+  const { photos: galleryPhotos } = useGallery();
+  const heroImageUrl = getGalleryImageByPath(galleryPhotos, "gallery:trabalhe:hero:0");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -144,12 +154,39 @@ export default function TrabalheConoscoPage() {
     <>
       {/* Hero Section */}
       <HeroWithImage
-        title={t.hero.title}
-        subtitle={t.hero.subtitle}
-        image={null}
+        title={
+          editor?.editMode ? (
+            <PageText page="trabalhe" section="hero" fieldKey="title" locale={locale} as="span" className="block" />
+          ) : (
+            getPageContent("trabalhe", "hero", "title", locale, overrides) || t.hero.title
+          )
+        }
+        subtitle={
+          editor?.editMode ? (
+            <PageText page="trabalhe" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" />
+          ) : (
+            getPageContent("trabalhe", "hero", "subtitle", locale, overrides) || t.hero.subtitle
+          )
+        }
+        image={heroImageUrl || null}
+        imageNode={editor?.editMode ? (
+          <PageImage src={heroImageUrl || ""} alt="Hero" path="gallery:trabalhe:hero:0" className="absolute inset-0 w-full h-full" />
+        ) : undefined}
         imageAlt="Trabalhe Conosco - Hotel Sonata"
-        icon={<Briefcase className="h-16 w-16" />}
-        badge={t.hero.badge}
+        icon={(() => {
+          const heroIconName = getPageContentIcon("hero", "icon", overrides, "Briefcase");
+          const HeroIconComponent = getIcon(heroIconName) ?? Briefcase;
+          return editor?.editMode
+            ? <EditableIcon page="trabalhe" section="hero" fieldKey="icon" locale={locale} defaultIconName="Briefcase" defaultIcon={Briefcase} iconClassName="h-16 w-16" />
+            : <HeroIconComponent className="h-16 w-16" />;
+        })()}
+        badge={
+          editor?.editMode ? (
+            <PageText page="trabalhe" section="hero" fieldKey="badge" locale={locale} as="span" />
+          ) : (
+            getPageContent("trabalhe", "hero", "badge", locale, overrides) || t.hero.badge
+          )
+        }
         height="large"
         overlay="medium"
       />
@@ -177,22 +214,22 @@ export default function TrabalheConoscoPage() {
 
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                {t.form.title}
+                {editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="title" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "title", locale, overrides) || t.form.title)}
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                {t.form.subtitle}
+                {editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "subtitle", locale, overrides) || t.form.subtitle)}
               </p>
             </div>
 
             <Card className="shadow-xl">
               <CardHeader>
-                <CardTitle className="text-2xl">{t.form.cardTitle}</CardTitle>
+                <CardTitle className="text-2xl">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="cardTitle" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "cardTitle", locale, overrides) || t.form.cardTitle)}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Nome Completo */}
                   <div className="space-y-2">
-                    <Label htmlFor="name">{t.form.fields.name}</Label>
+                    <Label htmlFor="name">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.name" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.name", locale, overrides) || t.form.fields.name)}</Label>
                     <Input
                       id="name"
                       name="name"
@@ -200,14 +237,14 @@ export default function TrabalheConoscoPage() {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      placeholder={t.form.placeholders.name}
+                      placeholder={getPageContent("trabalhe", "form", "placeholders.name", locale, overrides) || t.form.placeholders.name}
                     />
                   </div>
 
                   {/* Email e Telefone */}
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="email">{t.form.fields.email}</Label>
+                      <Label htmlFor="email">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.email" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.email", locale, overrides) || t.form.fields.email)}</Label>
                       <Input
                         id="email"
                         name="email"
@@ -215,11 +252,11 @@ export default function TrabalheConoscoPage() {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder={t.form.placeholders.email}
+                        placeholder={getPageContent("trabalhe", "form", "placeholders.email", locale, overrides) || t.form.placeholders.email}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">{t.form.fields.phone}</Label>
+                      <Label htmlFor="phone">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.phone" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.phone", locale, overrides) || t.form.fields.phone)}</Label>
                       <Input
                         id="phone"
                         name="phone"
@@ -227,14 +264,14 @@ export default function TrabalheConoscoPage() {
                         required
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder={t.form.placeholders.phone}
+                        placeholder={getPageContent("trabalhe", "form", "placeholders.phone", locale, overrides) || t.form.placeholders.phone}
                       />
                     </div>
                   </div>
 
                   {/* Cargo de Interesse */}
                   <div className="space-y-2">
-                    <Label htmlFor="position">{t.form.fields.position}</Label>
+                    <Label htmlFor="position">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.position" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.position", locale, overrides) || t.form.fields.position)}</Label>
                     <Select
                       value={formData.position}
                       onValueChange={(value) =>
@@ -243,7 +280,7 @@ export default function TrabalheConoscoPage() {
                       required
                     >
                       <SelectTrigger id="position">
-                        <SelectValue placeholder={t.form.placeholders.position} />
+                        <SelectValue placeholder={getPageContent("trabalhe", "form", "placeholders.position", locale, overrides) || t.form.placeholders.position} />
                       </SelectTrigger>
                       <SelectContent>
                         {t.form.positions.map((pos: string, index: number) => (
@@ -257,20 +294,20 @@ export default function TrabalheConoscoPage() {
 
                   {/* Mensagem */}
                   <div className="space-y-2">
-                    <Label htmlFor="message">{t.form.fields.message}</Label>
+                    <Label htmlFor="message">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.message" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.message", locale, overrides) || t.form.fields.message)}</Label>
                     <Textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
-                      placeholder={t.form.placeholders.message}
+                      placeholder={getPageContent("trabalhe", "form", "placeholders.message", locale, overrides) || t.form.placeholders.message}
                       rows={5}
                     />
                   </div>
 
                   {/* Upload de Currículo */}
                   <div className="space-y-2">
-                    <Label htmlFor="resume">{t.form.fields.resume}</Label>
+                    <Label htmlFor="resume">{editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="fields.resume" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "fields.resume", locale, overrides) || t.form.fields.resume)}</Label>
                     <div className="flex items-center gap-4">
                       <Input
                         id="resume"
@@ -287,7 +324,7 @@ export default function TrabalheConoscoPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {t.form.resumeHint}
+                      {editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="resumeHint" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "resumeHint", locale, overrides) || t.form.resumeHint)}
                     </p>
                   </div>
 
@@ -306,13 +343,13 @@ export default function TrabalheConoscoPage() {
                     ) : (
                       <>
                         <Upload className="mr-2 h-4 w-4" />
-                        {t.form.button}
+                        {editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="button" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "button", locale, overrides) || t.form.button)}
                       </>
                     )}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">
-                    {t.form.privacy}
+                    {editor?.editMode ? <PageText page="trabalhe" section="form" fieldKey="privacy" locale={locale} as="span" /> : (getPageContent("trabalhe", "form", "privacy", locale, overrides) || t.form.privacy)}
                   </p>
                 </form>
               </CardContent>
@@ -322,24 +359,24 @@ export default function TrabalheConoscoPage() {
             <div className="mt-12 grid md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">{t.info.process.title}</CardTitle>
+                  <CardTitle className="text-lg">{editor?.editMode ? <PageText page="trabalhe" section="info" fieldKey="process.title" locale={locale} as="span" /> : (getPageContent("trabalhe", "info", "process.title", locale, overrides) || t.info.process.title)}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {t.info.process.description}
+                    {editor?.editMode ? <PageText page="trabalhe" section="info" fieldKey="process.description" locale={locale} as="span" /> : (getPageContent("trabalhe", "info", "process.description", locale, overrides) || t.info.process.description)}
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">{t.info.benefits.title}</CardTitle>
+                  <CardTitle className="text-lg">{editor?.editMode ? <PageText page="trabalhe" section="info" fieldKey="benefits.title" locale={locale} as="span" /> : (getPageContent("trabalhe", "info", "benefits.title", locale, overrides) || t.info.benefits.title)}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="text-sm text-muted-foreground space-y-2">
                     {t.info.benefits.items.map((benefit: string, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>{benefit}</span>
+                        <span>{editor?.editMode ? <PageText page="trabalhe" section="info" fieldKey={`benefits.items.${index}`} locale={locale} as="span" /> : (getPageContent("trabalhe", "info", `benefits.items.${index}`, locale, overrides) || benefit)}</span>
                       </li>
                     ))}
                   </ul>

@@ -17,6 +17,7 @@ const staticPages = [
   { path: "/esg", priority: 0.7, changefreq: "monthly" },
   { path: "/contato", priority: 0.7, changefreq: "monthly" },
   { path: "/pacotes", priority: 0.9, changefreq: "daily" },
+  { path: "/blog", priority: 0.8, changefreq: "daily" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -167,6 +168,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch (error) {
     console.error("Erro ao buscar landing pages para sitemap:", error);
+  }
+
+  // Blog: índice + posts publicados
+  try {
+    const { blogPosts } = await import("@/lib/db/schema");
+    for (const locale of locales) {
+      const blogPath = locale === "pt" ? "/blog" : `/${locale}/blog`;
+      urls.push({
+        url: `${SITE_URL}${blogPath}`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.8,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((loc) => [
+              loc === "pt" ? "pt-BR" : loc === "en" ? "en-US" : "es-ES",
+              loc === "pt" ? `${SITE_URL}/blog` : `${SITE_URL}/${loc}/blog`,
+            ])
+          ),
+        },
+      });
+    }
+    const publishedPosts = await db
+      .select({ slug: blogPosts.slug, locale: blogPosts.locale, updatedAt: blogPosts.updatedAt })
+      .from(blogPosts)
+      .where(eq(blogPosts.status, "published"));
+    for (const post of publishedPosts) {
+      const path =
+        post.locale === "pt" ? `/blog/${post.slug}` : `/${post.locale}/blog/${post.slug}`;
+      urls.push({
+        url: `${SITE_URL}${path}`,
+        lastModified: post.updatedAt ? new Date(post.updatedAt) : new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((loc) => [
+              loc === "pt" ? "pt-BR" : loc === "en" ? "en-US" : "es-ES",
+              loc === "pt"
+                ? `${SITE_URL}/blog/${post.slug}`
+                : `${SITE_URL}/${loc}/blog/${post.slug}`,
+            ])
+          ),
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar blog para sitemap:", error);
   }
 
   return urls;

@@ -14,10 +14,13 @@ import { PhotoStory } from "@/components/PhotoStory";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
 import { HorizontalScroll, EditorialCarousel, EditorialSlide, MasonrySwap } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
-import { Waves, UtensilsCrossed, Bed, Sparkles, PawPrint, Trophy } from "lucide-react";
+import { PageText, PageImage } from "@/components/PageEditor";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useEditor } from "@/lib/context/EditorContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { getPageContent } from "@/lib/utils/pageContent";
 import { getGalleryImageTitle } from "@/lib/utils";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 // Função para buscar quartos do banco de dados
 async function getRooms(locale: string = 'pt') {
@@ -39,6 +42,30 @@ async function getRooms(locale: string = 'pt') {
     return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Erro ao buscar quartos:', error);
+    return [];
+  }
+}
+
+// Função para buscar todos os pacotes ativos
+async function getPackages() {
+  try {
+    const res = await fetch('/api/packages', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      console.error('Erro ao buscar pacotes:', res.status, res.statusText);
+      return [];
+    }
+    
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Erro ao buscar pacotes:', error);
     return [];
   }
 }
@@ -96,15 +123,16 @@ async function getDayUsePackage() {
 
 // Função para buscar galeria de fotos do banco de dados
 // Busca apenas imagens da home para melhor performance
-async function getGalleryPhotos() {
+// Cache-bust opcional para refetch após edição (evita resposta em cache)
+async function getGalleryPhotos(cacheBust?: boolean) {
   try {
-    // Buscar apenas imagens da página home
-    const res = await fetch('/api/gallery?page=home&active=true', {
+    const url = cacheBust
+      ? `/api/gallery?page=home&active=true&_t=${Date.now()}`
+      : '/api/gallery?page=home&active=true';
+    const res = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store'
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
     });
     
     if (!res.ok) {
@@ -224,8 +252,11 @@ async function getHighlights() {
 
 export default function Home() {
   const { locale } = useLanguage();
+  const editor = useEditor();
+  const overrides = editor?.overrides ?? {};
   const t = getPageTranslation(locale, "home");
   const [rooms, setRooms] = useState<any[]>([]);
+  const [packages, setPackages] = useState<any[]>([]);
   const [socialPosts, setSocialPosts] = useState<any[]>([]);
   const [sustainability, setSustainability] = useState<any[]>([]);
   const [certifications, setCertifications] = useState<any[]>([]);
@@ -313,9 +344,9 @@ export default function Home() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [roomsData, dayUseData, socialData, sustainabilityData, certificationsData, galleryData, highlightsData] = await Promise.all([
+        const [roomsData, packagesData, socialData, sustainabilityData, certificationsData, galleryData, highlightsData] = await Promise.all([
           getRooms(locale),
-          getDayUsePackage(),
+          getPackages(),
           getSocialMediaPosts(),
           getSustainability(),
           getCertifications(),
@@ -323,25 +354,8 @@ export default function Home() {
           getHighlights() // Buscar highlights do carrossel
         ]);
         
-        // Combinar quartos com Day Use (se existir)
-        let combinedRooms = Array.isArray(roomsData) ? roomsData : [];
-        
-        // Se Day Use existe, adicionar como um "quarto" especial
-        if (dayUseData) {
-          console.log('Day Use encontrado:', dayUseData);
-          combinedRooms.push({
-            id: dayUseData.id,
-            code: "day-use",
-            name: dayUseData.name || "Day Use",
-            description: dayUseData.description,
-            shortDescription: dayUseData.description,
-            imageUrl: dayUseData.imageUrl,
-          });
-        } else {
-          console.log('Day Use não encontrado no banco de dados');
-        }
-        
-        setRooms(combinedRooms);
+        setRooms(Array.isArray(roomsData) ? roomsData : []);
+        setPackages(Array.isArray(packagesData) ? packagesData : []);
         setSocialPosts(Array.isArray(socialData) ? socialData : []);
         setSustainability(Array.isArray(sustainabilityData) ? sustainabilityData : []);
         setCertifications(Array.isArray(certificationsData) ? certificationsData : []);
@@ -357,12 +371,26 @@ export default function Home() {
     fetchData();
   }, [locale]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onGalleryUpdated = async () => {
+      try {
+        const galleryData = await getGalleryPhotos(true);
+        setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
+      } catch (error) {
+        console.error("Erro ao atualizar galeria:", error);
+      }
+    };
+    window.addEventListener("gallery-updated", onGalleryUpdated);
+    return () => window.removeEventListener("gallery-updated", onGalleryUpdated);
+  }, []);
+
   return (
     <>
       {/* Hero/Carrossel - Usa highlights do banco de dados ou fallback para vídeo fixo */}
       <div className="relative -mt-20 lg:-mt-28">
         {highlights && highlights.length > 0 ? (
-          <VideoCarousel highlights={highlights} locale={locale} />
+          <VideoCarousel highlights={highlights} locale={locale} galleryPhotos={galleryPhotos} />
         ) : (
           <Hero videoId="xptckGz4eH8" height="100vh" />
         )}
@@ -373,10 +401,34 @@ export default function Home() {
         <ReservationForm />
       </div>
 
-      {/* Seção de Quartos - integrada com banco de dados */}
+      {/* Seção de Quartos e Pacotes - integrada com banco de dados */}
       {/* Padding top adicional para compensar a sobreposição do formulário */}
       <div className="pt-12 lg:pt-16">
-        <PackagesSection rooms={rooms} />
+        <PackagesSection
+          rooms={rooms}
+          packages={packages}
+          title={
+            editor?.editMode ? (
+              <PageText page="home" section="packagesSection" fieldKey="title" locale={locale} as="span" />
+            ) : (
+              getPageContent("home", "packagesSection", "title", locale, overrides) || t.packagesSection?.title
+            )
+          }
+          subtitle={
+            editor?.editMode ? (
+              <PageText page="home" section="packagesSection" fieldKey="subtitle" locale={locale} as="span" />
+            ) : (
+              getPageContent("home", "packagesSection", "subtitle", locale, overrides) || t.packagesSection?.subtitle
+            )
+          }
+          empty={
+            editor?.editMode ? (
+              <PageText page="home" section="packagesSection" fieldKey="empty" locale={locale} as="span" />
+            ) : (
+              getPageContent("home", "packagesSection", "empty", locale, overrides) || t.packagesSection?.empty
+            )
+          }
+        />
       </div>
 
       {/* Experiências Visuais - CARROSSEL EDITORIAL FULLWIDTH */}
@@ -391,10 +443,37 @@ export default function Home() {
             {/* Piscina Vista Mar */}
           {homeImages.experienceImages.piscina[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.piscina[0]}
-              title={t.experiences.cards.pool.title}
-              subtitle={t.experiences.cards.pool.badge}
-              description={t.experiences.cards.pool.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-piscina:0") || homeImages.experienceImages.piscina[0]}
+                    path="gallery:home:experiencias-piscina:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.piscina[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.pool.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.pool.title", locale, overrides) || t.experiences.cards.pool.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.pool.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.pool.badge", locale, overrides) || t.experiences.cards.pool.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.pool.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.pool.description", locale, overrides) || t.experiences.cards.pool.description
+                )
+              }
               textPosition="bottom-left"
               overlay="dark"
             />
@@ -403,10 +482,37 @@ export default function Home() {
             {/* Gastronomia Regional */}
           {homeImages.experienceImages.gastronomia[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.gastronomia[0]}
-              title={t.experiences.cards.gastronomy.title}
-              subtitle={t.experiences.cards.gastronomy.badge}
-              description={t.experiences.cards.gastronomy.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-gastronomia:0") || homeImages.experienceImages.gastronomia[0]}
+                    path="gallery:home:experiencias-gastronomia:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.gastronomia[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.gastronomy.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.gastronomy.title", locale, overrides) || t.experiences.cards.gastronomy.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.gastronomy.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.gastronomy.badge", locale, overrides) || t.experiences.cards.gastronomy.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.gastronomy.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.gastronomy.description", locale, overrides) || t.experiences.cards.gastronomy.description
+                )
+              }
               textPosition="bottom-right"
               overlay="dark"
             />
@@ -415,10 +521,37 @@ export default function Home() {
             {/* Quartos Confortáveis */}
           {homeImages.experienceImages.quartos[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.quartos[0]}
-              title={t.experiences.cards.rooms.title}
-              subtitle={t.experiences.cards.rooms.badge}
-              description={t.experiences.cards.rooms.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-quartos:0") || homeImages.experienceImages.quartos[0]}
+                    path="gallery:home:experiencias-quartos:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.quartos[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.rooms.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.rooms.title", locale, overrides) || t.experiences.cards.rooms.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.rooms.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.rooms.badge", locale, overrides) || t.experiences.cards.rooms.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.rooms.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.rooms.description", locale, overrides) || t.experiences.cards.rooms.description
+                )
+              }
               textPosition="bottom-left"
               overlay="dark"
             />
@@ -427,10 +560,37 @@ export default function Home() {
             {/* Spa & Bem-Estar */}
           {homeImages.experienceImages.spa[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.spa[0]}
-              title={t.experiences.cards.spa.title}
-              subtitle={t.experiences.cards.spa.badge}
-              description={t.experiences.cards.spa.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-spa:0") || homeImages.experienceImages.spa[0]}
+                    path="gallery:home:experiencias-spa:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.spa[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.spa.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.spa.title", locale, overrides) || t.experiences.cards.spa.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.spa.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.spa.badge", locale, overrides) || t.experiences.cards.spa.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.spa.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.spa.description", locale, overrides) || t.experiences.cards.spa.description
+                )
+              }
               textPosition="bottom-right"
               overlay="dark"
             />
@@ -439,10 +599,37 @@ export default function Home() {
             {/* Beach Tennis */}
           {homeImages.experienceImages.beachTennis[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.beachTennis[0]}
-              title={t.experiences.cards.beachTennis.title}
-              subtitle={t.experiences.cards.beachTennis.badge}
-              description={t.experiences.cards.beachTennis.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-beach-tennis:0") || homeImages.experienceImages.beachTennis[0]}
+                    path="gallery:home:experiencias-beach-tennis:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.beachTennis[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.beachTennis.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.beachTennis.title", locale, overrides) || t.experiences.cards.beachTennis.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.beachTennis.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.beachTennis.badge", locale, overrides) || t.experiences.cards.beachTennis.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.beachTennis.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.beachTennis.description", locale, overrides) || t.experiences.cards.beachTennis.description
+                )
+              }
               textPosition="bottom-left"
               overlay="dark"
             />
@@ -451,10 +638,37 @@ export default function Home() {
             {/* Pet Friendly */}
           {homeImages.experienceImages.sustentabilidade[0] && (
             <EditorialSlide
-              image={homeImages.experienceImages.sustentabilidade[0]}
-              title={t.experiences.cards.sustainability.title}
-              subtitle={t.experiences.cards.sustainability.badge}
-              description={t.experiences.cards.sustainability.description}
+              image={
+                editor?.editMode ? (
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, "gallery:home:experiencias-sustentabilidade:0") || homeImages.experienceImages.sustentabilidade[0]}
+                    path="gallery:home:experiencias-sustentabilidade:0"
+                    aspectRatio="auto"
+                    className="absolute inset-0"
+                  />
+                ) : homeImages.experienceImages.sustentabilidade[0]
+              }
+              title={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.sustainability.title" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.sustainability.title", locale, overrides) || t.experiences.cards.sustainability.title
+                )
+              }
+              subtitle={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.sustainability.badge" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.sustainability.badge", locale, overrides) || t.experiences.cards.sustainability.badge
+                )
+              }
+              description={
+                editor?.editMode ? (
+                  <PageText page="home" section="experiences" fieldKey="cards.sustainability.description" locale={locale} as="span" />
+                ) : (
+                  getPageContent("home", "experiences", "cards.sustainability.description", locale, overrides) || t.experiences.cards.sustainability.description
+                )
+              }
               textPosition="bottom-right"
               overlay="dark"
             />
@@ -464,106 +678,107 @@ export default function Home() {
 
       {/* PhotoStory - Um Dia no Hotel - GRID 1x4 FULLWIDTH */}
       <section className="relative overflow-hidden">
-        {/* Mobile: Carrossel Horizontal */}
-        <div className="lg:hidden">
-          <HorizontalScroll 
-            itemWidth="full" 
-            showArrows={false} 
-            showDots={true}
-            gap={0}
-          >
-            {homeImages.photoStoryPhotos
-              .slice(0, 4)
-              .map((photo, index) => {
-                const items = [
-                  { title: t.photoStory.items.sunrise.title, description: t.photoStory.items.sunrise.description, time: t.photoStory.items.sunrise.time },
-                  { title: t.photoStory.items.breakfast.title, description: t.photoStory.items.breakfast.description, time: t.photoStory.items.breakfast.time },
-                  { title: t.photoStory.items.bike.title, description: t.photoStory.items.bike.description, time: t.photoStory.items.bike.time },
-                  { title: t.photoStory.items.beachTennis.title, description: t.photoStory.items.beachTennis.description, time: t.photoStory.items.beachTennis.time }
-                ];
-                const item = items[index] || items[0];
-                
-                if (!photo.imageUrl || photo.imageUrl.trim() === '') return null;
-                
-                return (
-                  <div key={index} className="group relative overflow-hidden">
-                    <div className="relative w-full h-[400px]">
-                      <Image
-                        src={photo.imageUrl}
-                        alt={item.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="100vw"
-                      />
-                      {/* Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      
-                      {/* Texto */}
-                      <div className="absolute inset-0 flex flex-col justify-end p-6">
-                        <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">
-                          {item.time}
-                        </span>
-                        <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">
-                          {item.title}
-                        </h3>
-                        <p className="text-white/90 text-sm leading-relaxed">
-                          {item.description}
-                        </p>
+        {(() => {
+          const photoStoryKeys = ["sunrise", "breakfast", "bike", "beachTennis"] as const;
+          const getPhotoStoryItem = (index: number) => {
+            const key = photoStoryKeys[index] ?? "sunrise";
+            const itemT = t.photoStory?.items?.[key];
+            return {
+              title: editor?.editMode ? (
+                <PageText page="home" section="photoStory" fieldKey={`items.${key}.title`} locale={locale} as="span" />
+              ) : (
+                getPageContent("home", "photoStory", `items.${key}.title`, locale, overrides) || (itemT?.title ?? "")
+              ),
+              description: editor?.editMode ? (
+                <PageText page="home" section="photoStory" fieldKey={`items.${key}.description`} locale={locale} as="span" />
+              ) : (
+                getPageContent("home", "photoStory", `items.${key}.description`, locale, overrides) || (itemT?.description ?? "")
+              ),
+              time: editor?.editMode ? (
+                <PageText page="home" section="photoStory" fieldKey={`items.${key}.time`} locale={locale} as="span" />
+              ) : (
+                getPageContent("home", "photoStory", `items.${key}.time`, locale, overrides) || (itemT?.time ?? "")
+              ),
+              titleStr: getPageContent("home", "photoStory", `items.${key}.title`, locale, overrides) || (itemT?.title ?? ""),
+            };
+          };
+          return (
+            <>
+              {/* Mobile: Carrossel Horizontal */}
+              <div className="lg:hidden">
+                <HorizontalScroll itemWidth="full" showArrows={false} showDots={true} gap={0}>
+                  {homeImages.photoStoryPhotos.slice(0, 4).map((photo, index) => {
+                    const item = getPhotoStoryItem(index);
+                    if (!photo.imageUrl || photo.imageUrl.trim() === "") return null;
+                    return (
+                      <div key={index} className="group relative overflow-hidden">
+                        <div className="relative w-full h-[400px]">
+                          {editor?.editMode ? (
+                            <PageImage
+                              src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
+                              path={`gallery:home:photo-story:${index}`}
+                              aspectRatio="auto"
+                              className="absolute inset-0"
+                            />
+                          ) : (
+                            <Image
+                              src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
+                              alt={item.titleStr}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                              sizes="100vw"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="absolute inset-0 flex flex-col justify-end p-6">
+                            <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">{item.time}</span>
+                            <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
+                            <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </HorizontalScroll>
+              </div>
+              {/* Desktop: 4 colunas */}
+              <div className="hidden lg:grid lg:grid-cols-4 gap-0">
+                {homeImages.photoStoryPhotos.slice(0, 4).map((photo, index) => {
+                  const item = getPhotoStoryItem(index);
+                  if (!photo.imageUrl || photo.imageUrl.trim() === "") return null;
+                  return (
+                    <div key={index} className="group relative overflow-hidden">
+                      <div className="relative w-full h-[500px]">
+                        {editor?.editMode ? (
+                          <PageImage
+                            src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
+                            path={`gallery:home:photo-story:${index}`}
+                            aspectRatio="auto"
+                            className="absolute inset-0"
+                          />
+                        ) : (
+                          <Image
+                            src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
+                            alt={item.titleStr}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            sizes="25vw"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                        <div className="absolute inset-0 flex flex-col justify-end p-6">
+                          <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2">{item.time}</span>
+                          <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
+                          <p className="text-white/90 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-              .filter(item => item !== null)}
-          </HorizontalScroll>
-        </div>
-
-        {/* Desktop: 4 colunas lado a lado sem espaço */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-0">
-          {homeImages.photoStoryPhotos
-            .slice(0, 4)
-            .map((photo, index) => {
-              const items = [
-                { title: t.photoStory.items.sunrise.title, description: t.photoStory.items.sunrise.description, time: t.photoStory.items.sunrise.time },
-                { title: t.photoStory.items.breakfast.title, description: t.photoStory.items.breakfast.description, time: t.photoStory.items.breakfast.time },
-                { title: t.photoStory.items.bike.title, description: t.photoStory.items.bike.description, time: t.photoStory.items.bike.time },
-                { title: t.photoStory.items.beachTennis.title, description: t.photoStory.items.beachTennis.description, time: t.photoStory.items.beachTennis.time }
-              ];
-              const item = items[index] || items[0];
-              
-              if (!photo.imageUrl || photo.imageUrl.trim() === '') return null;
-              
-              return (
-                <div key={index} className="group relative overflow-hidden">
-                  <div className="relative w-full h-[500px]">
-                    <Image
-                      src={photo.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="25vw"
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                    
-                    {/* Texto */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-6">
-                      <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2">
-                        {item.time}
-                      </span>
-                      <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">
-                        {item.title}
-                      </h3>
-                      <p className="text-white/90 text-sm leading-relaxed line-clamp-3">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-            .filter(item => item !== null)}
-        </div>
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {/* Galeria - Momentos Inesquecíveis - MASONRY ANIMADO */}
@@ -573,15 +788,36 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              {t.gallery.title}
+              {editor?.editMode ? (
+                <PageText page="home" section="gallery" fieldKey="title" locale={locale} as="span" />
+              ) : (
+                getPageContent("home", "gallery", "title", locale, overrides) || t.gallery.title
+              )}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t.gallery.subtitle}
+              {editor?.editMode ? (
+                <PageText page="home" section="gallery" fieldKey="subtitle" locale={locale} as="span" />
+              ) : (
+                getPageContent("home", "gallery", "subtitle", locale, overrides) || t.gallery.subtitle
+              )}
             </p>
           </div>
           
           {/* Grid Masonry com imagens trocando de posição */}
-          {homeImages.galeriaMomentosPhotos.length >= 4 ? (
+          {editor?.editMode ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {homeImages.galeriaMomentosPhotos.slice(0, 9).map((photo, index) => (
+                <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                  <PageImage
+                    src={getGalleryImageByPath(galleryPhotos, `gallery:home:galeria-momentos:${index}`) || photo.imageUrl}
+                    path={`gallery:home:galeria-momentos:${index}`}
+                    aspectRatio="auto"
+                    className="w-full h-full"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : homeImages.galeriaMomentosPhotos.length >= 4 ? (
             <MasonrySwap
               images={homeImages.galeriaMomentosPhotos
                 .map(photo => photo.imageUrl)
@@ -589,28 +825,32 @@ export default function Home() {
               interval={5000}
             />
           ) : (
-          <ImageGalleryGrid
-            images={homeImages.galeriaMomentosPhotos
-              .map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title
-                };
-              })
-              .filter(img => img.src)}
-            columns={3}
-            aspectRatio="landscape"
-          />
+            <ImageGalleryGrid
+              images={homeImages.galeriaMomentosPhotos
+                .map((photo, index) => {
+                  const title = getGalleryImageTitle(photo, index + 1);
+                  return {
+                    src: photo.imageUrl,
+                    alt: title,
+                    title: title
+                  };
+                })
+                .filter(img => img.src)}
+              columns={3}
+              aspectRatio="landscape"
+            />
           )}
         </div>
       </section>
 
+      {/* Sustentabilidade - integrado com banco de dados */}
+      <SustainabilitySection items={sustainability} galleryPhotos={galleryPhotos} />
 
+      {/* Certificações - integrado com banco de dados */}
+      <CertificationsSection certifications={certifications} galleryPhotos={galleryPhotos} />
 
       {/* Feed de Redes Sociais - integrado com banco de dados */}
-      <SocialMediaFeed posts={socialPosts} />
+      <SocialMediaFeed posts={socialPosts} galleryPhotos={galleryPhotos} />
     </>
   );
 }

@@ -5,6 +5,34 @@
 
 import { fetchGalleryWithFallback, fetchGalleryByCategory } from "./gallery-mapper";
 
+/** Foto da galeria com campos usados por getGalleryImageByPath */
+export interface GalleryPhotoForPath {
+  page?: string | null;
+  section?: string | null;
+  order?: number;
+  imageUrl: string;
+}
+
+/**
+ * Resolve a URL da imagem a partir do path usado no editor (ex: gallery:hotel:hero:0).
+ * Prioriza o registro da galeria com page/section/order correspondentes, para que
+ * após salvar no editor e recarregar a página a imagem atualizada seja exibida.
+ */
+export function getGalleryImageByPath(
+  photos: GalleryPhotoForPath[] | undefined | null,
+  path: string
+): string | null {
+  if (!path.startsWith("gallery:") || !photos?.length) return null;
+  const parts = path.split(":");
+  if (parts.length < 4) return null;
+  const [, page, section, orderStr] = parts;
+  const order = parseInt(orderStr ?? "0", 10) ?? 0;
+  const photo = photos.find(
+    (p) => (p.page ?? "") === page && (p.section ?? "") === section && (p.order ?? 0) === order
+  );
+  return photo?.imageUrl ?? null;
+}
+
 /**
  * Busca imagens para uma seção específica de uma página
  * Prioriza sistema novo, mas faz fallback para sistema antigo se necessário

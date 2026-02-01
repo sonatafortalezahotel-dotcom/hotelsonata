@@ -1,19 +1,23 @@
 'use client';
 
 import Image from "next/image";
+import React, { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from "lucide-react";
 import { useState } from "react";
 
 interface AmenityCardProps {
-  title: string;
-  description: string;
-  images: string[];
-  icon?: LucideIcon;
-  schedule?: string;
-  badge?: string;
-  tags?: string[];
+  title: string | ReactNode;
+  description: string | ReactNode;
+  images: (string | ReactNode)[];
+  /** Ícone Lucide ou ReactNode (ex.: EditableIcon no modo edição). */
+  icon?: LucideIcon | ReactNode;
+  schedule?: string | ReactNode;
+  badge?: string | ReactNode;
+  tags?: (string | ReactNode)[];
+  /** Quando definido (ex.: modo edição), substitui a lista de tags por este conteúdo (ex.: EditableTagList). */
+  tagsSlot?: ReactNode;
 }
 
 export function AmenityCard({ 
@@ -23,10 +27,11 @@ export function AmenityCard({
   icon: Icon,
   schedule,
   badge,
-  tags = []
+  tags = [],
+  tagsSlot,
 }: AmenityCardProps) {
-  // Filtrar imagens vazias e validar array
-  const validImages = Array.isArray(images) ? images.filter(img => img && img.trim() !== "") : [];
+  // Filtrar imagens - strings vazias removidas; ReactNodes mantidos
+  const validImages = Array.isArray(images) ? images.filter(img => img != null && (typeof img !== "string" || img.trim() !== "")) : [];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = () => {
@@ -42,22 +47,33 @@ export function AmenityCard({
   };
 
   const currentImage = validImages.length > 0 ? validImages[currentImageIndex] : null;
+  const isReactNode = currentImage != null && typeof currentImage !== "string";
+  // Lucide icons can be function components or forwardRef (object); only valid elements should be rendered directly
+  const isIconElement = Icon != null && React.isValidElement(Icon);
+  const isIconComponent = Icon != null && !isIconElement && (typeof Icon === "function" || (typeof Icon === "object" && "$$typeof" in (Icon as object)));
+  const IconComponent = isIconComponent ? (Icon as LucideIcon) : null;
 
   return (
     <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group">
       {/* Galeria de Imagens */}
       <div className="relative aspect-[4/3] overflow-hidden">
         {currentImage ? (
-          <Image
-            src={currentImage}
-            alt={`${title} - Imagem ${currentImageIndex + 1}`}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+          isReactNode ? (
+            <div className="absolute inset-0 [&>div]:absolute [&>div]:inset-0 [&_img]:object-cover [&_img]:w-full [&_img]:h-full">
+              {currentImage}
+            </div>
+          ) : (
+            <Image
+              src={currentImage as string}
+              alt={typeof title === "string" ? `${title} - Imagem ${currentImageIndex + 1}` : `Imagem ${currentImageIndex + 1}`}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          )
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-            {Icon && <Icon className="h-16 w-16 text-muted-foreground/50" />}
+            {Icon && (isIconElement ? Icon : IconComponent ? <IconComponent className="h-16 w-16 text-muted-foreground/50" /> : <span className="h-16 w-16 flex items-center justify-center text-muted-foreground/50">Ícone</span>)}
           </div>
         )}
         
@@ -70,7 +86,7 @@ export function AmenityCard({
           </div>
         )}
 
-        {/* Navegação de Imagens - Apenas se houver mais de uma */}
+        {/* Navegação de Imagens - Apenas se houver mais de uma (inclui modo edição com várias PageImage) */}
         {validImages.length > 1 && (
           <>
             <button
@@ -110,8 +126,8 @@ export function AmenityCard({
           </>
         )}
 
-        {/* Overlay gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Overlay gradiente - pointer-events-none para permitir clicar na imagem no modo edição */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent" />
       </div>
 
       {/* Conteúdo */}
@@ -119,7 +135,7 @@ export function AmenityCard({
         <div className="flex items-start gap-3 mb-4">
           {Icon && (
             <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Icon className="h-6 w-6 text-primary" />
+              {isIconElement ? Icon : IconComponent ? <IconComponent className="h-6 w-6 text-primary" /> : null}
             </div>
           )}
           <div className="flex-1">
@@ -140,8 +156,10 @@ export function AmenityCard({
           {description}
         </p>
 
-        {/* Tags */}
-        {tags.length > 0 && (
+        {/* Tags ou slot editável (ex.: EditableTagList no modo edição) */}
+        {tagsSlot != null ? (
+          <div className="flex flex-wrap gap-2">{tagsSlot}</div>
+        ) : tags.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
               <Badge key={index} variant="outline" className="text-xs">
@@ -149,7 +167,7 @@ export function AmenityCard({
               </Badge>
             ))}
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

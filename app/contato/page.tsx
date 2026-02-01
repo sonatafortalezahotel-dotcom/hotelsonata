@@ -11,8 +11,12 @@ import { FullWidthGallery, AsymmetricGallery } from "@/components/HorizontalScro
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { useEditor } from "@/lib/context/EditorContext";
+import { getPageContent } from "@/lib/utils/pageContent";
+import { PageText, PageImage } from "@/components/PageEditor";
 import { useEffect, useState, useMemo } from "react";
 import { useGallery } from "@/lib/hooks/useGallery";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 // Função para buscar informações de contato
 async function getContactInfo() {
@@ -53,9 +57,10 @@ async function getContactInfo() {
   }
 }
 
-export default function ContatoPage() {
+function ContatoPageContent() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "contact");
+  const editor = useEditor();
   const [contactInfo, setContactInfo] = useState<any>(null);
   const { photos: galleryPhotos } = useGallery();
 
@@ -136,11 +141,18 @@ export default function ContatoPage() {
     <>
       {/* Hero Section com Imagem */}
       <HeroWithImage
-        title={t.hero.title}
-        subtitle={t.hero.subtitle}
-        image={contatoImages.hero || galleryPhotos[0]?.imageUrl || null}
+        title={editor?.editMode ? <PageText page="contato" section="hero" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("contato", "hero", "title", locale, editor?.overrides ?? {}) || t.hero.title)}
+        subtitle={editor?.editMode ? <PageText page="contato" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("contato", "hero", "subtitle", locale, editor?.overrides ?? {}) || t.hero.subtitle)}
+        image={getGalleryImageByPath(galleryPhotos, "gallery:contato:hero-contato:0") || contatoImages.hero || galleryPhotos[0]?.imageUrl || null}
+        imageNode={editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:contato:hero-contato:0") || contatoImages.hero || galleryPhotos[0]?.imageUrl || ""} alt="Hero" path="gallery:contato:hero-contato:0" className="absolute inset-0 w-full h-full" /> : undefined}
         imageAlt="Recepção Hotel Sonata de Iracema"
-        badge={t.hero.badge}
+        badge={
+          editor?.editMode ? (
+            <PageText page="contato" section="hero" fieldKey="badge" locale={locale} as="span" />
+          ) : (
+            getPageContent("contato", "hero", "badge", locale, editor?.overrides ?? {}) || t.hero.badge
+          )
+        }
         height="large"
         overlay="medium"
       />
@@ -151,10 +163,18 @@ export default function ContatoPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24 pb-8">
           <div className="text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.team.title}
+              {editor?.editMode ? (
+                <PageText page="contato" section="team" fieldKey="title" locale={locale} as="span" />
+              ) : (
+                getPageContent("contato", "team", "title", locale, editor?.overrides ?? {}) || t.team.title
+              )}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t.team.subtitle}
+              {editor?.editMode ? (
+                <PageText page="contato" section="team" fieldKey="subtitle" locale={locale} as="span" />
+              ) : (
+                getPageContent("contato", "team", "subtitle", locale, editor?.overrides ?? {}) || t.team.subtitle
+              )}
             </p>
           </div>
         </div>
@@ -163,8 +183,10 @@ export default function ContatoPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-[400px] md:h-[500px] lg:h-[600px]">
           {/* Recepção */}
           <div className="relative overflow-hidden group">
-            {(() => {
-              const imageUrl = contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl;
+            {editor?.editMode ? (
+              <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:0") || contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl || ""} path="gallery:contato:galeria-equipe:0" className="w-full h-full object-cover" />
+            ) : (() => {
+              const imageUrl = getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:0") || contatoImages.galeriaEquipe[0] || galleryPhotos[0]?.imageUrl;
               return imageUrl && imageUrl.trim() !== "" ? (
                 <Image
                   src={imageUrl}
@@ -176,17 +198,23 @@ export default function ContatoPage() {
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
               );
             })()}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.reception.title}</h3>
-              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.reception.description}</p>
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} />
+            <div className="absolute bottom-8 left-8 right-8 text-white z-10">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="reception.title" locale={locale} as="span" /> : (getPageContent("contato", "team", "reception.title", locale, editor?.overrides ?? {}) || t.team.reception.title)}
+              </h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="reception.description" locale={locale} as="span" /> : (getPageContent("contato", "team", "reception.description", locale, editor?.overrides ?? {}) || t.team.reception.description)}
+              </p>
             </div>
           </div>
 
           {/* Gastronomia */}
           <div className="relative overflow-hidden group">
-            {(() => {
-              const imageUrl = contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl;
+            {editor?.editMode ? (
+              <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:1") || contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl || ""} path="gallery:contato:galeria-equipe:1" className="w-full h-full object-cover" />
+            ) : (() => {
+              const imageUrl = getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:1") || contatoImages.galeriaEquipe[1] || galleryPhotos[1]?.imageUrl;
               return imageUrl && imageUrl.trim() !== "" ? (
                 <Image
                   src={imageUrl}
@@ -198,17 +226,23 @@ export default function ContatoPage() {
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
               );
             })()}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.gastronomy.title}</h3>
-              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.gastronomy.description}</p>
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} />
+            <div className="absolute bottom-8 left-8 right-8 text-white z-10">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="gastronomy.title" locale={locale} as="span" /> : (getPageContent("contato", "team", "gastronomy.title", locale, editor?.overrides ?? {}) || t.team.gastronomy.title)}
+              </h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="gastronomy.description" locale={locale} as="span" /> : (getPageContent("contato", "team", "gastronomy.description", locale, editor?.overrides ?? {}) || t.team.gastronomy.description)}
+              </p>
             </div>
           </div>
 
           {/* Lazer */}
           <div className="relative overflow-hidden group">
-            {(() => {
-              const imageUrl = contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl;
+            {editor?.editMode ? (
+              <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:2") || contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl || ""} path="gallery:contato:galeria-equipe:2" className="w-full h-full object-cover" />
+            ) : (() => {
+              const imageUrl = getGalleryImageByPath(galleryPhotos, "gallery:contato:galeria-equipe:2") || contatoImages.galeriaEquipe[2] || galleryPhotos[2]?.imageUrl;
               return imageUrl && imageUrl.trim() !== "" ? (
                 <Image
                   src={imageUrl}
@@ -220,10 +254,14 @@ export default function ContatoPage() {
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
               );
             })()}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">{t.team.leisure.title}</h3>
-              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">{t.team.leisure.description}</p>
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} />
+            <div className="absolute bottom-8 left-8 right-8 text-white z-10">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 drop-shadow-2xl">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="leisure.title" locale={locale} as="span" /> : (getPageContent("contato", "team", "leisure.title", locale, editor?.overrides ?? {}) || t.team.leisure.title)}
+              </h3>
+              <p className="text-white/90 text-sm md:text-base drop-shadow-lg">
+                {editor?.editMode ? <PageText page="contato" section="team" fieldKey="leisure.description" locale={locale} as="span" /> : (getPageContent("contato", "team", "leisure.description", locale, editor?.overrides ?? {}) || t.team.leisure.description)}
+              </p>
             </div>
           </div>
         </div>
@@ -232,10 +270,10 @@ export default function ContatoPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pb-24">
           <div className="text-center bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg max-w-3xl mx-auto">
             <p className="text-lg text-muted-foreground mb-4">
-              {t.team.message}
+              {editor?.editMode ? <PageText page="contato" section="team" fieldKey="message" locale={locale} as="span" /> : (getPageContent("contato", "team", "message", locale, editor?.overrides ?? {}) || t.team.message)}
             </p>
             <p className="text-foreground font-semibold">
-              {t.team.local}
+              {editor?.editMode ? <PageText page="contato" section="team" fieldKey="local" locale={locale} as="span" /> : (getPageContent("contato", "team", "local", locale, editor?.overrides ?? {}) || t.team.local)}
             </p>
           </div>
         </div>
@@ -248,7 +286,7 @@ export default function ContatoPage() {
             {/* Formulário */}
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-6">
-                {t.form.title}
+                {editor?.editMode ? <PageText page="contato" section="form" fieldKey="title" locale={locale} as="span" /> : (getPageContent("contato", "form", "title", locale, editor?.overrides ?? {}) || t.form.title)}
               </h2>
               <Card className="shadow-xl">
                 <CardContent className="pt-6">
@@ -300,10 +338,10 @@ export default function ContatoPage() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-3xl font-bold text-foreground mb-6">
-                  {t.info.title}
+                  {editor?.editMode ? <PageText page="contato" section="info" fieldKey="title" locale={locale} as="span" /> : (getPageContent("contato", "info", "title", locale, editor?.overrides ?? {}) || t.info.title)}
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  {t.info.subtitle}
+                  {editor?.editMode ? <PageText page="contato" section="info" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("contato", "info", "subtitle", locale, editor?.overrides ?? {}) || t.info.subtitle)}
                 </p>
               </div>
 
@@ -441,21 +479,37 @@ export default function ContatoPage() {
         </div>
       </section>
 
-      {/* Como Chegar - Galeria Fullwidth Assimétrica */}
+      {/* Como Chegar - Localização Privilegiada (título, subtítulo, imagens e cards editáveis) */}
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.location.title}
+              {editor?.editMode ? (
+                <PageText page="contato" section="location" fieldKey="title" locale={locale} as="span" />
+              ) : (
+                getPageContent("contato", "location", "title", locale, editor?.overrides ?? {}) || t.location.title
+              )}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t.location.subtitle}
+              {editor?.editMode ? (
+                <PageText page="contato" section="location" fieldKey="subtitle" locale={locale} as="span" />
+              ) : (
+                getPageContent("contato", "location", "subtitle", locale, editor?.overrides ?? {}) || t.location.subtitle
+              )}
             </p>
           </div>
         </div>
 
         {/* Galeria Assimétrica se tiver 5+ fotos, senão 1x4 */}
-        {contatoImages.galeriaLocalizacao.length >= 5 ? (
+        {editor?.editMode ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 container mx-auto px-4 sm:px-6 lg:px-8">
+            {Array.from({ length: 4 }, (_, i) => contatoImages.galeriaLocalizacao[i]).map((photo, i) => (
+              <div key={i} className="relative aspect-video rounded-lg overflow-hidden">
+                <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:contato:galeria-localizacao:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:contato:galeria-localizacao:${i}`} aspectRatio="auto" className="w-full h-full" />
+              </div>
+            ))}
+          </div>
+        ) : contatoImages.galeriaLocalizacao.length >= 5 ? (
           <AsymmetricGallery
             images={contatoImages.galeriaLocalizacao.map((photo: any) => photo.imageUrl).filter((img: string) => img)}
             interval={4500}
@@ -473,22 +527,58 @@ export default function ContatoPage() {
             <Card>
               <CardContent className="pt-6 text-center">
                 <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">{t.location.ponte}</h3>
-                <p className="text-sm text-muted-foreground">{t.location.ponteDistance}</p>
+                <h3 className="font-bold mb-2">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="ponte" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "ponte", locale, editor?.overrides ?? {}) || t.location.ponte
+                  )}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="ponteDistance" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "ponteDistance", locale, editor?.overrides ?? {}) || t.location.ponteDistance
+                  )}
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">{t.location.dragao}</h3>
-                <p className="text-sm text-muted-foreground">{t.location.dragaoDistance}</p>
+                <h3 className="font-bold mb-2">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="dragao" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "dragao", locale, editor?.overrides ?? {}) || t.location.dragao
+                  )}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="dragaoDistance" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "dragaoDistance", locale, editor?.overrides ?? {}) || t.location.dragaoDistance
+                  )}
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">{t.location.airport}</h3>
-                <p className="text-sm text-muted-foreground">{t.location.airportDistance}</p>
+                <h3 className="font-bold mb-2">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="airport" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "airport", locale, editor?.overrides ?? {}) || t.location.airport
+                  )}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {editor?.editMode ? (
+                    <PageText page="contato" section="location" fieldKey="airportDistance" locale={locale} as="span" />
+                  ) : (
+                    getPageContent("contato", "location", "airportDistance", locale, editor?.overrides ?? {}) || t.location.airportDistance
+                  )}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -510,4 +600,8 @@ export default function ContatoPage() {
       </section>
     </>
   );
+}
+
+export default function ContatoPage() {
+  return <ContatoPageContent />;
 }

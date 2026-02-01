@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import SkipToContent from "@/components/SkipToContent";
 import { AwardsSection } from "@/components/AwardsSection";
 import BookingBar from "@/components/BookingBar";
+import { EditorProvider } from "@/lib/context/EditorContext";
 import { cn } from "@/lib/utils";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -18,23 +19,23 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <>
+    <EditorProvider>
       <SkipToContent />
       <Header />
       {/* BookingBar: sticky na home, fixo/relativo nas outras páginas */}
       <BookingBar isHomePage={isHomePage} />
       {/* 
         Espaçamento superior: 
-        - Home: sem pt extra (BookingBar é sticky)
-        - Outras: lg:pt-0 porque BookingBar está acima do main
-        - Mobile: pb-24 (96px) = espaço para BookingBar fixo em mobile (agora mais compacta)
-        - Desktop: lg:pb-16 (64px) = espaço antes do footer
+        - Home: pt para Header + BookingBar sticky
+        - Outras: pt para não ficar atrás do Header (fixo) + BookingBar (sticky) — header ~96px + barra ~48px
+        - Mobile: pb-24 (96px) = espaço para BookingBar fixo em mobile
+        - Desktop: lg:pb-16 = espaço antes do footer
       */}
       <main 
         id="main-content" 
         className={cn(
           "pb-24 lg:pb-16 min-h-screen relative z-10",
-          isHomePage ? "pt-20 lg:pt-28" : "pt-20 lg:pt-0"
+          isHomePage ? "pt-20 lg:pt-28" : "pt-20 lg:pt-36"
         )}
         tabIndex={-1}
       >
@@ -53,7 +54,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         }}
       />
       <Footer />
-    </>
+    </EditorProvider>
   );
 }
 

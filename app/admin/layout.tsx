@@ -18,6 +18,8 @@ import {
   MapPin,
   BookOpen,
   Search,
+  Layout,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,6 +28,7 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
+  { icon: Layout, label: "Editor Visual", href: "/admin/visual-editor" },
   { icon: BookOpen, label: "Reservas", href: "/admin/reservations" },
   { icon: Image, label: "Destaques", href: "/admin/highlights" },
   { icon: Package, label: "Pacotes", href: "/admin/packages" },
@@ -36,6 +39,7 @@ const menuItems = [
   { icon: Award, label: "Certificações", href: "/admin/certifications" },
   { icon: Instagram, label: "Redes Sociais", href: "/admin/social-media" },
   { icon: Search, label: "SEO & Landing Pages", href: "/admin/seo" },
+  { icon: FileText, label: "Blog", href: "/admin/blog" },
   { icon: Settings, label: "Configurações", href: "/admin/settings" },
 ];
 
@@ -50,17 +54,31 @@ export default function AdminLayout({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Verifica se está autenticado
-    const token = localStorage.getItem("admin_token");
-    if (!token && pathname !== "/admin/login") {
-      router.push("/admin/login");
-    } else {
+    try {
+      if (typeof window === "undefined" || !window.localStorage) {
+        setIsAuthenticated(true);
+        return;
+      }
+      const token = window.localStorage.getItem("admin_token");
+      if (!token && pathname !== "/admin/login") {
+        router.push("/admin/login");
+      } else {
+        setIsAuthenticated(true);
+      }
+    } catch {
+      // Storage indisponível neste contexto (iframe, etc.)
       setIsAuthenticated(true);
     }
   }, [pathname, router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.removeItem("admin_token");
+      }
+    } catch {
+      // ignorar se storage não disponível
+    }
     router.push("/admin/login");
   };
 

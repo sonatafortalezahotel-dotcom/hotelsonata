@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean, varchar, integer, date, jsonb, decimal } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, boolean, varchar, integer, date, jsonb, decimal, uniqueIndex, primaryKey } from "drizzle-orm/pg-core";
 
 // Tabela de usuários (para admin)
 export const users = pgTable("users", {
@@ -408,4 +408,98 @@ export const seoLandingPageTranslations = pgTable("seo_landing_page_translations
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Conteúdo editável por página (overrides de traduções no editor visual)
+export const pageContent = pgTable("page_content", {
+  id: serial("id").primaryKey(),
+  page: varchar("page", { length: 50 }).notNull(), // hotel | lazer | quartos | gastronomia | eventos | esg | contato
+  section: varchar("section", { length: 100 }).notNull(), // hero, gallery, etc.
+  fieldKey: varchar("field_key", { length: 100 }).notNull(), // title, subtitle, description
+  locale: varchar("locale", { length: 5 }).notNull(), // pt, es, en
+  value: text("value").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// --- Blog ---
+
+// Categorias do blog
+export const blogCategories = pgTable("blog_categories", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  order: integer("order").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Traduções para categorias do blog
+export const blogCategoryTranslations = pgTable("blog_category_translations", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").notNull().references(() => blogCategories.id, { onDelete: "cascade" }),
+  locale: varchar("locale", { length: 5 }).notNull(), // "pt", "es", "en"
+  name: text("name").notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Tags do blog
+export const blogTags = pgTable("blog_tags", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Traduções para tags do blog
+export const blogTagTranslations = pgTable("blog_tag_translations", {
+  id: serial("id").primaryKey(),
+  tagId: integer("tag_id").notNull().references(() => blogTags.id, { onDelete: "cascade" }),
+  locale: varchar("locale", { length: 5 }).notNull(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Posts do blog (slug+locale único por idioma)
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 200 }).notNull(),
+  locale: varchar("locale", { length: 5 }).notNull().default("pt"), // "pt", "es", "en"
+  title: text("title").notNull(),
+  excerpt: text("excerpt"),
+  content: text("content"), // HTML
+  featuredImageUrl: text("featured_image_url"),
+  authorName: text("author_name"),
+  authorUrl: text("author_url"),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  status: varchar("status", { length: 20 }).default("draft").notNull(), // "draft" | "published"
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  metaKeywords: text("meta_keywords"),
+  ogImage: text("og_image"),
+  canonicalUrl: text("canonical_url"),
+  order: integer("order").default(0).notNull(),
+}, (table) => ({
+  slugLocaleUnique: uniqueIndex("blog_posts_slug_locale_idx").on(table.slug, table.locale),
+}));
+
+// Relação N:N posts <-> categorias
+export const blogPostCategories = pgTable("blog_post_categories", {
+  postId: integer("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  categoryId: integer("category_id").notNull().references(() => blogCategories.id, { onDelete: "cascade" }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.postId, table.categoryId] }),
+}));
+
+// Relação N:N posts <-> tags
+export const blogPostTags = pgTable("blog_post_tags", {
+  postId: integer("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  tagId: integer("tag_id").notNull().references(() => blogTags.id, { onDelete: "cascade" }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.postId, table.tagId] }),
+}));
 

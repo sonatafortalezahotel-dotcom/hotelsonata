@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface FeatureImageSectionProps {
-  title: string;
+  title: string | ReactNode;
   description: string | ReactNode;
   image: string | null;
   imageAlt: string;
-  badge?: string;
+  /** Quando informado (ex.: modo edição), renderiza no lugar da imagem estática */
+  imageNode?: ReactNode;
+  badge?: string | ReactNode;
   imagePosition?: "left" | "right";
   features?: string[];
   ctaText?: string;
@@ -23,6 +25,7 @@ export function FeatureImageSection({
   description,
   image,
   imageAlt,
+  imageNode,
   badge,
   imagePosition = "right",
   features,
@@ -77,7 +80,11 @@ export function FeatureImageSection({
           {/* Imagem */}
           <div className={`relative ${imagePosition === "left" ? "lg:order-1" : "order-2"}`}>
             <div className="relative aspect-[4/5] lg:aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl">
-              {image && image.trim() !== "" ? (
+              {imageNode != null ? (
+                <div className="absolute inset-0 [&>img]:w-full [&>img]:h-full [&>img]:object-cover">
+                  {imageNode}
+                </div>
+              ) : image && image.trim() !== "" ? (
                 <Image
                   src={image}
                   alt={imageAlt}

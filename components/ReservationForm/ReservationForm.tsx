@@ -22,6 +22,10 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useEditor } from "@/lib/context/EditorContext";
+import { PageText } from "@/components/PageEditor";
+import { getPageContent } from "@/lib/utils/pageContent";
+import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
 
 interface ReservationFormProps {
   className?: string;
@@ -44,45 +48,21 @@ export default function ReservationForm({
     setIsMounted(true);
   }, []);
 
-  const labels = {
-    pt: {
-      checkIn: "Check-in",
-      checkOut: "Check-out",
-      dates: "Datas",
-      guests: "Hóspedes",
-      adults: "Adultos",
-      children: "Crianças",
-      promoCode: "CUPOM",
-      promoCodePlaceholder: "CUPOM",
-      reserve: "PESQUISAR",
-      selectDate: "Selecione a data",
-    },
-    es: {
-      checkIn: "Entrada",
-      checkOut: "Salida",
-      dates: "Fechas",
-      guests: "Huéspedes",
-      adults: "Adultos",
-      children: "Niños",
-      promoCode: "CUPÓN",
-      promoCodePlaceholder: "CUPÓN",
-      reserve: "BUSCAR",
-      selectDate: "Seleccione la fecha",
-    },
-    en: {
-      checkIn: "Check-in",
-      checkOut: "Check-out",
-      dates: "Dates",
-      guests: "Guests",
-      adults: "Adults",
-      children: "Children",
-      promoCode: "COUPON",
-      promoCodePlaceholder: "COUPON",
-      reserve: "SEARCH",
-      selectDate: "Select date",
-    },
+  const editor = useEditor();
+  const globalOverrides = editor?.globalOverrides ?? {};
+  const getLabel = (fieldKey: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="reservationForm" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "reservationForm", fieldKey, locale, globalOverrides) || "";
   };
-
+  const getLabelStr = (fieldKey: string, fallback: string) =>
+    getPageContent("global", "reservationForm", fieldKey, locale, globalOverrides) || fallback;
+  const labels = {
+    pt: { checkIn: "Check-in", checkOut: "Check-out", dates: "Datas", guests: "Hóspedes", adults: "Adultos", children: "Crianças", promoCode: "CUPOM", promoCodePlaceholder: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", dates: "Fechas", guests: "Huéspedes", adults: "Adultos", children: "Niños", promoCode: "CUPÓN", promoCodePlaceholder: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", dates: "Dates", guests: "Guests", adults: "Adults", children: "Children", promoCode: "COUPON", promoCodePlaceholder: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+  };
   const t = labels[locale as keyof typeof labels] || labels.pt;
 
   const handleReserve = () => {
@@ -113,31 +93,28 @@ export default function ReservationForm({
     setIsLoading(true);
     
     try {
-      const checkInStr = format(checkIn, "yyyy-MM-dd");
-      const checkOutStr = format(checkOut, "yyyy-MM-dd");
-      const params = new URLSearchParams({
-        checkin: checkInStr,
-        checkout: checkOutStr,
-        adults: adults,
-        children: children,
+      // Construir URL da Omnibees com os parâmetros
+      const omnibeesUrl = buildOmnibeesUrl({
+        checkIn,
+        checkOut,
+        adults,
+        children,
+        promoCode: promoCode.trim() || undefined,
+        locale: locale as "pt" | "es" | "en",
       });
-      
-      if (promoCode.trim()) {
-        params.append("promo", promoCode.trim());
-      }
       
       // Toast de sucesso antes do redirect
       toast.success(
         locale === "en" 
-          ? "Searching for availability..." 
+          ? "Redirecting to booking system..." 
           : locale === "es" 
-          ? "Buscando disponibilidad..."
-          : "Buscando disponibilidade..."
+          ? "Redirigiendo al sistema de reservas..."
+          : "Redirecionando para o sistema de reservas..."
       );
       
       // Pequeno delay para o usuário ver o feedback
       setTimeout(() => {
-        window.location.href = `/reservas?${params.toString()}`;
+        window.location.href = omnibeesUrl;
       }, 500);
     } catch (error) {
       setIsLoading(false);
@@ -190,12 +167,12 @@ export default function ReservationForm({
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
-                            {t.checkIn}
+                            {getLabel("checkIn")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -223,12 +200,12 @@ export default function ReservationForm({
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
-                        {t.checkIn}
+                        {getLabel("checkIn")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                         </span>
                       </div>
                     </div>
@@ -251,12 +228,12 @@ export default function ReservationForm({
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
-                            {t.checkOut}
+                            {getLabel("checkOut")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -287,12 +264,12 @@ export default function ReservationForm({
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
-                        {t.checkOut}
+                        {getLabel("checkOut")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                         </span>
                       </div>
                     </div>
@@ -325,7 +302,7 @@ export default function ReservationForm({
                     <PopoverContent className="w-auto p-4" align="start">
                       <div className="space-y-4 min-w-[200px]">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{t.adults}</label>
+                          <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                           <Select value={adults} onValueChange={setAdults}>
                             <SelectTrigger className="w-full">
                               <SelectValue />
@@ -340,7 +317,7 @@ export default function ReservationForm({
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{t.children}</label>
+                          <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
                           <Select value={children} onValueChange={setChildren}>
                             <SelectTrigger className="w-full">
                               <SelectValue />
@@ -390,7 +367,7 @@ export default function ReservationForm({
                   <Input
                     id="promoCode"
                     type="text"
-                    placeholder={t.promoCode}
+                    placeholder={getLabelStr("promoCodePlaceholder", t.promoCode)}
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs lg:text-sm"

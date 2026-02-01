@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils";
 import { useScrollBehavior } from "@/hooks/useScrollBehavior";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useEditor } from "@/lib/context/EditorContext";
+import { PageText } from "@/components/PageEditor";
+import { getPageContent } from "@/lib/utils/pageContent";
 
 interface HeaderContentProps {
   usePrimaryBackground?: boolean;
@@ -75,15 +78,24 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
     }
   }, [isLanguageMenuOpen]);
 
+  const editor = useEditor();
+  const globalOverrides = editor?.globalOverrides ?? {};
   const menuItems = [
-    { label: { pt: "Hotel", es: "Hotel", en: "Hotel" }, href: "/hotel" },
-    { label: { pt: "Lazer", es: "Ocio", en: "Leisure" }, href: "/lazer" },
-    { label: { pt: "Quartos", es: "Habitaciones", en: "Rooms" }, href: "/quartos" },
-    { label: { pt: "Gastronomia", es: "Gastronomía", en: "Gastronomy" }, href: "/gastronomia" },
-    { label: { pt: "Eventos", es: "Eventos", en: "Events" }, href: "/eventos" },
-    { label: { pt: "ESG", es: "ESG", en: "ESG" }, href: "/esg" },
-    { label: { pt: "Contatos", es: "Contactos", en: "Contact" }, href: "/contato" },
+    { fieldKey: "nav.hotel", href: "/hotel" },
+    { fieldKey: "nav.lazer", href: "/lazer" },
+    { fieldKey: "nav.quartos", href: "/quartos" },
+    { fieldKey: "nav.gastronomia", href: "/gastronomia" },
+    { fieldKey: "nav.eventos", href: "/eventos" },
+    { fieldKey: "nav.blog", href: "/blog" },
+    { fieldKey: "nav.esg", href: "/esg" },
+    { fieldKey: "nav.contato", href: "/contato" },
   ];
+  const getNavLabel = (fieldKey: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="header" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "header", fieldKey, locale, globalOverrides) || "";
+  };
 
   const languages = [
     { code: "pt" as const, name: "PT", label: "Português", flag: "🇧🇷" },
@@ -182,7 +194,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="text-lg font-medium hover:text-primary transition-colors"
                     >
-                      {item.label[locale as keyof typeof item.label] || item.label.pt}
+                      {getNavLabel(item.fieldKey)}
                     </Link>
                   ))}
                 </nav>
@@ -247,7 +259,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                 )}
               >
                 <span>
-                  {item.label[locale as keyof typeof item.label] || item.label.pt}
+                  {getNavLabel(item.fieldKey)}
                 </span>
                 <span
                   className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 transition-all duration-300 group-hover:w-3/4 bg-primary-foreground"

@@ -8,6 +8,11 @@ import { Loader2, Filter, Grid, List } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useEditor } from "@/lib/context/EditorContext";
+import { getPageContent } from "@/lib/utils/pageContent";
+import { PageText, PageImage } from "@/components/PageEditor";
+import { useGallery } from "@/lib/hooks/useGallery";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { getRooms } from "@/lib/hooks/useRooms";
 import RoomCardEnhanced from "@/components/RoomCard/RoomCardEnhanced";
@@ -37,9 +42,12 @@ interface Room {
 
 export default function ReservasPage() {
   const { locale } = useLanguage();
+  const editor = useEditor();
+  const { photos: galleryPhotos } = useGallery();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const overrides = editor?.overrides ?? {};
+
   const [checkIn, setCheckIn] = useState<Date | null>(null);
   const [checkOut, setCheckOut] = useState<Date | null>(null);
   const [adults, setAdults] = useState("2");
@@ -97,6 +105,30 @@ export default function ReservasPage() {
   };
 
   const t = labels[locale as keyof typeof labels] || labels.pt;
+
+  // Hero: título, subtítulo e imagem editáveis em editMode
+  const heroTitle =
+    editor?.editMode ? (
+      <PageText page="reservas" section="hero" fieldKey="title" locale={locale} as="span" className="block" />
+    ) : (
+      getPageContent("reservas", "hero", "title", locale, overrides) || t.title
+    );
+  const heroSubtitle =
+    editor?.editMode ? (
+      <PageText page="reservas" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" />
+    ) : (
+      getPageContent("reservas", "hero", "subtitle", locale, overrides) || t.subtitle
+    );
+  const heroImageUrl =
+    getGalleryImageByPath(galleryPhotos, "gallery:reservas:hero-reservas:0") || heroImage;
+  const heroImageNode = editor?.editMode ? (
+    <PageImage
+      src={heroImageUrl}
+      alt="Buscar Quartos"
+      path="gallery:reservas:hero-reservas:0"
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+  ) : undefined;
 
   // Carregar parâmetros da URL
   useEffect(() => {
@@ -279,12 +311,13 @@ export default function ReservasPage() {
 
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero Section - título, subtítulo e imagem de fundo editáveis em ?editMode=1 */}
       <HeroWithImage
-        title={t.title}
-        subtitle={t.subtitle}
-        image={heroImage}
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        image={heroImageNode ? undefined : heroImageUrl || undefined}
         imageAlt="Buscar Quartos"
+        imageNode={heroImageNode ?? undefined}
         height="small"
         overlay="medium"
       />

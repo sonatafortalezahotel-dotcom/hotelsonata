@@ -337,3 +337,107 @@ export function generateBreadcrumbStructuredData(
   };
 }
 
+/**
+ * Gera Structured Data (JSON-LD) para BlogPosting (SEO padrão 2025)
+ */
+export function generateBlogPostingStructuredData(options: {
+  headline: string;
+  description?: string;
+  image?: string;
+  datePublished: string; // ISO 8601
+  dateModified: string; // ISO 8601
+  url: string; // canonical / mainEntityOfPage
+  author?: { name: string; url?: string };
+  publisher?: { name: string; logo?: string };
+  siteUrl?: string;
+}): object {
+  const siteUrl = options.siteUrl ?? DEFAULT_SITE_URL;
+  const publisherName = options.publisher?.name ?? DEFAULT_SITE_NAME;
+  const structuredData: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: options.headline,
+    ...(options.description && { description: options.description }),
+    image: options.image
+      ? (options.image.startsWith("http") ? options.image : `${siteUrl}${options.image}`)
+      : `${siteUrl}/og-image.jpg`,
+    datePublished: options.datePublished,
+    dateModified: options.dateModified,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": options.url,
+    },
+    author: options.author
+      ? {
+          "@type": "Person",
+          name: options.author.name,
+          ...(options.author.url && { url: options.author.url }),
+        }
+      : {
+          "@type": "Organization",
+          name: publisherName,
+        },
+    publisher: {
+      "@type": "Organization",
+      name: publisherName,
+      ...(options.publisher?.logo && {
+        logo: {
+          "@type": "ImageObject",
+          url: options.publisher.logo.startsWith("http")
+            ? options.publisher.logo
+            : `${siteUrl}${options.publisher.logo}`,
+        },
+      }),
+    },
+  };
+  return structuredData;
+}
+
+/**
+ * Opções de metadata para artigos (blog post)
+ */
+export interface ArticleMetadataOptions {
+  publishedTime?: string; // ISO 8601
+  modifiedTime?: string; // ISO 8601
+  authors?: string[];
+  section?: string;
+  tags?: string[];
+}
+
+/**
+ * Gera metadata Next.js para artigo (type: "article") com campos Open Graph de artigo
+ */
+export function generateArticleMetadata(
+  seoData: SEOData,
+  options: {
+    locale?: string;
+    path?: string;
+    siteName?: string;
+    siteUrl?: string;
+    twitterHandle?: string;
+    additionalKeywords?: string[];
+    article?: ArticleMetadataOptions;
+  } = {}
+): Metadata {
+  const base = generateMetadata(seoData, {
+    ...options,
+    type: "article",
+  });
+
+  const article = options.article;
+  if (!article) return base;
+
+  return {
+    ...base,
+    openGraph: {
+      ...base.openGraph,
+      type: "article",
+      ...(article.publishedTime && { publishedTime: article.publishedTime }),
+      ...(article.modifiedTime && { modifiedTime: article.modifiedTime }),
+      ...(article.authors && article.authors.length > 0 && { authors: article.authors }),
+      ...(article.section && { section: article.section }),
+      ...(article.tags && article.tags.length > 0 && { tags: article.tags }),
+    },
+  };
+}
+

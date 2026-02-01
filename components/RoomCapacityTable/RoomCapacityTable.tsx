@@ -3,6 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { useEditor } from "@/lib/context/EditorContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
+import { getPageContent } from "@/lib/utils/pageContent";
+import { PageText } from "@/components/PageEditor";
 
 const rooms = [
   { name: "Sonata", area: 196, auditorium: 250, espinha: 100, escola: 130, u: 60, banquete: 100, isMain: true },
@@ -23,13 +27,41 @@ const configurations = [
   { key: "banquete", label: "Banquete", image: "/Sobre Hotel/Eventos/BANQUETA.jpg" }
 ];
 
+function cellValue(
+  get: (section: string, fieldKey: string) => string,
+  roomIndex: number,
+  field: "name" | "area" | "auditorium" | "espinha" | "escola" | "u" | "banquete",
+  fallback: string | number
+): string {
+  const v = get("capacity", `table.rooms.${roomIndex}.${field}`);
+  return v !== "" ? v : String(fallback);
+}
+
 export function RoomCapacityTable() {
+  const editor = useEditor();
+  const { locale } = useLanguage();
+  const overrides = editor?.overrides ?? {};
+  const get = (section: string, fieldKey: string) =>
+    getPageContent("eventos", section, fieldKey, locale, overrides);
+
+  const tipContent = editor?.editMode
+    ? <PageText page="eventos" section="capacity" fieldKey="tip" locale={locale} as="span" placeholder="Role horizontalmente para ver todas as configurações em dispositivos móveis" />
+    : (get("capacity", "tip") || "Role horizontalmente para ver todas as configurações em dispositivos móveis");
+
+  const cardTitle = editor?.editMode
+    ? <PageText page="eventos" section="capacity" fieldKey="title" locale={locale} as="span" className="block" placeholder="Tabela Comparativa de Capacidades" />
+    : (get("capacity", "title") || "Tabela Comparativa de Capacidades");
+
+  const cardSubtitle = editor?.editMode
+    ? <PageText page="eventos" section="capacity" fieldKey="subtitle" locale={locale} as="span" className="block" placeholder="Compare rapidamente a capacidade de todas as salas em cada configuração" />
+    : (get("capacity", "subtitle") || "Compare rapidamente a capacidade de todas as salas em cada configuração");
+
   return (
     <Card className="overflow-hidden border-2 border-purple-200 dark:border-purple-900">
       <CardHeader className="bg-gradient-to-r from-purple-50 to-white dark:from-purple-950/20 dark:to-gray-950">
-        <CardTitle className="text-2xl text-center">Tabela Comparativa de Capacidades</CardTitle>
+        <CardTitle className="text-2xl text-center">{cardTitle}</CardTitle>
         <p className="text-center text-muted-foreground text-sm">
-          Compare rapidamente a capacidade de todas as salas em cada configuração
+          {cardSubtitle}
         </p>
       </CardHeader>
       <CardContent className="p-0">
@@ -38,7 +70,11 @@ export function RoomCapacityTable() {
             <thead>
               <tr className="bg-purple-600 text-white">
                 <th className="py-4 px-4 text-left font-semibold sticky left-0 bg-purple-600 z-10">
-                  Sala
+                  {editor?.editMode ? (
+                    <PageText page="eventos" section="capacity" fieldKey="table.columnRoom" locale={locale} as="span" placeholder="Sala" />
+                  ) : (
+                    get("capacity", "table.columnRoom") || "Sala"
+                  )}
                 </th>
                 <th className="py-4 px-4 text-center font-semibold min-w-[80px]">
                   M²
@@ -52,9 +88,16 @@ export function RoomCapacityTable() {
                           alt={config.label}
                           fill
                           className="object-contain p-1 bg-white"
+                          sizes="64px"
                         />
                       </div>
-                      <span className="text-sm">{config.label}</span>
+                      <span className="text-sm">
+                        {editor?.editMode ? (
+                          <PageText page="eventos" section="capacity" fieldKey={`table.configs.${config.key}`} locale={locale} as="span" placeholder={config.label} />
+                        ) : (
+                          get("capacity", `table.configs.${config.key}`) || config.label
+                        )}
+                      </span>
                     </div>
                   </th>
                 ))}
@@ -62,40 +105,68 @@ export function RoomCapacityTable() {
             </thead>
             <tbody>
               {rooms.map((room, index) => (
-                <tr 
-                  key={room.name}
+                <tr
+                  key={`${room.name}-${index}`}
                   className={`
                     border-b border-gray-200 dark:border-gray-800
-                    hover:bg-purple-50 dark:hover:bg-purple-950/10 
+                    hover:bg-purple-50 dark:hover:bg-purple-950/10
                     transition-colors
-                    ${room.isMain ? 'bg-purple-50 dark:bg-purple-950/20' : index % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900'}
+                    ${room.isMain ? "bg-purple-50 dark:bg-purple-950/20" : index % 2 === 0 ? "bg-white dark:bg-gray-950" : "bg-gray-50 dark:bg-gray-900"}
                   `}
                 >
                   <td className="py-4 px-4 font-semibold text-foreground sticky left-0 bg-inherit z-10">
                     <div className="flex items-center gap-2">
-                      {room.name}
+                      {editor?.editMode ? (
+                        <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.name`} locale={locale} as="span" placeholder={room.name} />
+                      ) : (
+                        cellValue(get, index, "name", room.name)
+                      )}
                       {room.isMain && (
                         <Badge className="bg-purple-600 text-xs">Principal</Badge>
                       )}
                     </div>
                   </td>
                   <td className="py-4 px-4 text-center text-muted-foreground">
-                    {room.area}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.area`} locale={locale} as="span" placeholder={String(room.area)} />
+                    ) : (
+                      cellValue(get, index, "area", room.area)
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-lg text-purple-700 dark:text-purple-400">
-                    {room.auditorium}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.auditorium`} locale={locale} as="span" placeholder={String(room.auditorium)} />
+                    ) : (
+                      cellValue(get, index, "auditorium", room.auditorium)
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-lg text-purple-700 dark:text-purple-400">
-                    {room.espinha}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.espinha`} locale={locale} as="span" placeholder={String(room.espinha)} />
+                    ) : (
+                      cellValue(get, index, "espinha", room.espinha)
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-lg text-purple-700 dark:text-purple-400">
-                    {room.escola}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.escola`} locale={locale} as="span" placeholder={String(room.escola)} />
+                    ) : (
+                      cellValue(get, index, "escola", room.escola)
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-lg text-purple-700 dark:text-purple-400">
-                    {room.u}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.u`} locale={locale} as="span" placeholder={String(room.u)} />
+                    ) : (
+                      cellValue(get, index, "u", room.u)
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-lg text-purple-700 dark:text-purple-400">
-                    {room.banquete}
+                    {editor?.editMode ? (
+                      <PageText page="eventos" section="capacity" fieldKey={`table.rooms.${index}.banquete`} locale={locale} as="span" placeholder={String(room.banquete)} />
+                    ) : (
+                      cellValue(get, index, "banquete", room.banquete)
+                    )}
                   </td>
                 </tr>
               ))}
@@ -104,7 +175,7 @@ export function RoomCapacityTable() {
         </div>
 
         <div className="p-4 bg-muted/30 text-center text-sm text-muted-foreground border-t">
-          <p>💡 <strong>Dica:</strong> Role horizontalmente para ver todas as configurações em dispositivos móveis</p>
+          <p>💡 <strong>Dica:</strong> {tipContent}</p>
         </div>
       </CardContent>
     </Card>

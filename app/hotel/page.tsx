@@ -10,83 +10,87 @@ import { AccommodationsSection } from "@/components/AccommodationsSection";
 import { LeisureServicesSection } from "@/components/LeisureServicesSection";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
+import { useEditor } from "@/lib/context/EditorContext";
+import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
+import { getIcon } from "@/lib/icon-registry";
+import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { FeatureImageSection } from "@/components/FeatureImageSection";
 import { AsymmetricGallery } from "@/components/HorizontalScroll";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
 
-export default function HotelPage() {
+function getNested(obj: Record<string, unknown>, path: string): string {
+  const value = path.split(".").reduce((o: unknown, k) => (o as Record<string, unknown>)?.[k], obj);
+  return typeof value === "string" ? value : "";
+}
+
+function HotelPageContent() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "hotel");
+  const editor = useEditor();
+  const overrides = editor?.overrides ?? {};
   const photoTracker = usePhotoTracker();
   const { photos: galleryPhotos, loading } = useGallery();
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const [currentTimelineIndex, setCurrentTimelineIndex] = useState(0);
 
   // Buscar todas as imagens usando useMemo
+  // Galeria do hotel: priorizar fotos com page=hotel e section=galeria (editáveis no modo edição)
   const hotelImages = useMemo(() => {
     photoTracker.reset();
-    
+
+    const hero = photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || null;
+    const historia = photoTracker.getUnusedPhoto(galleryPhotos, "piscina", {
+      allowRelatedCategories: true,
+      relatedCategories: ["geral"]
+    })?.imageUrl || null;
+    const familia = photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || null;
+    const localizacaoPhotos = photoTracker.getUnusedPhotos(galleryPhotos, "localizacao", 3, {
+      allowRelatedCategories: true,
+      relatedCategories: ["geral"]
+    });
+    const localizacao = localizacaoPhotos.map(p => p.imageUrl).filter(Boolean);
+
+    const galeriaBySection = photoTracker.getUnusedPhotosByPageSection(galleryPhotos, "hotel", "galeria", 9);
+    const galeriaFallback = photoTracker.getUnusedPhotos(galleryPhotos, [
+      "piscina", "gastronomia", "restaurante", "quarto", "recepcao",
+      "spa", "academia", "lazer", "esporte", "sustentabilidade", "geral"
+    ], 9);
+    const galeria = galeriaBySection.length >= 4 ? galeriaBySection : galeriaFallback;
+
     return {
-      hero: photoTracker.getUnusedPhoto(galleryPhotos, "recepcao")?.imageUrl || null,
-      historia: photoTracker.getUnusedPhoto(galleryPhotos, "piscina", {
-        allowRelatedCategories: true,
-        relatedCategories: ["geral"]
-      })?.imageUrl || null,
-      familia: photoTracker.getUnusedPhoto(galleryPhotos, "piscina")?.imageUrl || null,
-      galeria: photoTracker.getUnusedPhotos(galleryPhotos, [
-        "piscina", "gastronomia", "restaurante", "quarto", "recepcao",
-        "spa", "academia", "lazer", "esporte", "sustentabilidade", "geral"
-      ], 9),
-      localizacao: (() => {
-        // Buscar 3 imagens de localização de uma vez (para os 3 cards)
-        const locationPhotos = photoTracker.getUnusedPhotos(galleryPhotos, "localizacao", 3, {
-          allowRelatedCategories: true,
-          relatedCategories: ["geral"]
-        });
-        return locationPhotos.map(p => p.imageUrl).filter(Boolean);
-      })(),
+      hero,
+      historia,
+      familia,
+      galeria,
+      localizacao,
     };
   }, [galleryPhotos, photoTracker]);
 
-  const diferenciais = [
-    {
-      icon: Eye,
-      title: t.differentials.seaView.title,
-      description: t.differentials.seaView.description
-    },
-    {
-      icon: MapPin,
-      title: t.differentials.location.title,
-      description: t.differentials.location.description
-    },
-    {
-      icon: Users,
-      title: t.differentials.family.title,
-      description: t.differentials.family.description
-    },
-    {
-      icon: Award,
-      title: t.differentials.breakfast.title,
-      description: t.differentials.breakfast.description
-    },
-    {
-      icon: Leaf,
-      title: t.differentials.sustainability.title,
-      description: t.differentials.sustainability.description
-    }
-  ];
+  const diferenciaisKeys = [
+    { icon: Eye, key: "seaView", defaultIconName: "Eye" },
+    { icon: MapPin, key: "location", defaultIconName: "MapPin" },
+    { icon: Users, key: "family", defaultIconName: "Users" },
+    { icon: Award, key: "breakfast", defaultIconName: "Award" },
+    { icon: Leaf, key: "sustainability", defaultIconName: "Leaf" }
+  ] as const;
 
-  const timeline = [
-    { year: "2005", title: t.timeline.start.title, description: t.timeline.start.description },
-    { year: "2010", title: t.timeline.expansion.title, description: t.timeline.expansion.description },
-    { year: "2015", title: t.timeline.renovation.title, description: t.timeline.renovation.description },
-    { year: "2020", title: t.timeline.sustainability.title, description: t.timeline.sustainability.description },
-    { year: "2025", title: t.timeline.anniversary.title, description: t.timeline.anniversary.description }
+  const timelineKeys = [
+    { year: "2005", titleKey: "start.title", descKey: "start.description" },
+    { year: "2010", titleKey: "expansion.title", descKey: "expansion.description" },
+    { year: "2015", titleKey: "renovation.title", descKey: "renovation.description" },
+    { year: "2020", titleKey: "sustainability.title", descKey: "sustainability.description" },
+    { year: "2025", titleKey: "anniversary.title", descKey: "anniversary.description" }
   ];
+  const timeline = timelineKeys.map(({ year, titleKey, descKey }) => ({
+    year,
+    title: getPageContent("hotel", "timeline", titleKey, locale, overrides) || getNested(t as Record<string, unknown>, "timeline." + titleKey),
+    description: getPageContent("hotel", "timeline", descKey, locale, overrides) || getNested(t as Record<string, unknown>, "timeline." + descKey)
+  }));
 
   // Função para scroll suave para um item específico da timeline
   const scrollToTimelineItem = (index: number) => {
@@ -173,32 +177,69 @@ export default function HotelPage() {
       .filter(img => img.src);
   }, [hotelImages.galeria]);
 
+  const heroTitle = editor?.editMode
+    ? <PageText page="hotel" section="hero" fieldKey="title" locale={locale} as="span" className="block" />
+    : getPageContent("hotel", "hero", "title", locale, overrides) || t.hero.title;
+  const heroSubtitle = editor?.editMode
+    ? <PageText page="hotel" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" />
+    : getPageContent("hotel", "hero", "subtitle", locale, overrides) || t.hero.subtitle;
+  const heroBadge = editor?.editMode
+    ? <PageText page="hotel" section="hero" fieldKey="badge" locale={locale} as="span" className="inline-block" />
+    : getPageContent("hotel", "hero", "badge", locale, overrides) || t.hero.badge;
+  const heroImageUrl =
+    getGalleryImageByPath(galleryPhotos, "gallery:hotel:hero:0") ||
+    hotelImages.hero ||
+    galleryPhotos[0]?.imageUrl ||
+    null;
+  const heroImageNode = editor?.editMode
+    ? <PageImage src={heroImageUrl || ""} alt="Hero" path="gallery:hotel:hero:0" className="absolute inset-0 w-full h-full" />
+    : null;
+
+  const heroIconName = getPageContentIcon("hero", "icon", overrides, "Heart");
+  const HeroIconComponent = getIcon(heroIconName) ?? Heart;
+  const heroIcon = editor?.editMode
+    ? <EditableIcon page="hotel" section="hero" fieldKey="icon" locale={locale} defaultIconName="Heart" defaultIcon={Heart} iconClassName="h-16 w-16" />
+    : <HeroIconComponent className="h-16 w-16" />;
+
   return (
     <>
       {/* Hero Section com Imagem de Fundo */}
       <HeroWithImage
-        title={t.hero.title}
-        subtitle={t.hero.subtitle}
-        image={hotelImages.hero || galleryPhotos[0]?.imageUrl || null}
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        image={heroImageUrl}
+        imageNode={heroImageNode ?? undefined}
         imageAlt="Hotel Sonata de Iracema - Vista da Piscina"
-        icon={<Heart className="h-16 w-16" />}
-        badge={t.hero.badge}
+        icon={heroIcon}
+        badge={heroBadge}
         height="large"
         overlay="medium"
       />
 
       {/* Nossa História */}
       <FeatureImageSection
-        title={t.history.title}
+        title={editor?.editMode ? <PageText page="hotel" section="history" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "history", "title", locale, overrides) || t.history.title)}
         description={
           <div className="space-y-4">
-            <p>{t.history.paragraph1}</p>
-            <p>{t.history.paragraph2}</p>
-            <p>{t.history.paragraph3}</p>
-            <p>{t.history.paragraph4}</p>
+            {editor?.editMode ? (
+              <>
+                <p><PageText page="hotel" section="history" fieldKey="paragraph1" locale={locale} as="span" /></p>
+                <p><PageText page="hotel" section="history" fieldKey="paragraph2" locale={locale} as="span" /></p>
+                <p><PageText page="hotel" section="history" fieldKey="paragraph3" locale={locale} as="span" /></p>
+                <p><PageText page="hotel" section="history" fieldKey="paragraph4" locale={locale} as="span" /></p>
+              </>
+            ) : (
+              <>
+                <p>{getPageContent("hotel", "history", "paragraph1", locale, overrides) || t.history.paragraph1}</p>
+                <p>{getPageContent("hotel", "history", "paragraph2", locale, overrides) || t.history.paragraph2}</p>
+                <p>{getPageContent("hotel", "history", "paragraph3", locale, overrides) || t.history.paragraph3}</p>
+                <p>{getPageContent("hotel", "history", "paragraph4", locale, overrides) || t.history.paragraph4}</p>
+              </>
+            )}
           </div>
         }
-        image={hotelImages.historia || galleryPhotos[1]?.imageUrl || null}
+        image={getGalleryImageByPath(galleryPhotos, "gallery:hotel:historia:0") || hotelImages.historia || galleryPhotos[1]?.imageUrl || null}
+        imageNode={editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:hotel:historia:0") || hotelImages.historia || galleryPhotos[1]?.imageUrl || ""} alt="História" path="gallery:hotel:historia:0" className="w-full h-full object-cover" /> : undefined}
         imageAlt="História do Hotel Sonata"
         badge="Desde 2005"
         imagePosition="right"
@@ -206,20 +247,37 @@ export default function HotelPage() {
       />
 
       {/* Galeria de Fotos do Hotel - LAYOUT ASSIMÉTRICO FULLWIDTH */}
-      <AsymmetricGallery
-        images={hotelGalleryImages.map(img => img.src).filter(src => src && src.trim() !== '')}
-        interval={4000}
-      />
+      {editor?.editMode ? (
+        <section className="relative w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 container mx-auto">
+            {Array.from({ length: 9 }, (_, i) => hotelImages.galeria[i]).map((photo, i) => (
+              <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                <PageImage
+                  src={photo?.imageUrl ?? ""}
+                  path={`gallery:hotel:galeria:${i}`}
+                  aspectRatio="auto"
+                  className="w-full h-full"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <AsymmetricGallery
+          images={hotelGalleryImages.map(img => img.src).filter(src => src && src.trim() !== '')}
+          interval={4000}
+        />
+      )}
 
       {/* Timeline - Nossa Jornada */}
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.journey.title}
+              {editor?.editMode ? <PageText page="hotel" section="journey" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "journey", "title", locale, overrides) || t.journey.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t.journey.subtitle}
+              {editor?.editMode ? <PageText page="hotel" section="journey" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("hotel", "journey", "subtitle", locale, overrides) || t.journey.subtitle)}
             </p>
           </div>
 
@@ -240,7 +298,7 @@ export default function HotelPage() {
               {/* Espaço inicial */}
               <div className="flex-shrink-0 w-[5vw]" />
               
-              {timeline.map((item, index) => (
+              {timelineKeys.map((item, index) => (
                 <div
                   key={index}
                   className="flex-shrink-0 w-[80vw] sm:w-[60vw] md:w-[45vw] lg:w-[350px] relative"
@@ -251,10 +309,12 @@ export default function HotelPage() {
                       <CardContent className="p-6 text-center">
                         <div className="mb-4">
                           <p className="text-5xl font-bold text-primary mb-2">{item.year}</p>
-                          <h3 className="text-xl font-bold text-foreground">{item.title}</h3>
+                          <h3 className="text-xl font-bold text-foreground">
+                            {editor?.editMode ? <PageText page="hotel" section="timeline" fieldKey={item.titleKey} locale={locale} as="span" /> : timeline[index].title}
+                          </h3>
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {item.description}
+                          {editor?.editMode ? <PageText page="hotel" section="timeline" fieldKey={item.descKey} locale={locale} as="span" /> : timeline[index].description}
                         </p>
                       </CardContent>
                     </Card>
@@ -318,24 +378,34 @@ export default function HotelPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.differentialsSection.title}
+              {editor?.editMode ? <PageText page="hotel" section="differentialsSection" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "differentialsSection", "title", locale, overrides) || t.differentialsSection.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t.differentialsSection.subtitle}
+              {editor?.editMode ? <PageText page="hotel" section="differentialsSection" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("hotel", "differentialsSection", "subtitle", locale, overrides) || t.differentialsSection.subtitle)}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-            {diferenciais.map((item, index) => {
-              const Icon = item.icon;
+            {diferenciaisKeys.map((item, index) => {
+              const iconName = getPageContentIcon("differentials", `${item.key}.icon`, overrides, item.defaultIconName);
+              const ResolvedIcon = getIcon(iconName) ?? item.icon;
+              const differentialIcon = editor?.editMode
+                ? <EditableIcon page="hotel" section="differentials" fieldKey={`${item.key}.icon`} locale={locale} defaultIconName={item.defaultIconName} defaultIcon={item.icon} iconClassName="h-8 w-8 text-primary" />
+                : <ResolvedIcon className="h-8 w-8 text-primary" />;
+              const title = getPageContent("hotel", "differentials", item.key + ".title", locale, overrides) || ((t.differentials as Record<string, { title: string; description: string }>)[item.key]?.title ?? "");
+              const description = getPageContent("hotel", "differentials", item.key + ".description", locale, overrides) || ((t.differentials as Record<string, { title: string; description: string }>)[item.key]?.description ?? "");
               return (
                 <Card key={index} className="text-center hover:shadow-xl transition-all duration-300">
                   <CardContent className="pt-8 pb-6">
                     <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                      <Icon className="h-8 w-8 text-primary" />
+                      {differentialIcon}
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
-                    <p className="text-muted-foreground">{item.description}</p>
+                    <h3 className="text-xl font-bold text-foreground mb-3">
+                      {editor?.editMode ? <PageText page="hotel" section="differentials" fieldKey={`${item.key}.title`} locale={locale} as="span" /> : title}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {editor?.editMode ? <PageText page="hotel" section="differentials" fieldKey={`${item.key}.description`} locale={locale} as="span" /> : description}
+                    </p>
                   </CardContent>
                 </Card>
               );
@@ -352,15 +422,25 @@ export default function HotelPage() {
 
       {/* Família Bezerra */}
       <FeatureImageSection
-        title={t.family.title}
+        title={editor?.editMode ? <PageText page="hotel" section="family" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "family", "title", locale, overrides) || t.family.title)}
         description={
           <div className="space-y-4">
-            <p>{t.family.paragraph1}</p>
-            <p>{t.family.paragraph2}</p>
+            {editor?.editMode ? (
+              <>
+                <p><PageText page="hotel" section="family" fieldKey="paragraph1" locale={locale} as="span" /></p>
+                <p><PageText page="hotel" section="family" fieldKey="paragraph2" locale={locale} as="span" /></p>
+              </>
+            ) : (
+              <>
+                <p>{getPageContent("hotel", "family", "paragraph1", locale, overrides) || t.family.paragraph1}</p>
+                <p>{getPageContent("hotel", "family", "paragraph2", locale, overrides) || t.family.paragraph2}</p>
+              </>
+            )}
           </div>
         }
-        image={hotelImages.familia || galleryPhotos[2]?.imageUrl || null}
-        imageAlt={t.family.imageAlt}
+        image={getGalleryImageByPath(galleryPhotos, "gallery:hotel:familia:0") || hotelImages.familia || galleryPhotos[2]?.imageUrl || null}
+        imageNode={editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:hotel:familia:0") || hotelImages.familia || galleryPhotos[2]?.imageUrl || ""} alt={getPageContent("hotel", "family", "imageAlt", locale, overrides) || t.family.imageAlt} path="gallery:hotel:familia:0" className="w-full h-full object-cover" /> : undefined}
+        imageAlt={getPageContent("hotel", "family", "imageAlt", locale, overrides) || t.family.imageAlt}
         badge="Acolhimento Nordestino"
         imagePosition="left"
         backgroundColor="primary"
@@ -371,10 +451,10 @@ export default function HotelPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {t.explore.title}
+              {editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "title", locale, overrides) || t.explore.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t.explore.subtitle}
+              {editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "subtitle", locale, overrides) || t.explore.subtitle)}
             </p>
           </div>
 
@@ -382,90 +462,54 @@ export default function HotelPage() {
             {/* Praia de Iracema */}
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
-                {(() => {
-                  const base =
-                    (Array.isArray(hotelImages.localizacao)
-                      ? hotelImages.localizacao[0]
-                      : hotelImages.localizacao) || galleryPhotos[3]?.imageUrl;
-                  const valid =
-                    typeof base === "string" && base.trim() !== "";
-                  return valid ? (
-                    <img
-                      src={base}
-                      alt={t.explore.spots.beach.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                  );
+                {editor?.editMode && (getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:0") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[0] : hotelImages.localizacao)) ? (
+                  <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:0") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[0]! : hotelImages.localizacao!)} alt={getPageContent("hotel", "explore", "spots.beach.title", locale, overrides) || t.explore.spots.beach.title} path="gallery:hotel:localizacao:0" className="w-full h-full object-cover" />
+                ) : (() => {
+                  const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:0") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[0] : hotelImages.localizacao) || galleryPhotos[3]?.imageUrl;
+                  const valid = typeof base === "string" && base.trim() !== "";
+                  return valid ? <img src={base} alt={t.explore.spots.beach.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">
-                <h3 className="text-xl font-bold mb-2">{t.explore.spots.beach.title}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {t.explore.spots.beach.description}
-                </p>
-                <Badge>{t.explore.spots.beach.badge}</Badge>
+                <h3 className="text-xl font-bold mb-2">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.beach.title" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.beach.title", locale, overrides) || t.explore.spots.beach.title)}</h3>
+                <p className="text-muted-foreground mb-4">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.beach.description" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.beach.description", locale, overrides) || t.explore.spots.beach.description)}</p>
+                <Badge>{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.beach.badge" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.beach.badge", locale, overrides) || t.explore.spots.beach.badge)}</Badge>
               </CardContent>
             </Card>
 
             {/* Centro Dragão do Mar */}
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
-                {(() => {
-                  const base =
-                    (Array.isArray(hotelImages.localizacao)
-                      ? hotelImages.localizacao[1]
-                      : undefined) || galleryPhotos[4]?.imageUrl;
-                  const valid =
-                    typeof base === "string" && base.trim() !== "";
-                  return valid ? (
-                    <img
-                      src={base}
-                      alt={t.explore.spots.culture.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                  );
+                {editor?.editMode && (getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:1") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[1] : null)) ? (
+                  <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:1") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[1]! : "")} alt={t.explore.spots.culture.title} path="gallery:hotel:localizacao:1" className="w-full h-full object-cover" />
+                ) : (() => {
+                  const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:1") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[1] : undefined) || galleryPhotos[4]?.imageUrl;
+                  const valid = typeof base === "string" && base.trim() !== "";
+                  return valid ? <img src={base} alt={t.explore.spots.culture.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">
-                <h3 className="text-xl font-bold mb-2">{t.explore.spots.culture.title}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {t.explore.spots.culture.description}
-                </p>
-                <Badge>{t.explore.spots.culture.badge}</Badge>
+                <h3 className="text-xl font-bold mb-2">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.culture.title" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.culture.title", locale, overrides) || t.explore.spots.culture.title)}</h3>
+                <p className="text-muted-foreground mb-4">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.culture.description" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.culture.description", locale, overrides) || t.explore.spots.culture.description)}</p>
+                <Badge>{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.culture.badge" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.culture.badge", locale, overrides) || t.explore.spots.culture.badge)}</Badge>
               </CardContent>
             </Card>
 
             {/* Mercado dos Pinhões */}
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
               <div className="relative aspect-video">
-                {(() => {
-                  const base =
-                    (Array.isArray(hotelImages.localizacao)
-                      ? hotelImages.localizacao[2]
-                      : undefined) || galleryPhotos[5]?.imageUrl;
-                  const valid =
-                    typeof base === "string" && base.trim() !== "";
-                  return valid ? (
-                    <img
-                      src={base}
-                      alt={t.explore.spots.market.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
-                  );
+                {editor?.editMode && (getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:2") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[2] : null)) ? (
+                  <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:2") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[2]! : "")} alt={t.explore.spots.market.title} path="gallery:hotel:localizacao:2" className="w-full h-full object-cover" />
+                ) : (() => {
+                  const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:2") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[2] : undefined) || galleryPhotos[5]?.imageUrl;
+                  const valid = typeof base === "string" && base.trim() !== "";
+                  return valid ? <img src={base} alt={t.explore.spots.market.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">
-                <h3 className="text-xl font-bold mb-2">{t.explore.spots.market.title}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {t.explore.spots.market.description}
-                </p>
-                <Badge>{t.explore.spots.market.badge}</Badge>
+                <h3 className="text-xl font-bold mb-2">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.market.title" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.market.title", locale, overrides) || t.explore.spots.market.title)}</h3>
+                <p className="text-muted-foreground mb-4">{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.market.description" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.market.description", locale, overrides) || t.explore.spots.market.description)}</p>
+                <Badge>{editor?.editMode ? <PageText page="hotel" section="explore" fieldKey="spots.market.badge" locale={locale} as="span" /> : (getPageContent("hotel", "explore", "spots.market.badge", locale, overrides) || t.explore.spots.market.badge)}</Badge>
               </CardContent>
             </Card>
           </div>
@@ -473,9 +517,7 @@ export default function HotelPage() {
           <div className="mt-12 text-center">
             <div className="flex items-center justify-center gap-3 text-muted-foreground mb-6">
               <Bike className="h-5 w-5 text-primary" />
-              <p>
-                {t.bikes.message}
-              </p>
+              <p>{editor?.editMode ? <PageText page="hotel" section="bikes" fieldKey="message" locale={locale} as="span" /> : (getPageContent("hotel", "bikes", "message", locale, overrides) || t.bikes.message)}</p>
             </div>
           </div>
         </div>
@@ -485,19 +527,23 @@ export default function HotelPage() {
       <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/90 to-primary text-primary-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            {t.cta.title}
+            {editor?.editMode ? <PageText page="hotel" section="cta" fieldKey="title" locale={locale} as="span" /> : (getPageContent("hotel", "cta", "title", locale, overrides) || t.cta.title)}
           </h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto text-primary-foreground/90">
-            {t.cta.subtitle}
+            {editor?.editMode ? <PageText page="hotel" section="cta" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("hotel", "cta", "subtitle", locale, overrides) || t.cta.subtitle)}
           </p>
           <a 
             href="/"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-primary hover:bg-white/90 h-11 px-8"
           >
-            {t.cta.button}
+            {editor?.editMode ? <PageText page="hotel" section="cta" fieldKey="button" locale={locale} as="span" /> : (getPageContent("hotel", "cta", "button", locale, overrides) || t.cta.button)}
           </a>
         </div>
       </section>
     </>
   );
+}
+
+export default function HotelPage() {
+  return <HotelPageContent />;
 }

@@ -21,7 +21,11 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { useEditor } from "@/lib/context/EditorContext";
+import { PageText } from "@/components/PageEditor";
+import { getPageContent } from "@/lib/utils/pageContent";
 import { toast } from "sonner";
+import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
 
 interface BookingBarProps {
   isHomePage?: boolean;
@@ -65,39 +69,19 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
-  const labels = {
-    pt: {
-      checkIn: "Check-in",
-      checkOut: "Check-out",
-      adults: "Adultos",
-      children: "Crianças",
-      guests: "Hóspedes",
-      promoCode: "CUPOM",
-      reserve: "PESQUISAR",
-      selectDate: "Selecione a data",
-    },
-    es: {
-      checkIn: "Entrada",
-      checkOut: "Salida",
-      adults: "Adultos",
-      children: "Niños",
-      guests: "Huéspedes",
-      promoCode: "CUPÓN",
-      reserve: "BUSCAR",
-      selectDate: "Seleccione la fecha",
-    },
-    en: {
-      checkIn: "Check-in",
-      checkOut: "Check-out",
-      adults: "Adults",
-      children: "Children",
-      guests: "Guests",
-      promoCode: "COUPON",
-      reserve: "SEARCH",
-      selectDate: "Select date",
-    },
+  const editor = useEditor();
+  const globalOverrides = editor?.globalOverrides ?? {};
+  const getLabel = (fieldKey: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="bookingBar" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "bookingBar", fieldKey, locale, globalOverrides) || "";
   };
-
+  const labels = {
+    pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", guests: "Guests", promoCode: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+  };
   const t = labels[locale as keyof typeof labels] || labels.pt;
   const dateLocale = locale === "pt" ? ptBR : undefined;
 
@@ -136,29 +120,26 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
     setIsLoading(true);
     
     try {
-      const checkInStr = format(checkIn, "yyyy-MM-dd");
-      const checkOutStr = format(checkOut, "yyyy-MM-dd");
-      const params = new URLSearchParams({
-        checkin: checkInStr,
-        checkout: checkOutStr,
-        adults: adults,
-        children: children,
+      // Construir URL da Omnibees com os parâmetros
+      const omnibeesUrl = buildOmnibeesUrl({
+        checkIn,
+        checkOut,
+        adults,
+        children,
+        promoCode: promoCode.trim() || undefined,
+        locale: locale as "pt" | "es" | "en",
       });
-      
-      if (promoCode.trim()) {
-        params.append("promo", promoCode.trim());
-      }
       
       toast.success(
         locale === "en" 
-          ? "Searching for availability..." 
+          ? "Redirecting to booking system..." 
           : locale === "es" 
-          ? "Buscando disponibilidad..."
-          : "Buscando disponibilidade..."
+          ? "Redirigiendo al sistema de reservas..."
+          : "Redirecionando para o sistema de reservas..."
       );
       
       setTimeout(() => {
-        window.location.href = `/reservas?${params.toString()}`;
+        window.location.href = omnibeesUrl;
       }, 500);
     } catch (error) {
       setIsLoading(false);
@@ -210,10 +191,10 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
                             <div className="flex flex-col items-start min-w-0 flex-1">
                               <span className="text-[10px] text-white/60 uppercase font-medium leading-tight">
-                                {t.checkIn}
+                                {getLabel("checkIn")}
                               </span>
                               <span className="truncate text-xs font-medium">
-                                {checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : t.selectDate.split(' ')[0]}
+                                {checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate).split(' ')[0]}
                               </span>
                             </div>
                           </div>
@@ -237,7 +218,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
-                        <span className="text-xs">{t.checkIn}</span>
+                        <span className="text-xs">{getLabel("checkIn")}</span>
                       </div>
                     </Button>
                   )}
@@ -259,10 +240,10 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
                             <div className="flex flex-col items-start min-w-0 flex-1">
                               <span className="text-[10px] text-white/60 uppercase font-medium leading-tight">
-                                {t.checkOut}
+                                {getLabel("checkOut")}
                               </span>
                               <span className="truncate text-xs font-medium">
-                                {checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : t.selectDate.split(' ')[0]}
+                                {checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate).split(' ')[0]}
                               </span>
                             </div>
                           </div>
@@ -289,7 +270,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
-                        <span className="text-xs">{t.checkOut}</span>
+                        <span className="text-xs">{getLabel("checkOut")}</span>
                       </div>
                     </Button>
                   )}
@@ -350,7 +331,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <PopoverContent className="w-auto p-4" align="start">
                           <div className="space-y-4 min-w-[200px]">
                             <div>
-                              <label className="text-sm font-medium mb-2 block">{t.adults}</label>
+                              <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                               <Select value={adults} onValueChange={setAdults}>
                                 <SelectTrigger className="w-full">
                                   <SelectValue />
@@ -365,7 +346,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               </Select>
                             </div>
                             <div>
-                              <label className="text-sm font-medium mb-2 block">{t.children}</label>
+                              <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
                               <Select value={children} onValueChange={setChildren}>
                                 <SelectTrigger className="w-full">
                                   <SelectValue />
@@ -411,7 +392,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       <Input
                         id="promoCode"
                         type="text"
-                        placeholder={t.promoCode}
+                        placeholder={getPageContent("global", "bookingBar", "promoCode", locale, globalOverrides) || t.promoCode}
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                         className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs"
@@ -439,12 +420,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
-                            {t.checkIn}
+                            {getLabel("checkIn")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -472,12 +453,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
-                        {t.checkIn}
+                        {getLabel("checkIn")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
                         </span>
                       </div>
                     </div>
@@ -500,12 +481,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
-                            {t.checkOut}
+                            {getLabel("checkOut")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -536,12 +517,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
-                        {t.checkOut}
+                        {getLabel("checkOut")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : t.selectDate}
+                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
                         </span>
                       </div>
                     </div>
@@ -574,7 +555,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     <PopoverContent className="w-auto p-4" align="start">
                       <div className="space-y-4 min-w-[200px]">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{t.adults}</label>
+                          <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                           <Select value={adults} onValueChange={setAdults}>
                             <SelectTrigger className="w-full">
                               <SelectValue />
@@ -589,7 +570,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{t.children}</label>
+                          <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
                           <Select value={children} onValueChange={setChildren}>
                             <SelectTrigger className="w-full">
                               <SelectValue />
@@ -639,7 +620,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   <Input
                     id="promoCode"
                     type="text"
-                    placeholder={t.promoCode}
+                    placeholder={getPageContent("global", "bookingBar", "promoCode", locale, globalOverrides) || t.promoCode}
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs lg:text-sm"
@@ -663,7 +644,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   ) : (
                     <>
                        <Search className="mr-1.5 h-4 w-4 text-white" />
-                      <span className="text-xs">{t.reserve}</span>
+                      <span className="text-xs">{getLabel("reserve")}</span>
                     </>
                   )}
                 </Button>

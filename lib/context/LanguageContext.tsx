@@ -29,12 +29,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     if (urlLocale) {
       setLocaleState(urlLocale);
-      localStorage.setItem("locale", urlLocale);
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          window.localStorage.setItem("locale", urlLocale);
+        }
+      } catch {
+        // Storage pode estar indisponível (iframe, modo privado, etc.)
+      }
     } else {
-      // Se não tem na URL, tenta do localStorage
-      const savedLocale = localStorage.getItem("locale") as Locale;
-      if (savedLocale && ["pt", "es", "en"].includes(savedLocale)) {
-        setLocaleState(savedLocale);
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          const savedLocale = window.localStorage.getItem("locale") as Locale;
+          if (savedLocale && ["pt", "es", "en"].includes(savedLocale)) {
+            setLocaleState(savedLocale);
+          }
+        }
+      } catch {
+        // Storage indisponível neste contexto
       }
     }
   }, [pathname]);
@@ -42,7 +53,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Função para mudar o idioma
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
-    localStorage.setItem("locale", newLocale);
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem("locale", newLocale);
+      }
+    } catch {
+      // Storage pode estar indisponível (iframe, modo privado, etc.)
+    }
     
     // Atualizar a URL para refletir o novo idioma
     let newPath = pathname || "/";
@@ -70,8 +87,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     // Remove a barra inicial se existir para evitar duplicação
     const cleanPath = newPath.startsWith("/") ? newPath.slice(1) : newPath;
     
+    // Preserva query string (ex: ?editMode=1) ao trocar idioma
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    
     // Redireciona para a nova URL com locale
-    router.push(`/${newLocale}/${cleanPath}`);
+    router.push(`/${newLocale}/${cleanPath}${search}`);
   };
 
   // Função de tradução simples

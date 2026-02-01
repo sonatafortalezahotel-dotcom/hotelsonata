@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { Providers } from "./providers";
 import { PublicLayout } from "@/components/PublicLayout";
@@ -126,9 +127,11 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <StructuredData data={hotelStructuredData} />
         <Providers>
-          <PublicLayout>
-            {children}
-          </PublicLayout>
+          <Suspense fallback={null}>
+            <PublicLayout>
+              {children}
+            </PublicLayout>
+          </Suspense>
         </Providers>
       </body>
     </html>

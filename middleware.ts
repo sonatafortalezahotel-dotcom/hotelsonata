@@ -24,8 +24,8 @@ export function middleware(request: NextRequest) {
     );
     
     // Verificar se é uma rota conhecida (não catch-all)
-    // Rotas conhecidas: /esg, /quartos, /gastronomia, /lazer, /eventos, /contatos, /pacotes, /reservas
-    const knownRoutes = ["esg", "quartos", "gastronomia", "lazer", "eventos", "contatos", "pacotes", "reservas", "admin"];
+    // Rotas conhecidas: mesma página com outro idioma → rewrite para path sem locale
+    const knownRoutes = ["esg", "quartos", "gastronomia", "lazer", "eventos", "contato", "pacotes", "reservas", "hotel", "checkout", "trabalhe-conosco", "blog", "admin"];
     const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
     const firstSegment = pathWithoutLocale.split("/").filter(Boolean)[0];
     const isKnownRoute = knownRoutes.includes(firstSegment || "");
@@ -50,8 +50,9 @@ export function middleware(request: NextRequest) {
       response.headers.set("x-locale", locale || "pt");
     }
   } else {
-    // Se não tem locale, deixa passar normal (assume pt ou o que o contexto decidir, ou a rota raiz)
+    // Sem locale na URL: assume português (pt) e envia no header para as páginas
     response = NextResponse.next();
+    response.headers.set("x-locale", "pt");
   }
 
   // Adicionar headers de segurança e compatibilidade
