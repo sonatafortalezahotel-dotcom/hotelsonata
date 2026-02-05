@@ -50,6 +50,16 @@ const PAGE_PATH_TO_KEY: Record<string, PageKey> = {
   "/trabalhe-conosco": "trabalhe",
 };
 
+/** Remove o segmento de locale do pathname (ex: /es/hotel -> /hotel) para lookup em PAGE_PATH_TO_KEY. */
+function pathnameWithoutLocale(pathname: string): string {
+  const segment = pathname.split("/").filter(Boolean)[0];
+  if (segment && LOCALES.includes(segment as (typeof LOCALES)[number])) {
+    const without = "/" + pathname.split("/").slice(2).join("/") || "/";
+    return without;
+  }
+  return pathname;
+}
+
 export function EditorProvider({
   children,
   pageKey: pageKeyProp,
@@ -59,11 +69,12 @@ export function EditorProvider({
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "";
+  const pathForLookup = pathnameWithoutLocale(pathname);
   const editMode = searchParams.get("editMode") === "1";
   const { locale } = useLanguage();
   const pageKeyFromPath =
-    PAGE_PATH_TO_KEY[pathname] ??
-    (pathname?.startsWith("/quartos") ? "quartos" : pathname?.startsWith("/pacotes") ? "pacotes" : null);
+    PAGE_PATH_TO_KEY[pathForLookup] ??
+    (pathForLookup?.startsWith("/quartos") ? "quartos" : pathForLookup?.startsWith("/pacotes") ? "pacotes" : null);
   const pageKey = pageKeyProp ?? pageKeyFromPath;
 
   const [imageOverrides, setImageOverrides] = useState<Record<string, string>>({});
