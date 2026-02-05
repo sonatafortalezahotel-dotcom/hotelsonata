@@ -7,7 +7,6 @@ import VideoCarousel from "@/components/VideoCarousel";
 import ReservationForm from "@/components/ReservationForm";
 import PackagesSection from "@/components/PackagesSection";
 import SocialMediaFeed from "@/components/SocialMediaFeed";
-import SustainabilitySection from "@/components/SustainabilitySection";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { PhotoStory } from "@/components/PhotoStory";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
@@ -173,31 +172,6 @@ async function getSocialMediaPosts() {
   }
 }
 
-// Função para buscar dados de sustentabilidade
-async function getSustainability() {
-  try {
-    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
-    const res = await fetch('/api/sustainability', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store'
-    });
-    
-    if (!res.ok) {
-      console.error('Erro ao buscar sustentabilidade:', res.status, res.statusText);
-      return [];
-    }
-    
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Erro ao buscar sustentabilidade:', error);
-    return [];
-  }
-}
-
 // Função para buscar highlights do carrossel principal
 async function getHighlights() {
   try {
@@ -232,7 +206,6 @@ export default function Home() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [packages, setPackages] = useState<any[]>([]);
   const [socialPosts, setSocialPosts] = useState<any[]>([]);
-  const [sustainability, setSustainability] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [highlights, setHighlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -317,11 +290,10 @@ export default function Home() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [roomsData, packagesData, socialData, sustainabilityData, galleryData, highlightsData] = await Promise.all([
+        const [roomsData, packagesData, socialData, galleryData, highlightsData] = await Promise.all([
           getRooms(locale),
           getPackages(),
           getSocialMediaPosts(),
-          getSustainability(),
           getGalleryPhotos(), // Buscar todas as fotos da galeria
           getHighlights() // Buscar highlights do carrossel
         ]);
@@ -329,7 +301,6 @@ export default function Home() {
         setRooms(Array.isArray(roomsData) ? roomsData : []);
         setPackages(Array.isArray(packagesData) ? packagesData : []);
         setSocialPosts(Array.isArray(socialData) ? socialData : []);
-        setSustainability(Array.isArray(sustainabilityData) ? sustainabilityData : []);
         setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
         setHighlights(Array.isArray(highlightsData) ? highlightsData : []);
       } catch (error) {
@@ -813,9 +784,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      {/* Sustentabilidade - integrado com banco de dados */}
-      <SustainabilitySection items={sustainability} galleryPhotos={galleryPhotos} />
 
       {/* Feed de Redes Sociais - integrado com banco de dados */}
       <SocialMediaFeed posts={socialPosts} galleryPhotos={galleryPhotos} />

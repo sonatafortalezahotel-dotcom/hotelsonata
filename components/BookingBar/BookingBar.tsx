@@ -404,10 +404,10 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               )}
             </div>
 
-            {/* Versão desktop (sempre expandida) */}
-            <div className="hidden lg:flex flex-row items-stretch gap-0">
+            {/* Versão desktop (sempre expandida) - elementos centralizados */}
+            <div className="hidden lg:flex flex-row items-center justify-center gap-0">
               {/* Campo de Check-in */}
-              <div className="flex-1 border-r border-white/10 dark:border-white/10 pr-6 pl-2">
+              <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -418,11 +418,11 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           "text-sm lg:text-base"
                         )}
                       >
-                        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                        <div className="flex flex-col items-center justify-center gap-1 flex-1 min-w-0 text-center">
                           <span className="text-xs text-white/70 uppercase font-medium">
                             {getLabel("checkIn")}
                           </span>
-                          <div className="flex items-center gap-2 w-full">
+                          <div className="flex items-center justify-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
                               {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
@@ -446,16 +446,16 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between text-left font-normal h-8 lg:h-9 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-1",
+                      "w-full justify-center font-normal h-8 lg:h-9 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-1",
                       "text-sm lg:text-base"
                     )}
                     disabled
                   >
-                    <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                    <div className="flex flex-col items-center gap-1 flex-1 min-w-0 text-center">
                       <span className="text-xs text-white/70 uppercase font-medium">
                         {getLabel("checkIn")}
                       </span>
-                      <div className="flex items-center gap-2 w-full">
+                      <div className="flex items-center justify-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
                           {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
@@ -468,7 +468,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               </div>
 
               {/* Campo de Check-out */}
-              <div className="flex-1 border-r border-white/10 dark:border-white/10 pr-6 pl-6">
+              <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -479,11 +479,11 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           "text-sm lg:text-base"
                         )}
                       >
-                        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                        <div className="flex flex-col items-center justify-center gap-1 flex-1 min-w-0 text-center">
                           <span className="text-xs text-white/70 uppercase font-medium">
                             {getLabel("checkOut")}
                           </span>
-                          <div className="flex items-center gap-2 w-full">
+                          <div className="flex items-center justify-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
                               {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
@@ -510,16 +510,16 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between text-left font-normal h-8 lg:h-9 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-1",
+                      "w-full justify-center font-normal h-8 lg:h-9 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-1",
                       "text-sm lg:text-base"
                     )}
                     disabled
                   >
-                    <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                    <div className="flex flex-col items-center justify-center gap-1 flex-1 min-w-0 text-center">
                       <span className="text-xs text-white/70 uppercase font-medium">
                         {getLabel("checkOut")}
                       </span>
-                      <div className="flex items-center gap-2 w-full">
+                      <div className="flex items-center justify-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
                           {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
@@ -532,7 +532,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               </div>
 
               {/* Campo de Hóspedes */}
-              <div className="flex-1 border-r border-white/10 dark:border-white/10 pr-6 pl-6">
+              <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -543,7 +543,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           "text-sm lg:text-base"
                         )}
                       >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="flex items-center justify-center gap-2 flex-1 min-w-0 text-center">
                           <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                           <span className="truncate text-xs lg:text-sm">
                             {formattedGuests}
@@ -602,7 +602,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     )}
                     disabled
                   >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className="flex items-center justify-center gap-2 flex-1 min-w-0 text-center">
                       <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                       <span className="truncate text-xs lg:text-sm">
                         {formattedGuests}
@@ -614,8 +614,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               </div>
 
                {/* Campo de Cupom */}
-              <div className="flex-1 border-r border-white/10 dark:border-white/10 pr-6 pl-6">
-                <div className="flex items-center h-8 lg:h-9 px-1">
+              <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
+                <div className="flex items-center justify-center h-8 lg:h-9 w-full px-1">
                   <Tag className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white mr-2" />
                   <Input
                     id="promoCode"
@@ -630,7 +630,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               </div>
 
               {/* Botão de Pesquisa */}
-              <div className="flex-shrink-0 pl-6">
+              <div className="flex-shrink-0 flex items-center justify-center pl-6">
                  <Button
                   onClick={handleReserve}
                   className="w-full lg:w-auto h-8 lg:h-9 px-3 lg:px-4 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs"
