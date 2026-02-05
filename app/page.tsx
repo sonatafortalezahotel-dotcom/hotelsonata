@@ -673,9 +673,11 @@ export default function Home() {
                           )}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                           <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
-                            <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">{item.time}</span>
-                            <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
-                            <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
+                            <div className="pointer-events-auto">
+                              <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                              <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
+                              <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -709,9 +711,11 @@ export default function Home() {
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
                         <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
-                          <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2">{item.time}</span>
-                          <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
-                          <p className="text-white/90 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+                          <div className="pointer-events-auto">
+                            <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                            <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
+                            <p className="text-white/90 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
