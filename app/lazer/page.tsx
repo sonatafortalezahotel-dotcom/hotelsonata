@@ -348,7 +348,7 @@ function LazerPageContent() {
         ]}
       />
 
-      {/* 4. Galeria - Academia & Fitness - CARROSSEL FULLWIDTH - path + getGalleryImageByPath para renderizar após publicar/recarregar */}
+      {/* 4. Galeria - Academia & Fitness - CARROSSEL FULLWIDTH - texto por slide (cada slide editável independente) */}
       <EditorialCarousel
         autoplay={!editor?.editMode}
         autoplayInterval={5000}
@@ -359,13 +359,19 @@ function LazerPageContent() {
         {lazerImagesWithDistributed.academia.galeria.map((photo, index) => {
           const path = `gallery:lazer:galeria-academia:${index}`;
           const imageUrl = getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl || "";
+          const titleKey = `carouselAcademia.${index}.title`;
+          const badgeKey = `carouselAcademia.${index}.badge`;
+          const subtitleKey = `carouselAcademia.${index}.subtitle`;
+          const fallbackTitle = getPageContent("lazer", "gallery", titleKey, locale, editor?.overrides ?? {}) || t.gallery.fitness.title;
+          const fallbackBadge = getPageContent("lazer", "gallery", badgeKey, locale, editor?.overrides ?? {}) || t.gallery.fitness.badge;
+          const fallbackSubtitle = getPageContent("lazer", "gallery", subtitleKey, locale, editor?.overrides ?? {}) || t.gallery.fitness.subtitle;
           return (
             <EditorialSlide
               key={path}
               image={editor?.editMode ? <PageImage src={imageUrl} path={path} aspectRatio="auto" className="absolute inset-0" /> : imageUrl}
-              title={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="fitness.title" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "fitness.title", locale, editor?.overrides ?? {}) || t.gallery.fitness.title)}
-              subtitle={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="fitness.badge" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "fitness.badge", locale, editor?.overrides ?? {}) || t.gallery.fitness.badge)}
-              description={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="fitness.subtitle" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "fitness.subtitle", locale, editor?.overrides ?? {}) || t.gallery.fitness.subtitle)}
+              title={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey={titleKey} locale={locale} as="span" /> : fallbackTitle}
+              subtitle={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey={badgeKey} locale={locale} as="span" /> : fallbackBadge}
+              description={editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey={subtitleKey} locale={locale} as="span" /> : fallbackSubtitle}
               textPosition="bottom-left"
               overlay="dark"
             />
@@ -406,17 +412,6 @@ function LazerPageContent() {
                           sizes="100vw"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                        {index === 0 && (
-                          <div className="absolute bottom-8 left-8 text-white">
-                            <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
-                              <Sparkles className="h-4 w-4 mr-2 inline" />
-                              {editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="spa.badge" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "spa.badge", locale, editor?.overrides ?? {}) || t.gallery.spa.badge)}
-                            </Badge>
-                            <h2 className="text-2xl font-bold drop-shadow-2xl">
-                              {editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="spa.title" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "spa.title", locale, editor?.overrides ?? {}) || t.gallery.spa.title)}
-                            </h2>
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -438,17 +433,6 @@ function LazerPageContent() {
                         sizes="25vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      {index === 0 && (
-                        <div className="absolute bottom-8 left-8 text-white">
-                          <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-sm px-3 py-1">
-                            <Sparkles className="h-3 w-3 mr-1 inline" />
-                            {editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="spa.badge" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "spa.badge", locale, editor?.overrides ?? {}) || t.gallery.spa.badge)}
-                          </Badge>
-                          <h2 className="text-xl font-bold drop-shadow-2xl">
-                            {editor?.editMode ? <PageText page="lazer" section="gallery" fieldKey="spa.title" locale={locale} as="span" /> : (getPageContent("lazer", "gallery", "spa.title", locale, editor?.overrides ?? {}) || t.gallery.spa.title)}
-                          </h2>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
