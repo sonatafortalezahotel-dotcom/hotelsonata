@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 
 interface ImageUploadProps {
   value: string;
@@ -57,11 +58,12 @@ export function ImageUpload({
     };
     reader.readAsDataURL(file);
 
-    // Upload
+    // Upload (otimiza imagem antes: resize + compressão)
     setUploading(true);
     try {
+      const optimized = await optimizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized);
       formData.append("folder", folder);
       formData.append("access", "public");
 

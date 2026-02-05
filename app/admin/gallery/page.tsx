@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ImagePreview } from "@/components/admin/ImagePreview";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 
 interface GalleryItem {
   id: number;
@@ -82,8 +83,9 @@ export default function GalleryPage() {
     setUploading(true);
     
     try {
+      const optimized = await optimizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized);
       formData.append("folder", "gallery");
 
       const response = await fetch("/api/upload", {

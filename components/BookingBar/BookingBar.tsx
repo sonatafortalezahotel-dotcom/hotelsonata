@@ -163,8 +163,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       className={cn(
         "transition-all duration-300 w-full left-0 right-0",
         isHomePage 
-          ? "z-50 sticky top-20 lg:top-20 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home, sticky FULL WIDTH com fundo
-          : "fixed bottom-0 lg:sticky lg:top-24 z-40 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Outras páginas: mobile fixo bottom, desktop sticky abaixo do header (top-24 = 96px altura do header)
+          ? "z-[50] sticky top-20 lg:top-20 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home, sticky abaixo do header (header z-[60])
+          : "fixed bottom-0 lg:sticky lg:top-24 z-[40] bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Outras páginas: mobile fixo bottom, desktop sticky abaixo do header
       )}
     >
       {/* Container interno para o conteúdo */}

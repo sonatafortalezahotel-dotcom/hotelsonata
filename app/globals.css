@@ -442,3 +442,9 @@ body > section:last-of-type + div {
   width: 100%;
   height: auto;
 }
+
+/* Toasts (Sonner) sempre acima de header, booking bar e modais */
+[data-sonner-toaster],
+ol[data-sonner-toaster] {
+  z-index: 99999 !important;
+}

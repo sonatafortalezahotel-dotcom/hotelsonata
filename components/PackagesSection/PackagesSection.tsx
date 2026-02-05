@@ -121,10 +121,10 @@ export default function PackagesSection({
                       {/* Overlay Gradiente */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                       
-                      {/* Texto Sobreposto */}
+                      {/* Texto Sobreposto (nome/descrição vêm das traduções por idioma; se faltar, mostra fallback) */}
                       <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-10">
                         <h3 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-3 drop-shadow-2xl">
-                          {room.name}
+                          {room.name || room.code || (locale === "es" ? "Habitación" : locale === "en" ? "Room" : "Quarto")}
                         </h3>
                         {(room.shortDescription || room.description) && (
                           <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed mb-4">

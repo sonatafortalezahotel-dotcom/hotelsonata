@@ -13,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 import type { PageSection, PageType } from "@/lib/constants/page-sections";
 import { isLegacyImage, suggestPageSectionForImage } from "@/lib/utils/gallery-mapper";
 
@@ -60,8 +61,9 @@ export function SectionBlockEditor({
     setUploading(true);
     
     try {
+      const optimized = await optimizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized);
       const folderName = page === "seo-landing-page" && customPageId 
         ? `images/seo-landing-pages/${customPageId}`
         : `images/${page}`;

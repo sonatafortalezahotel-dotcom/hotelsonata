@@ -22,6 +22,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 
 const UPLOAD_FOLDER = "blog";
 
@@ -193,8 +194,9 @@ export function BlogRichTextEditor({
     _onSuccess: (url: string) => void
   ) => {
     toast.info("Enviando imagem...");
+    const optimized = await optimizeImageForUpload(file);
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", optimized);
     formData.append("folder", UPLOAD_FOLDER);
     formData.append("access", "public");
     try {

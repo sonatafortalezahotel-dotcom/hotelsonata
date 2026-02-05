@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Link as LinkIcon, Upload, Image as ImageIcon, Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 
 interface ImageEditDialogProps {
   open: boolean;
@@ -101,7 +102,7 @@ export function ImageEditDialog({
       return;
     }
 
-    // Validação de tamanho (50MB)
+    // Validação de tamanho (50MB) — será otimizada antes do upload
     const maxSizeBytes = 50 * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       toast.error("A imagem deve ter no máximo 50MB");
@@ -110,8 +111,9 @@ export function ImageEditDialog({
 
     setUploading(true);
     try {
+      const optimized = await optimizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized);
       formData.append("folder", "hotel-sonata");
       formData.append("access", "public");
 

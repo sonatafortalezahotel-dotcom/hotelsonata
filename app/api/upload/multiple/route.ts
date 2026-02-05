@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { uploadMultipleFiles, generateUniqueFilename, isImageFile, isVideoFile, validateFileSize } from "@/lib/upload";
 
-// Tamanhos máximos permitidos (em bytes)
-const MAX_IMAGE_SIZE = 50 * 1024 * 1024; // 50MB
+// Tamanhos máximos permitidos (em bytes). Imagens: 4MB (cliente otimiza antes do upload).
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 
 export async function POST(request: Request) {

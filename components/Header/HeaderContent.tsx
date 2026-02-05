@@ -109,7 +109,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
   );
 
   const headerClasses = cn(
-    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+    "fixed top-0 left-0 right-0 z-[60] transition-all duration-300",
     usePrimaryBackground || isScrolled
       ? "bg-primary shadow-lg"
       : "bg-primary/95 backdrop-blur-sm"

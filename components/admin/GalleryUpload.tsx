@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 
 interface GalleryUploadProps {
   value: string[]; // Array de URLs
@@ -55,11 +56,12 @@ export function GalleryUpload({
       }
     }
 
-    // Upload múltiplo
+    // Upload múltiplo (otimiza cada imagem antes)
     setUploading(true);
     try {
+      const optimizedFiles = await Promise.all(files.map((f) => optimizeImageForUpload(f)));
       const formData = new FormData();
-      files.forEach((file) => {
+      optimizedFiles.forEach((file) => {
         formData.append("files", file);
       });
       formData.append("folder", folder);

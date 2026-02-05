@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Save, Edit2, X, Upload, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { optimizeImageForUpload } from "@/lib/imageOptimizer";
 import { ImageUpload } from "./ImageUpload";
 
 interface EditableField {
@@ -69,8 +70,9 @@ export function VisualEditor({
 
   const handleImageUpload = async (file: File, itemIndex: number) => {
     try {
+      const optimized = await optimizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized);
       const folderName = folder || `images/${page}`;
       formData.append("folder", folderName);
 
