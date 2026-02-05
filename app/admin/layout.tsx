@@ -33,7 +33,6 @@ const menuItems = [
   { icon: Image, label: "Destaques", href: "/admin/highlights" },
   { icon: Package, label: "Pacotes", href: "/admin/packages" },
   { icon: Bed, label: "Quartos", href: "/admin/rooms" },
-  { icon: Image, label: "Imagens por Página", href: "/admin/images" },
   { icon: CalendarDays, label: "Eventos", href: "/admin/events" },
   { icon: MapPin, label: "Pontos Turísticos", href: "/admin/nearby-attractions" },
   { icon: Award, label: "Certificações", href: "/admin/certifications" },
