@@ -8,7 +8,6 @@ import ReservationForm from "@/components/ReservationForm";
 import PackagesSection from "@/components/PackagesSection";
 import SocialMediaFeed from "@/components/SocialMediaFeed";
 import SustainabilitySection from "@/components/SustainabilitySection";
-import CertificationsSection from "@/components/CertificationsSection";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { PhotoStory } from "@/components/PhotoStory";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
@@ -199,31 +198,6 @@ async function getSustainability() {
   }
 }
 
-// Função para buscar certificações
-async function getCertifications() {
-  try {
-    // Usar URL relativa para evitar problemas de CORS em desenvolvimento
-    const res = await fetch('/api/certifications', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store'
-    });
-    
-    if (!res.ok) {
-      console.error('Erro ao buscar certificações:', res.status, res.statusText);
-      return [];
-    }
-    
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Erro ao buscar certificações:', error);
-    return [];
-  }
-}
-
 // Função para buscar highlights do carrossel principal
 async function getHighlights() {
   try {
@@ -259,7 +233,6 @@ export default function Home() {
   const [packages, setPackages] = useState<any[]>([]);
   const [socialPosts, setSocialPosts] = useState<any[]>([]);
   const [sustainability, setSustainability] = useState<any[]>([]);
-  const [certifications, setCertifications] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [highlights, setHighlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -344,12 +317,11 @@ export default function Home() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [roomsData, packagesData, socialData, sustainabilityData, certificationsData, galleryData, highlightsData] = await Promise.all([
+        const [roomsData, packagesData, socialData, sustainabilityData, galleryData, highlightsData] = await Promise.all([
           getRooms(locale),
           getPackages(),
           getSocialMediaPosts(),
           getSustainability(),
-          getCertifications(),
           getGalleryPhotos(), // Buscar todas as fotos da galeria
           getHighlights() // Buscar highlights do carrossel
         ]);
@@ -358,7 +330,6 @@ export default function Home() {
         setPackages(Array.isArray(packagesData) ? packagesData : []);
         setSocialPosts(Array.isArray(socialData) ? socialData : []);
         setSustainability(Array.isArray(sustainabilityData) ? sustainabilityData : []);
-        setCertifications(Array.isArray(certificationsData) ? certificationsData : []);
         setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
         setHighlights(Array.isArray(highlightsData) ? highlightsData : []);
       } catch (error) {
@@ -729,8 +700,8 @@ export default function Home() {
                               sizes="100vw"
                             />
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                          <div className="absolute inset-0 flex flex-col justify-end p-6">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
                             <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2">{item.time}</span>
                             <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
                             <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
@@ -765,8 +736,8 @@ export default function Home() {
                             sizes="25vw"
                           />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                        <div className="absolute inset-0 flex flex-col justify-end p-6">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
                           <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2">{item.time}</span>
                           <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
                           <p className="text-white/90 text-sm leading-relaxed line-clamp-3">{item.description}</p>
@@ -845,9 +816,6 @@ export default function Home() {
 
       {/* Sustentabilidade - integrado com banco de dados */}
       <SustainabilitySection items={sustainability} galleryPhotos={galleryPhotos} />
-
-      {/* Certificações - integrado com banco de dados */}
-      <CertificationsSection certifications={certifications} galleryPhotos={galleryPhotos} />
 
       {/* Feed de Redes Sociais - integrado com banco de dados */}
       <SocialMediaFeed posts={socialPosts} galleryPhotos={galleryPhotos} />
