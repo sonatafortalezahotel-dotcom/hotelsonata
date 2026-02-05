@@ -147,6 +147,27 @@ async function getGalleryPhotos(cacheBust?: boolean) {
   }
 }
 
+// Busca exclusiva da seção "Momentos Inesquecíveis" (page=home, section=galeria-momentos)
+// Garante que a seção use apenas as fotos definidas na edição visual, não de outro local
+async function getGalleryGaleriaMomentos(cacheBust?: boolean) {
+  try {
+    const url = cacheBust
+      ? `/api/gallery?page=home&section=galeria-momentos&active=true&limit=9&_t=${Date.now()}`
+      : '/api/gallery?page=home&section=galeria-momentos&active=true&limit=9';
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Erro ao buscar galeria Momentos Inesquecíveis:', error);
+    return [];
+  }
+}
+
 // Função para buscar posts das redes sociais do banco de dados
 async function getSocialMediaPosts() {
   try {
@@ -207,6 +228,7 @@ export default function Home() {
   const [packages, setPackages] = useState<any[]>([]);
   const [socialPosts, setSocialPosts] = useState<any[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+  const [galeriaMomentosPhotos, setGaleriaMomentosPhotos] = useState<any[]>([]);
   const [highlights, setHighlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -276,25 +298,28 @@ export default function Home() {
     // PhotoStory - 8 imagens de "photo-story"
     const photoStoryPhotos = getPhotosBySection("photo-story", 8);
 
-    // Galeria de Momentos - 9 imagens
-    const galeriaMomentosPhotos = getPhotosBySection("galeria-momentos", 9);
+    // Galeria de Momentos: usa lista dedicada (galeriaMomentosPhotos state), não derivada de galleryPhotos,
+    // para garantir que a seção mostre apenas as fotos definidas na edição visual (page=home, section=galeria-momentos)
+    const galeriaMomentosFromGallery = getPhotosBySection("galeria-momentos", 9);
+    const galeriaMomentosPhotosResolved = galeriaMomentosPhotos.length > 0 ? galeriaMomentosPhotos : galeriaMomentosFromGallery;
 
     return {
       experienceImages,
       photoStoryPhotos,
-      galeriaMomentosPhotos,
+      galeriaMomentosPhotos: galeriaMomentosPhotosResolved,
     };
-  }, [galleryPhotos]);
+  }, [galleryPhotos, galeriaMomentosPhotos]);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const [roomsData, packagesData, socialData, galleryData, highlightsData] = await Promise.all([
+        const [roomsData, packagesData, socialData, galleryData, galeriaMomentosData, highlightsData] = await Promise.all([
           getRooms(locale),
           getPackages(),
           getSocialMediaPosts(),
-          getGalleryPhotos(), // Buscar todas as fotos da galeria
+          getGalleryPhotos(), // Buscar todas as fotos da galeria (home)
+          getGalleryGaleriaMomentos(), // Busca exclusiva da seção Momentos Inesquecíveis
           getHighlights() // Buscar highlights do carrossel
         ]);
         
@@ -302,6 +327,7 @@ export default function Home() {
         setPackages(Array.isArray(packagesData) ? packagesData : []);
         setSocialPosts(Array.isArray(socialData) ? socialData : []);
         setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
+        setGaleriaMomentosPhotos(Array.isArray(galeriaMomentosData) ? galeriaMomentosData : []);
         setHighlights(Array.isArray(highlightsData) ? highlightsData : []);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -317,8 +343,12 @@ export default function Home() {
     if (typeof window === "undefined") return;
     const onGalleryUpdated = async () => {
       try {
-        const galleryData = await getGalleryPhotos(true);
+        const [galleryData, momentosData] = await Promise.all([
+          getGalleryPhotos(true),
+          getGalleryGaleriaMomentos(true),
+        ]);
         setGalleryPhotos(Array.isArray(galleryData) ? galleryData : []);
+        setGaleriaMomentosPhotos(Array.isArray(momentosData) ? momentosData : []);
       } catch (error) {
         console.error("Erro ao atualizar galeria:", error);
       }
@@ -749,19 +779,24 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Grid Masonry com imagens trocando de posição */}
+          {/* Grid Masonry - em edição: sempre 9 slots (page=home, section=galeria-momentos); fora: só fotos dessa seção */}
           {editor?.editMode ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {homeImages.galeriaMomentosPhotos.slice(0, 9).map((photo, index) => (
-                <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                  <PageImage
-                    src={getGalleryImageByPath(galleryPhotos, `gallery:home:galeria-momentos:${index}`) || photo.imageUrl}
-                    path={`gallery:home:galeria-momentos:${index}`}
-                    aspectRatio="auto"
-                    className="w-full h-full"
-                  />
-                </div>
-              ))}
+              {Array.from({ length: 9 }, (_, index) => {
+                const path = `gallery:home:galeria-momentos:${index}`;
+                const photoByOrder = homeImages.galeriaMomentosPhotos.find((p: any) => (p.order ?? 0) === index);
+                const src = getGalleryImageByPath(galleryPhotos, path) || photoByOrder?.imageUrl || "";
+                return (
+                  <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                    <PageImage
+                      src={src}
+                      path={path}
+                      aspectRatio="auto"
+                      className="w-full h-full"
+                    />
+                  </div>
+                );
+              })}
             </div>
           ) : homeImages.galeriaMomentosPhotos.length >= 4 ? (
             <MasonrySwap
