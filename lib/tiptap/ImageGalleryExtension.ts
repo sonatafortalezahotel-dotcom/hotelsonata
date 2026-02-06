@@ -139,10 +139,8 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
 
   addNodeView() {
     return ({ node, editor, getPos }) => {
-      const container = document.createElement("div");
-      container.className = "image-gallery-editor-wrapper";
-      container.style.cssText = "position: relative; margin: 1rem 0;";
-
+      // IMPORTANTE: O elemento DOM principal deve ser a própria galeria
+      // para que getHTML() serialize corretamente
       const dom = document.createElement("div");
       dom.className = "image-gallery";
       dom.setAttribute("data-gallery", JSON.stringify(node.attrs.images));
@@ -150,14 +148,18 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 0.5rem;
+        margin: 1rem 0;
         cursor: pointer;
         border: 2px solid transparent;
         border-radius: 0.5rem;
         padding: 0.5rem;
         transition: border-color 0.2s;
+        position: relative;
       `;
 
       const images = node.attrs.images || [];
+      
+      // Adicionar elementos img
       images.forEach((src: string) => {
         const img = document.createElement("img");
         img.src = src;
@@ -173,8 +175,9 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         dom.appendChild(img);
       });
 
-      // Badge com número de imagens
+      // Badge com número de imagens (absoluto dentro da própria div)
       const badge = document.createElement("div");
+      badge.className = "gallery-badge";
       badge.textContent = `${images.length} ${images.length === 1 ? 'imagem' : 'imagens'}`;
       badge.style.cssText = `
         position: absolute;
@@ -191,19 +194,20 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         transition: opacity 0.2s;
         z-index: 10;
       `;
+      dom.appendChild(badge);
 
       // Efeito hover
-      container.addEventListener("mouseenter", () => {
+      dom.addEventListener("mouseenter", () => {
         dom.style.borderColor = "hsl(var(--primary))";
         badge.style.opacity = "1";
       });
-      container.addEventListener("mouseleave", () => {
+      dom.addEventListener("mouseleave", () => {
         dom.style.borderColor = "transparent";
         badge.style.opacity = "0";
       });
 
       // Click para editar
-      container.addEventListener("click", (e) => {
+      dom.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         
@@ -214,18 +218,15 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         }
       });
 
-      container.appendChild(dom);
-      container.appendChild(badge);
-
       return {
-        dom: container,
+        dom,
         contentDOM: null,
         ignoreMutation: () => true,
         update: (updatedNode) => {
           if (updatedNode.type.name !== this.name) {
             return false;
           }
-          // Garantir que data-gallery esteja atualizado
+          // Atualizar data-gallery quando o nó mudar
           dom.setAttribute("data-gallery", JSON.stringify(updatedNode.attrs.images));
           return true;
         },
