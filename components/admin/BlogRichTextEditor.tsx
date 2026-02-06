@@ -147,7 +147,9 @@ export function BlogRichTextEditor({
         },
       },
       onUpdate: ({ editor: ed }) => {
-        onChangeRef.current(ed.getHTML());
+        const html = ed.getHTML();
+        console.log("[BlogEditor] HTML gerado:", html);
+        onChangeRef.current(html);
       },
     },
     []
@@ -177,8 +179,13 @@ export function BlogRichTextEditor({
     const editorHtml = editor.getHTML();
     const editorEmpty = !editorHtml || editorHtml === "<p></p>" || editorHtml === "<p><br></p>";
     if (value && editorEmpty && value !== editorHtml) {
+      console.log("[BlogEditor] Carregando conteúdo:", value);
       editor.commands.setContent(value, { emitUpdate: false });
       initialContentSet.current = true;
+      // Verificar se o conteúdo foi carregado corretamente
+      setTimeout(() => {
+        console.log("[BlogEditor] Conteúdo após carregar:", editor.getHTML());
+      }, 100);
     }
   }, [editor, value]);
 

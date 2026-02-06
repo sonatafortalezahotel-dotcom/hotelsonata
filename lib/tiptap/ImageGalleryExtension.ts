@@ -36,17 +36,19 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           const galleryData = element.getAttribute("data-gallery");
           if (!galleryData) return [];
           try {
-            return JSON.parse(galleryData);
+            const parsed = JSON.parse(galleryData);
+            return Array.isArray(parsed) ? parsed : [];
           } catch {
             return [];
           }
         },
         renderHTML: (attributes) => {
-          if (!attributes.images || !Array.isArray(attributes.images)) {
+          const images = attributes.images;
+          if (!images || !Array.isArray(images) || images.length === 0) {
             return {};
           }
           return {
-            "data-gallery": JSON.stringify(attributes.images),
+            "data-gallery": JSON.stringify(images),
           };
         },
       },
@@ -56,7 +58,20 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
   parseHTML() {
     return [
       {
-        tag: 'div.image-gallery[data-gallery]',
+        tag: 'div[data-gallery]',
+        getAttrs: (node) => {
+          if (typeof node === 'string') return false;
+          const element = node as HTMLElement;
+          const galleryData = element.getAttribute('data-gallery');
+          if (!galleryData) return false;
+          
+          try {
+            const images = JSON.parse(galleryData);
+            return Array.isArray(images) && images.length > 0 ? { images } : false;
+          } catch {
+            return false;
+          }
+        },
       },
     ];
   },
@@ -73,20 +88,16 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
       {
         src,
         alt: "",
-        class: "gallery-image",
         loading: "lazy",
       },
     ]);
 
     return [
       "div",
-      mergeAttributes(
-        {
-          class: "image-gallery",
-          "data-gallery": JSON.stringify(images),
-        },
-        this.options.HTMLAttributes
-      ),
+      {
+        class: "image-gallery",
+        "data-gallery": JSON.stringify(images),
+      },
       ...imgElements,
     ];
   },
