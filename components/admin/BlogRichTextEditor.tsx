@@ -20,9 +20,15 @@ import {
   Link as LinkIcon,
   ImagePlus,
   Loader2,
+  Images,
+  Video,
 } from "lucide-react";
 import { toast } from "sonner";
 import { optimizeImageForUpload } from "@/lib/imageOptimizer";
+import { YouTube } from "@/lib/tiptap/YouTubeExtension";
+import { ImageGallery } from "@/lib/tiptap/ImageGalleryExtension";
+import { YouTubeDialog } from "./YouTubeDialog";
+import { GalleryDialog } from "./GalleryDialog";
 
 const UPLOAD_FOLDER = "blog";
 
@@ -59,6 +65,10 @@ export function BlogRichTextEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
   const [, forceUpdate] = useState({});
+  const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false);
+  const [galleryDialogOpen, setGalleryDialogOpen] = useState(false);
+  const [editingGalleryImages, setEditingGalleryImages] = useState<string[]>([]);
+  const [galleryMode, setGalleryMode] = useState<"create" | "edit">("create");
 
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -66,6 +76,12 @@ export function BlogRichTextEditor({
   const uploadAndInsertImageRef = useRef<
     (file: File, onSuccess: (url: string) => void) => Promise<void>
   >(async () => {});
+
+  const handleGalleryEdit = useRef((images: string[]) => {
+    setEditingGalleryImages(images);
+    setGalleryMode("edit");
+    setGalleryDialogOpen(true);
+  });
 
   const extensions = useMemo(
     () => [
@@ -82,6 +98,21 @@ export function BlogRichTextEditor({
           class: "rounded-lg max-w-full h-auto block",
           referrerPolicy: "no-referrer",
           decoding: "async",
+        },
+      }),
+      YouTube.configure({
+        inline: false,
+        allowFullscreen: true,
+        HTMLAttributes: {
+          class: "youtube-video-wrapper",
+        },
+      }),
+      ImageGallery.configure({
+        HTMLAttributes: {
+          class: "image-gallery-wrapper",
+        },
+        onEdit: (images: string[]) => {
+          handleGalleryEdit.current(images);
         },
       }),
       Placeholder.configure({ placeholder }),
@@ -267,6 +298,41 @@ export function BlogRichTextEditor({
     editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }
 
+  function handleYouTubeInsert(url: string) {
+    editor?.chain().focus().setYoutubeVideo({ src: url }).run();
+    toast.success("Vídeo do YouTube inserido");
+  }
+
+  function handleGalleryInsert(images: string[]) {
+    if (galleryMode === "edit") {
+      // Atualizar galeria existente
+      editor?.chain().focus().updateImageGallery({ images }).run();
+      toast.success("Galeria atualizada");
+    } else {
+      // Criar nova galeria
+      editor?.chain().focus().setImageGallery({ images }).run();
+      toast.success("Galeria inserida");
+    }
+    // Reset para modo de criação
+    setGalleryMode("create");
+    setEditingGalleryImages([]);
+  }
+
+  function handleGalleryDialogClose(open: boolean) {
+    setGalleryDialogOpen(open);
+    if (!open) {
+      // Reset quando fechar
+      setGalleryMode("create");
+      setEditingGalleryImages([]);
+    }
+  }
+
+  function handleGalleryButtonClick() {
+    setGalleryMode("create");
+    setEditingGalleryImages([]);
+    setGalleryDialogOpen(true);
+  }
+
   if (!editor) {
     return (
       <div
@@ -358,6 +424,18 @@ export function BlogRichTextEditor({
         <ToolbarButton onMouseDown={handleImageClick} title="Inserir imagem">
           <ImagePlus className="h-4 w-4" />
         </ToolbarButton>
+        <ToolbarButton
+          onMouseDown={handleGalleryButtonClick}
+          title="Inserir galeria de imagens"
+        >
+          <Images className="h-4 w-4" />
+        </ToolbarButton>
+        <ToolbarButton
+          onMouseDown={() => setYoutubeDialogOpen(true)}
+          title="Inserir vídeo do YouTube"
+        >
+          <Video className="h-4 w-4" />
+        </ToolbarButton>
         {isImageSelected && (
           <span className="ml-1 flex items-center gap-0.5 border-l border-border pl-1">
             <span className="text-[10px] text-muted-foreground mr-0.5">Tamanho:</span>
@@ -396,6 +474,21 @@ export function BlogRichTextEditor({
         />
       </div>
       <EditorContent editor={editor} style={{ minHeight }} />
+
+      {/* Dialogs */}
+      <YouTubeDialog
+        open={youtubeDialogOpen}
+        onOpenChange={setYoutubeDialogOpen}
+        onInsert={handleYouTubeInsert}
+      />
+      <GalleryDialog
+        open={galleryDialogOpen}
+        onOpenChange={handleGalleryDialogClose}
+        onInsert={handleGalleryInsert}
+        initialImages={editingGalleryImages}
+        mode={galleryMode}
+      />
+
       <style jsx global>{`
         .ProseMirror {
           outline: none;
@@ -451,6 +544,36 @@ export function BlogRichTextEditor({
           padding: 0.2em 0.4em;
           border-radius: 0.25rem;
           font-size: 0.9em;
+        }
+        .ProseMirror .youtube-video {
+          position: relative;
+          width: 100%;
+          padding-bottom: 56.25%;
+          margin: 1.5rem 0;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          background: hsl(var(--muted));
+        }
+        .ProseMirror .youtube-video iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .ProseMirror .image-gallery {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 0.5rem;
+          margin: 1.5rem 0;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+        }
+        .ProseMirror .image-gallery img {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          border-radius: 0.375rem;
         }
       `}</style>
     </div>
