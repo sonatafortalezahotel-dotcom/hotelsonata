@@ -317,7 +317,9 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         
         if (this.options.onEdit) {
           const pos = typeof getPos === 'function' ? getPos() : 0;
-          editor.commands.setNodeSelection(pos);
+          if (typeof pos === 'number') {
+            editor.commands.setNodeSelection(pos);
+          }
           this.options.onEdit(node.attrs.images);
         }
       });
