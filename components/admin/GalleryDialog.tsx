@@ -19,8 +19,9 @@ const UPLOAD_FOLDER = "blog";
 interface GalleryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onInsert: (images: string[]) => void;
+  onInsert: (images: string[], layout: "grid" | "carousel") => void;
   initialImages?: string[];
+  initialLayout?: "grid" | "carousel";
   mode?: "create" | "edit";
 }
 
@@ -29,9 +30,11 @@ export function GalleryDialog({
   onOpenChange,
   onInsert,
   initialImages = [],
+  initialLayout = "grid",
   mode = "create",
 }: GalleryDialogProps) {
   const [images, setImages] = useState<string[]>(initialImages);
+  const [layout, setLayout] = useState<"grid" | "carousel">(initialLayout);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,8 +42,9 @@ export function GalleryDialog({
   useEffect(() => {
     if (open) {
       setImages(initialImages);
+      setLayout(initialLayout);
     }
-  }, [open, initialImages]);
+  }, [open, initialImages, initialLayout]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -102,12 +106,13 @@ export function GalleryDialog({
       toast.error("Adicione pelo menos uma imagem à galeria");
       return;
     }
-    onInsert(images);
+    onInsert(images, layout);
     handleClose();
   };
 
   const handleClose = () => {
     setImages(initialImages);
+    setLayout(initialLayout);
     onOpenChange(false);
   };
 
@@ -124,6 +129,45 @@ export function GalleryDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
+          {/* Seletor de Layout */}
+          <div className="mb-4 space-y-2">
+            <label className="text-sm font-medium">Tipo de Galeria</label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={layout === "grid" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setLayout("grid")}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="7" height="7" rx="1"/>
+                  <rect x="14" y="3" width="7" height="7" rx="1"/>
+                  <rect x="14" y="14" width="7" height="7" rx="1"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                Grid
+              </Button>
+              <Button
+                type="button"
+                variant={layout === "carousel" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setLayout("carousel")}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="2" y="6" width="20" height="12" rx="2"/>
+                  <path d="M7 6L7 18"/>
+                  <path d="M17 6L17 18"/>
+                </svg>
+                Carousel
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {layout === "grid" 
+                ? "Grid: múltiplas imagens lado a lado" 
+                : "Carousel: uma imagem por vez com navegação"}
+            </p>
+          </div>
+
           {/* Área de upload */}
           <div className="space-y-4">
             <Button

@@ -68,6 +68,7 @@ export function BlogRichTextEditor({
   const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false);
   const [galleryDialogOpen, setGalleryDialogOpen] = useState(false);
   const [editingGalleryImages, setEditingGalleryImages] = useState<string[]>([]);
+  const [editingGalleryLayout, setEditingGalleryLayout] = useState<"grid" | "carousel">("grid");
   const [galleryMode, setGalleryMode] = useState<"create" | "edit">("create");
 
   const onChangeRef = useRef(onChange);
@@ -336,19 +337,20 @@ export function BlogRichTextEditor({
     toast.success("Vídeo do YouTube inserido");
   }
 
-  function handleGalleryInsert(images: string[]) {
+  function handleGalleryInsert(images: string[], layout: "grid" | "carousel") {
     if (galleryMode === "edit") {
       // Atualizar galeria existente
-      editor?.chain().focus().updateImageGallery({ images }).run();
+      editor?.chain().focus().updateImageGallery({ images, layout }).run();
       toast.success("Galeria atualizada");
     } else {
       // Criar nova galeria
-      editor?.chain().focus().setImageGallery({ images }).run();
+      editor?.chain().focus().setImageGallery({ images, layout }).run();
       toast.success("Galeria inserida");
     }
     // Reset para modo de criação
     setGalleryMode("create");
     setEditingGalleryImages([]);
+    setEditingGalleryLayout("grid");
   }
 
   function handleGalleryDialogClose(open: boolean) {
@@ -357,12 +359,14 @@ export function BlogRichTextEditor({
       // Reset quando fechar
       setGalleryMode("create");
       setEditingGalleryImages([]);
+      setEditingGalleryLayout("grid");
     }
   }
 
   function handleGalleryButtonClick() {
     setGalleryMode("create");
     setEditingGalleryImages([]);
+    setEditingGalleryLayout("grid");
     setGalleryDialogOpen(true);
   }
 
@@ -519,6 +523,7 @@ export function BlogRichTextEditor({
         onOpenChange={handleGalleryDialogClose}
         onInsert={handleGalleryInsert}
         initialImages={editingGalleryImages}
+        initialLayout={editingGalleryLayout}
         mode={galleryMode}
       />
 
@@ -607,6 +612,18 @@ export function BlogRichTextEditor({
           height: 200px;
           object-fit: cover;
           border-radius: 0.375rem;
+        }
+        .ProseMirror .image-gallery-carousel {
+          position: relative;
+          max-width: 100%;
+          margin: 1.5rem 0;
+          border-radius: 0.5rem;
+          overflow: hidden;
+        }
+        .ProseMirror .image-gallery-carousel img {
+          width: 100%;
+          height: 400px;
+          object-fit: cover;
         }
       `}</style>
     </div>

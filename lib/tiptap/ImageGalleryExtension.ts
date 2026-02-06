@@ -8,8 +8,8 @@ export interface ImageGalleryOptions {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     imageGallery: {
-      setImageGallery: (options: { images: string[] }) => ReturnType;
-      updateImageGallery: (options: { images: string[] }) => ReturnType;
+      setImageGallery: (options: { images: string[]; layout?: "grid" | "carousel" }) => ReturnType;
+      updateImageGallery: (options: { images: string[]; layout?: "grid" | "carousel" }) => ReturnType;
     };
   }
 }
@@ -54,6 +54,17 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           };
         },
       },
+      layout: {
+        default: "grid",
+        parseHTML: (element) => {
+          return element.getAttribute("data-layout") || "grid";
+        },
+        renderHTML: (attributes) => {
+          return {
+            "data-layout": attributes.layout || "grid",
+          };
+        },
+      },
     };
   },
 
@@ -68,7 +79,8 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           }
           const element = node as HTMLElement;
           const galleryData = element.getAttribute('data-gallery');
-          console.log("[ImageGallery] parseHTML: data-gallery =", galleryData);
+          const layout = element.getAttribute('data-layout') || 'grid';
+          console.log("[ImageGallery] parseHTML: data-gallery =", galleryData, "layout =", layout);
           
           if (!galleryData) {
             console.warn("[ImageGallery] parseHTML: sem data-gallery");
@@ -78,7 +90,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           try {
             const images = JSON.parse(galleryData);
             console.log("[ImageGallery] parseHTML: parsed", images.length, "imagens");
-            return Array.isArray(images) && images.length > 0 ? { images } : false;
+            return Array.isArray(images) && images.length > 0 ? { images, layout } : false;
           } catch (error) {
             console.error("[ImageGallery] parseHTML: erro ao parsear JSON:", error, galleryData);
             return false;
@@ -91,13 +103,14 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
   renderHTML({ node, HTMLAttributes }) {
     // Garantir que pegamos os atributos do nó
     const images = node?.attrs?.images || HTMLAttributes.images || [];
+    const layout = node?.attrs?.layout || HTMLAttributes.layout || "grid";
     
     if (!Array.isArray(images) || images.length === 0) {
       console.warn("[ImageGallery] renderHTML: Sem imagens!", { node, HTMLAttributes });
       return ["div", { class: "image-gallery-empty" }, ""];
     }
 
-    console.log("[ImageGallery] renderHTML chamado com", images.length, "imagens");
+    console.log("[ImageGallery] renderHTML chamado com", images.length, "imagens, layout:", layout);
 
     // Criar os elementos img para cada imagem
     const imgElements = images.map((src: string) => [
@@ -110,11 +123,14 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
       },
     ]);
 
+    const className = layout === "carousel" ? "image-gallery-carousel" : "image-gallery";
+
     return [
       "div",
       {
-        class: "image-gallery",
+        class: className,
         "data-gallery": JSON.stringify(images),
+        "data-layout": layout,
       },
       ...imgElements,
     ];
@@ -123,7 +139,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
   addCommands() {
     return {
       setImageGallery:
-        (options: { images: string[] }) =>
+        (options: { images: string[]; layout?: "grid" | "carousel" }) =>
         ({ commands }) => {
           if (!options.images || options.images.length === 0) {
             return false;
@@ -132,11 +148,12 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
             type: this.name,
             attrs: {
               images: options.images,
+              layout: options.layout || "grid",
             },
           });
         },
       updateImageGallery:
-        (options: { images: string[] }) =>
+        (options: { images: string[]; layout?: "grid" | "carousel" }) =>
         ({ commands, state }) => {
           const { selection } = state;
           const node = state.doc.nodeAt(selection.from);
@@ -147,6 +164,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
 
           return commands.updateAttributes(this.name, {
             images: options.images,
+            layout: options.layout || node.attrs.layout || "grid",
           });
         },
     };
@@ -154,52 +172,117 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
 
   addNodeView() {
     return ({ node, editor, getPos }) => {
-      // IMPORTANTE: O elemento DOM principal deve ser a própria galeria
-      // para que getHTML() serialize corretamente
-      const dom = document.createElement("div");
-      dom.className = "image-gallery";
-      dom.setAttribute("data-gallery", JSON.stringify(node.attrs.images));
-      dom.style.cssText = `
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.5rem;
-        margin: 1rem 0;
-        cursor: pointer;
-        border: 2px solid transparent;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        transition: border-color 0.2s;
-        position: relative;
-      `;
-
+      const layout = node.attrs.layout || "grid";
       const images = node.attrs.images || [];
       
-      // IMPORTANTE: Limpar conteúdo anterior
+      // IMPORTANTE: O elemento DOM principal deve ser a própria galeria
+      const dom = document.createElement("div");
+      const className = layout === "carousel" ? "image-gallery-carousel" : "image-gallery";
+      dom.className = className;
+      dom.setAttribute("data-gallery", JSON.stringify(images));
+      dom.setAttribute("data-layout", layout);
+      
+      if (layout === "carousel") {
+        // Estilo carousel
+        dom.style.cssText = `
+          position: relative;
+          max-width: 100%;
+          margin: 1rem 0;
+          cursor: pointer;
+          border: 2px solid transparent;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        `;
+      } else {
+        // Estilo grid
+        dom.style.cssText = `
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 0.5rem;
+          margin: 1rem 0;
+          cursor: pointer;
+          border: 2px solid transparent;
+          border-radius: 0.5rem;
+          padding: 0.5rem;
+          transition: border-color 0.2s;
+          position: relative;
+        `;
+      }
+
       dom.innerHTML = '';
       
-      // Adicionar elementos img
-      images.forEach((src: string) => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.alt = "";
-        img.className = "gallery-image";
-        img.setAttribute("loading", "lazy");
-        img.style.cssText = `
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          border-radius: 0.375rem;
-        `;
-        dom.appendChild(img);
-      });
+      if (layout === "carousel") {
+        // Renderizar carousel
+        images.forEach((src: string, index: number) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "";
+          img.className = "gallery-image";
+          img.setAttribute("loading", "lazy");
+          img.style.cssText = `
+            display: ${index === 0 ? 'block' : 'none'};
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+          `;
+          dom.appendChild(img);
+        });
+        
+        // Indicadores
+        if (images.length > 1) {
+          const indicators = document.createElement("div");
+          indicators.className = "carousel-indicators";
+          indicators.style.cssText = `
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+            pointer-events: none;
+          `;
+          
+          images.forEach((_, index) => {
+            const dot = document.createElement("div");
+            dot.style.cssText = `
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background: ${index === 0 ? 'white' : 'rgba(255,255,255,0.5)'};
+              transition: background 0.3s;
+            `;
+            indicators.appendChild(dot);
+          });
+          
+          dom.appendChild(indicators);
+        }
+      } else {
+        // Renderizar grid
+        images.forEach((src: string) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "";
+          img.className = "gallery-image";
+          img.setAttribute("loading", "lazy");
+          img.style.cssText = `
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+          `;
+          dom.appendChild(img);
+        });
+      }
 
-      // Badge com número de imagens (NÃO será serializado pelo TipTap)
-      // Usar data-badge para não ser serializado como filho permanente
+      // Badge
       const badge = document.createElement("div");
       badge.className = "gallery-badge";
-      badge.setAttribute("data-tiptap-ignore", "true"); // Ignorar na serialização
+      badge.setAttribute("data-tiptap-ignore", "true");
       badge.setAttribute("contenteditable", "false");
-      badge.textContent = `${images.length} ${images.length === 1 ? 'imagem' : 'imagens'}`;
+      badge.textContent = `${images.length} ${images.length === 1 ? 'imagem' : 'imagens'} (${layout === 'carousel' ? 'Carousel' : 'Grid'})`;
       badge.style.cssText = `
         position: absolute;
         top: 0.5rem;
@@ -248,33 +331,59 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
             return false;
           }
           const newImages = updatedNode.attrs.images || [];
+          const newLayout = updatedNode.attrs.layout || "grid";
           
-          // Atualizar atributo data-gallery
+          // Atualizar atributos
           dom.setAttribute("data-gallery", JSON.stringify(newImages));
+          dom.setAttribute("data-layout", newLayout);
           
-          // Recriar imagens
+          // Recriar completamente se layout mudou
+          if (newLayout !== layout) {
+            return false; // Força recriação do NodeView
+          }
+          
+          // Atualizar imagens mantendo layout
           dom.innerHTML = '';
-          newImages.forEach((src: string) => {
-            const img = document.createElement("img");
-            img.src = src;
-            img.alt = "";
-            img.className = "gallery-image";
-            img.setAttribute("loading", "lazy");
-            img.style.cssText = `
-              width: 100%;
-              height: 200px;
-              object-fit: cover;
-              border-radius: 0.375rem;
-            `;
-            dom.appendChild(img);
-          });
+          
+          if (newLayout === "carousel") {
+            newImages.forEach((src: string, index: number) => {
+              const img = document.createElement("img");
+              img.src = src;
+              img.alt = "";
+              img.className = "gallery-image";
+              img.setAttribute("loading", "lazy");
+              img.style.cssText = `
+                display: ${index === 0 ? 'block' : 'none'};
+                width: 100%;
+                height: 400px;
+                object-fit: cover;
+                border-radius: 0.375rem;
+              `;
+              dom.appendChild(img);
+            });
+          } else {
+            newImages.forEach((src: string) => {
+              const img = document.createElement("img");
+              img.src = src;
+              img.alt = "";
+              img.className = "gallery-image";
+              img.setAttribute("loading", "lazy");
+              img.style.cssText = `
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 0.375rem;
+              `;
+              dom.appendChild(img);
+            });
+          }
           
           // Recriar badge
           const newBadge = document.createElement("div");
           newBadge.className = "gallery-badge";
           newBadge.setAttribute("data-tiptap-ignore", "true");
           newBadge.setAttribute("contenteditable", "false");
-          newBadge.textContent = `${newImages.length} ${newImages.length === 1 ? 'imagem' : 'imagens'}`;
+          newBadge.textContent = `${newImages.length} ${newImages.length === 1 ? 'imagem' : 'imagens'} (${newLayout === 'carousel' ? 'Carousel' : 'Grid'})`;
           newBadge.style.cssText = badge.style.cssText;
           dom.appendChild(newBadge);
           

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { CarouselGallery } from "./CarouselGallery";
 
 // Sanitize HTML: remove tags perigosas mas preserva iframes do YouTube e estruturas de galeria
 function sanitizeHtml(html: string): string {
@@ -44,10 +45,41 @@ interface BlogPostContentProps {
 
 export function BlogPostContent({ content, className }: BlogPostContentProps) {
   const sanitized = useMemo(() => sanitizeHtml(content), [content]);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Hidratar carousels após renderização
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const carousels = contentRef.current.querySelectorAll(".image-gallery-carousel[data-gallery]");
+    
+    carousels.forEach((carousel) => {
+      const galleryData = carousel.getAttribute("data-gallery");
+      if (!galleryData) return;
+
+      try {
+        const images = JSON.parse(galleryData);
+        if (!Array.isArray(images) || images.length === 0) return;
+
+        // Substituir o carousel estático por um componente React interativo
+        const container = document.createElement("div");
+        carousel.replaceWith(container);
+
+        // Renderizar o CarouselGallery
+        import("react-dom/client").then(({ createRoot }) => {
+          const root = createRoot(container);
+          root.render(<CarouselGallery images={images} />);
+        });
+      } catch (error) {
+        console.error("Erro ao hidratar carousel:", error);
+      }
+    });
+  }, [sanitized]);
 
   return (
     <>
       <div
+        ref={contentRef}
         className={cn(
           "prose prose-neutral dark:prose-invert max-w-none",
           "prose-img:rounded-lg prose-headings:font-semibold",
@@ -102,6 +134,28 @@ export function BlogPostContent({ content, className }: BlogPostContentProps) {
         @media (max-width: 640px) {
           .blog-post-content .image-gallery img {
             height: 150px;
+          }
+        }
+        .blog-post-content .image-gallery-carousel {
+          position: relative;
+          width: 100%;
+          margin: 2rem 0;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          background: hsl(var(--muted));
+        }
+        .blog-post-content .image-gallery-carousel img {
+          width: 100%;
+          height: 400px;
+          object-fit: cover;
+          display: none;
+        }
+        .blog-post-content .image-gallery-carousel img:first-child {
+          display: block;
+        }
+        @media (max-width: 640px) {
+          .blog-post-content .image-gallery-carousel img {
+            height: 300px;
           }
         }
       `}</style>
