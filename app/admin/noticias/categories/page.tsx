@@ -55,7 +55,7 @@ export default function AdminBlogCategoriesPage() {
 
   const load = async () => {
     try {
-      const res = await fetch("/api/blog/categories?locale=pt&count=true&all=true");
+      const res = await fetch("/api/noticias/categories?locale=pt&count=true&all=true");
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -73,7 +73,7 @@ export default function AdminBlogCategoriesPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/blog/categories", {
+      const res = await fetch("/api/noticias/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export default function AdminBlogCategoriesPage() {
     }
     setUpdating(true);
     try {
-      const res = await fetch(`/api/blog/categories/${editingId}`, {
+      const res = await fetch(`/api/noticias/categories/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -147,7 +147,7 @@ export default function AdminBlogCategoriesPage() {
   const handleDelete = async (id: number) => {
     if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
     try {
-      const res = await fetch(`/api/blog/categories/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/noticias/categories/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         toast.error(data.error || "Erro ao excluir categoria");
@@ -163,12 +163,12 @@ export default function AdminBlogCategoriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/blog">
+        <Link href="/admin/noticias">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">Categorias do blog</h1>
+        <h1 className="text-2xl font-bold">Categorias de notícias</h1>
       </div>
 
       <Card>

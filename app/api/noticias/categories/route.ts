@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Erro ao buscar categorias do blog:", error);
+    console.error("Erro ao buscar categorias de notícias:", error);
     return NextResponse.json(
       { error: "Erro ao buscar categorias" },
       { status: 500 }
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newCat, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar categoria do blog:", error);
+    console.error("Erro ao criar categoria de notícias:", error);
     return NextResponse.json(
       { error: "Erro ao criar categoria" },
       { status: 500 }

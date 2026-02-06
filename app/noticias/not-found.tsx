@@ -14,10 +14,10 @@ export default function BlogNotFound() {
         </h1>
         <p className="text-muted-foreground">
           O post que você procura não existe, foi removido ou ainda não foi
-          publicado. Confira a lista de posts no blog.
+          publicado. Confira a lista de posts em notícias.
         </p>
         <Button asChild>
-          <Link href="/blog">Ver todos os posts</Link>
+          <Link href="/noticias">Ver todos os posts</Link>
         </Button>
       </div>
     </div>

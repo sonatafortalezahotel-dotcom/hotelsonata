@@ -48,7 +48,7 @@ export default function AdminBlogPage() {
       const params = new URLSearchParams();
       params.set("status", statusFilter);
       params.set("locale", localeFilter === "all" ? "all" : localeFilter);
-      const res = await fetch(`/api/blog?${params.toString()}`);
+      const res = await fetch(`/api/noticias?${params.toString()}`);
       const data = await res.json();
       setPosts(data.posts ?? []);
     } catch (error) {
@@ -61,7 +61,7 @@ export default function AdminBlogPage() {
   const handleDelete = async (id: number) => {
     if (!confirm("Tem certeza que deseja excluir este post?")) return;
     try {
-      const res = await fetch(`/api/blog/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/noticias/${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Post excluído com sucesso");
         loadPosts();
@@ -79,23 +79,23 @@ export default function AdminBlogPage() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Blog</h1>
           <p className="text-muted-foreground">
-            Gerenciar posts, categorias e tags do blog.
+            Gerenciar posts, categorias e tags de notícias.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/admin/blog/categories">
+          <Link href="/admin/noticias/categories">
             <Button variant="outline" size="sm">
               <FolderOpen className="h-4 w-4 mr-2" />
               Categorias
             </Button>
           </Link>
-          <Link href="/admin/blog/tags">
+          <Link href="/admin/noticias/tags">
             <Button variant="outline" size="sm">
               <Tag className="h-4 w-4 mr-2" />
               Tags
             </Button>
           </Link>
-          <Link href="/admin/blog/new">
+          <Link href="/admin/noticias/new">
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Novo post
@@ -173,12 +173,12 @@ export default function AdminBlogPage() {
                         : "-"}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/blog/${post.slug}`} target="_blank" rel="noopener">
+                      <Link href={`/noticias/${post.slug}`} target="_blank" rel="noopener">
                         <Button variant="ghost" size="sm">
                           Ver
                         </Button>
                       </Link>
-                      <Link href={`/admin/blog/${post.id}`}>
+                      <Link href={`/admin/noticias/${post.id}`}>
                         <Button variant="ghost" size="icon">
                           <Pencil className="h-4 w-4" />
                         </Button>

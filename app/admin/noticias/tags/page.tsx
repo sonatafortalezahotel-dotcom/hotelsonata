@@ -50,7 +50,7 @@ export default function AdminBlogTagsPage() {
 
   const load = async () => {
     try {
-      const res = await fetch("/api/blog/tags?locale=pt&count=true");
+      const res = await fetch("/api/noticias/tags?locale=pt&count=true");
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -68,7 +68,7 @@ export default function AdminBlogTagsPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/blog/tags", {
+      const res = await fetch("/api/noticias/tags", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,7 +109,7 @@ export default function AdminBlogTagsPage() {
     }
     setUpdating(true);
     try {
-      const res = await fetch(`/api/blog/tags/${editingId}`, {
+      const res = await fetch(`/api/noticias/tags/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,7 +136,7 @@ export default function AdminBlogTagsPage() {
   const handleDelete = async (id: number) => {
     if (!confirm("Tem certeza que deseja excluir esta tag?")) return;
     try {
-      const res = await fetch(`/api/blog/tags/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/noticias/tags/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         toast.error(data.error || "Erro ao excluir tag");
@@ -152,12 +152,12 @@ export default function AdminBlogTagsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/blog">
+        <Link href="/admin/noticias">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">Tags do blog</h1>
+        <h1 className="text-2xl font-bold">Tags de notícias</h1>
       </div>
 
       <Card>

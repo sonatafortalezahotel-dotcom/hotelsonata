@@ -958,7 +958,7 @@ export const pageTranslations = {
           quartos: "Quartos",
           gastronomia: "Gastronomia",
           eventos: "Eventos",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contatos",
           trabalhe: "Trabalhe conosco",
@@ -981,7 +981,7 @@ export const pageTranslations = {
           quartos: "Quartos",
           gastronomia: "Gastronomia",
           eventos: "Eventos",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contatos",
           trabalhe: "Trabalhe conosco",
@@ -1923,7 +1923,7 @@ export const pageTranslations = {
           quartos: "Habitaciones",
           gastronomia: "Gastronomía",
           eventos: "Eventos",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contactos",
           trabalhe: "Trabaja con nosotros",
@@ -1946,7 +1946,7 @@ export const pageTranslations = {
           quartos: "Habitaciones",
           gastronomia: "Gastronomía",
           eventos: "Eventos",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contactos",
           trabalhe: "Trabaja con nosotros",
@@ -2078,7 +2078,7 @@ export const pageTranslations = {
         }
       }
     },
-    blog: {
+    noticias: {
       readMore: "Leer más",
       publishedOn: "Publicado el",
       noPosts: "No se encontraron publicaciones.",
@@ -2086,7 +2086,7 @@ export const pageTranslations = {
       tags: "Etiquetas",
       recentPosts: "Publicaciones recientes",
       search: "Buscar",
-      searchPlaceholder: "Buscar en el blog...",
+      searchPlaceholder: "Buscar en notícias...",
       sort: "Ordenar",
       sortRecent: "Más recientes",
       sortOldest: "Más antiguos",
@@ -2977,7 +2977,7 @@ export const pageTranslations = {
           quartos: "Rooms",
           gastronomia: "Gastronomy",
           eventos: "Events",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contact",
           trabalhe: "Work with us",
@@ -3000,7 +3000,7 @@ export const pageTranslations = {
           quartos: "Rooms",
           gastronomia: "Gastronomy",
           eventos: "Events",
-          blog: "Blog",
+          noticias: "Notícias",
           esg: "ESG",
           contato: "Contact",
           trabalhe: "Work with us",
@@ -3132,7 +3132,7 @@ export const pageTranslations = {
         }
       }
     },
-    blog: {
+    noticias: {
       readMore: "Read more",
       publishedOn: "Published on",
       noPosts: "No posts found.",
@@ -3140,7 +3140,7 @@ export const pageTranslations = {
       tags: "Tags",
       recentPosts: "Recent posts",
       search: "Search",
-      searchPlaceholder: "Search blog...",
+      searchPlaceholder: "Search news...",
       sort: "Sort",
       sortRecent: "Newest",
       sortOldest: "Oldest",

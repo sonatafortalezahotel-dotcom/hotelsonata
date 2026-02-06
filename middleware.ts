@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
     
     // Verificar se é uma rota conhecida (não catch-all)
     // Rotas conhecidas: mesma página com outro idioma → rewrite para path sem locale
-    const knownRoutes = ["esg", "quartos", "gastronomia", "lazer", "eventos", "contato", "pacotes", "reservas", "hotel", "checkout", "trabalhe-conosco", "blog", "admin"];
+    const knownRoutes = ["esg", "quartos", "gastronomia", "lazer", "eventos", "contato", "pacotes", "reservas", "hotel", "checkout", "trabalhe-conosco", "noticias", "admin"];
     const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
     const firstSegment = pathWithoutLocale.split("/").filter(Boolean)[0];
     const isKnownRoute = knownRoutes.includes(firstSegment || "");

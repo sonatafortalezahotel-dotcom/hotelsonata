@@ -14,7 +14,7 @@ interface BlogPaginationProps {
 export function BlogPagination({
   currentPage,
   totalPages,
-  basePath = "/blog",
+  basePath = "/noticias",
 }: BlogPaginationProps) {
   const searchParams = useSearchParams();
 

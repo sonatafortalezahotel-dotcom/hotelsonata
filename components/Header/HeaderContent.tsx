@@ -86,7 +86,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
     { fieldKey: "nav.quartos", href: "/quartos" },
     { fieldKey: "nav.gastronomia", href: "/gastronomia" },
     { fieldKey: "nav.eventos", href: "/eventos" },
-    { fieldKey: "nav.blog", href: "/blog" },
+    { fieldKey: "nav.noticias", href: "/noticias" },
     { fieldKey: "nav.esg", href: "/esg" },
     { fieldKey: "nav.contato", href: "/contato" },
   ];

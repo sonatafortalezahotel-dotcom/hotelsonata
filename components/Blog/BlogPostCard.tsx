@@ -20,14 +20,14 @@ export interface BlogPostCardPost {
 
 interface BlogPostCardProps {
   post: BlogPostCardPost;
-  basePath?: string; // e.g. "/blog" or "/en/blog"
+  basePath?: string; // e.g. "/noticias" or "/en/noticias"
   readMoreLabel?: string;
   publishedLabel?: string; // "Publicado em" / "Published on"
 }
 
 export function BlogPostCard({
   post,
-  basePath = "/blog",
+  basePath = "/noticias",
   readMoreLabel = "Ler mais",
   publishedLabel = "Publicado em",
 }: BlogPostCardProps) {

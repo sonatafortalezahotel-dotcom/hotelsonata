@@ -170,9 +170,9 @@ export async function GET(request: Request) {
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("Erro ao buscar posts do blog:", error);
+    console.error("Erro ao buscar posts de notícias:", error);
     return NextResponse.json(
-      { error: "Erro ao buscar posts do blog" },
+      { error: "Erro ao buscar posts de notícias" },
       { status: 500 }
     );
   }
@@ -264,9 +264,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar post do blog:", error);
+    console.error("Erro ao criar post de notícias:", error);
     return NextResponse.json(
-      { error: "Erro ao criar post do blog" },
+      { error: "Erro ao criar post de notícias" },
       { status: 500 }
     );
   }

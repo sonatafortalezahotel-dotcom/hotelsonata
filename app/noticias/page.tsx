@@ -273,7 +273,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const q = resolved.q || null;
   const sort = resolved.sort || "recent";
 
-  const basePath = locale === "pt" ? "/blog" : `/${locale}/blog`;
+  const basePath = locale === "pt" ? "/noticias" : `/${locale}/noticias`;
 
   const [listData, categories, tags, recentPosts] = await Promise.all([
     getBlogData(locale, page, category, tag, q, sort),
@@ -290,7 +290,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         <div className="flex-1 min-w-0">
           <div className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
-              Blog
+              Notícias
             </h1>
             <p className="text-muted-foreground">
               Novidades, dicas e histórias do Hotel Sonata de Iracema.

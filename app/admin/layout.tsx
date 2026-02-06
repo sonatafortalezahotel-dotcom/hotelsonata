@@ -38,7 +38,7 @@ const menuItems = [
   { icon: Award, label: "Certificações", href: "/admin/certifications" },
   { icon: Instagram, label: "Redes Sociais", href: "/admin/social-media" },
   { icon: Search, label: "SEO & Landing Pages", href: "/admin/seo" },
-  { icon: FileText, label: "Blog", href: "/admin/blog" },
+  { icon: FileText, label: "Notícias", href: "/admin/noticias" },
   { icon: Settings, label: "Configurações", href: "/admin/settings" },
 ];
 

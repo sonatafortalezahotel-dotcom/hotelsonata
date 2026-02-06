@@ -187,7 +187,7 @@ export async function generateMetadata({
     };
   }
 
-  const basePath = locale === "pt" ? "/blog" : `/${locale}/blog`;
+  const basePath = locale === "pt" ? "/noticias" : `/${locale}/noticias`;
   const path = `${basePath}/${post.slug}`;
   const canonical = post.canonicalUrl || `${SITE_URL}${path}`;
   const ogImage = post.ogImage || post.featuredImageUrl;
@@ -241,13 +241,13 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const sidebarData = await getSidebarData(locale);
-  const basePath = locale === "pt" ? "/blog" : `/${locale}/blog`;
+  const basePath = locale === "pt" ? "/noticias" : `/${locale}/noticias`;
   const path = `${basePath}/${post.slug}`;
   const canonical = post.canonicalUrl || `${SITE_URL}${path}`;
 
   const breadcrumbItems = [
     { name: "Home", url: SITE_URL },
-    { name: "Blog", url: `${SITE_URL}${basePath}` },
+    { name: "Notícias", url: `${SITE_URL}${basePath}` },
     { name: post.title, url: canonical },
   ];
   const breadcrumbData = generateBreadcrumbStructuredData(breadcrumbItems);
@@ -282,7 +282,7 @@ export default async function BlogPostPage({
           </li>
           <li aria-hidden>/</li>
           <li>
-            <Link href={basePath} className="hover:text-foreground">Blog</Link>
+            <Link href={basePath} className="hover:text-foreground">Notícias</Link>
           </li>
           <li aria-hidden>/</li>
           <li className="text-foreground truncate max-w-[200px]" aria-current="page">

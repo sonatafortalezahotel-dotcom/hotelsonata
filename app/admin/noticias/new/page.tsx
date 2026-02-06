@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,14 +19,11 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUpload, BlogRichTextEditor } from "@/components/admin";
 
-export default function EditBlogPostPage() {
+export default function NewBlogPostPage() {
   const router = useRouter();
-  const params = useParams();
-  const id = Number(params?.id);
   const [categories, setCategories] = useState<{ id: number; slug: string; name: string }[]>([]);
   const [tags, setTags] = useState<{ id: number; slug: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newTagName, setNewTagName] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
@@ -51,49 +48,12 @@ export default function EditBlogPostPage() {
     tagIds: [] as number[],
   });
 
-  useEffect(() => {
-    if (isNaN(id)) return;
-    fetch(`/api/blog/${id}?locale=pt`)
-      .then((r) => r.json())
-      .then(async (post) => {
-        if (post.error) {
-          toast.error("Post não encontrado");
-          return;
-        }
-        const locale = post.locale ?? "pt";
-        setForm({
-          slug: post.slug ?? "",
-          locale,
-          title: post.title ?? "",
-          excerpt: post.excerpt ?? "",
-          content: post.content ?? "",
-          featuredImageUrl: post.featuredImageUrl ?? "",
-          authorName: post.authorName ?? "",
-          authorUrl: post.authorUrl ?? "",
-          publishedAt: post.publishedAt
-            ? new Date(post.publishedAt).toISOString().slice(0, 16)
-            : "",
-          status: post.status ?? "draft",
-          metaTitle: post.metaTitle ?? "",
-          metaDescription: post.metaDescription ?? "",
-          metaKeywords: post.metaKeywords ?? "",
-          ogImage: post.ogImage ?? "",
-          canonicalUrl: post.canonicalUrl ?? "",
-          categoryIds: (post.categories ?? []).map((c: { id: number }) => c.id),
-          tagIds: (post.tags ?? []).map((t: { id: number }) => t.id),
-        });
-        const [cats, tagsData] = await Promise.all([
-          fetch(`/api/blog/categories?locale=${locale}`).then((r) => r.json()),
-          fetch(`/api/blog/tags?locale=${locale}`).then((r) => r.json()),
-        ]);
-        setCategories(cats);
-        setTags(tagsData);
-      })
-      .catch(() => toast.error("Erro ao carregar post"))
-      .finally(() => setFetching(false));
-  }, [id]);
-
   const locale = form.locale;
+
+  useEffect(() => {
+    fetch(`/api/noticias/categories?locale=${locale}`).then((r) => r.json()).then(setCategories).catch(() => {});
+    fetch(`/api/noticias/tags?locale=${locale}`).then((r) => r.json()).then(setTags).catch(() => {});
+  }, [locale]);
 
   const createCategoryAndSelect = async () => {
     const name = newCategoryName.trim();
@@ -104,7 +64,7 @@ export default function EditBlogPostPage() {
     setCreatingCategory(true);
     try {
       const slug = name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-àáâãäåèéêëìíîòóôõöùúûüç]/gi, "") || "nova-categoria";
-      const res = await fetch("/api/blog/categories", {
+      const res = await fetch("/api/noticias/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,7 +78,7 @@ export default function EditBlogPostPage() {
         return;
       }
       const created = await res.json();
-      const list = await fetch(`/api/blog/categories?locale=${locale}`).then((r) => r.json());
+      const list = await fetch(`/api/noticias/categories?locale=${locale}`).then((r) => r.json());
       setCategories(list);
       setForm((f) => ({ ...f, categoryIds: [created.id] }));
       setNewCategoryName("");
@@ -139,7 +99,7 @@ export default function EditBlogPostPage() {
     setCreatingTag(true);
     try {
       const slug = name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-àáâãäåèéêëìíîòóôõöùúûüç]/gi, "") || "nova-tag";
-      const res = await fetch("/api/blog/tags", {
+      const res = await fetch("/api/noticias/tags", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -153,7 +113,7 @@ export default function EditBlogPostPage() {
         return;
       }
       const created = await res.json();
-      const list = await fetch(`/api/blog/tags?locale=${locale}`).then((r) => r.json());
+      const list = await fetch(`/api/noticias/tags?locale=${locale}`).then((r) => r.json());
       setTags(list);
       setForm((f) => ({ ...f, tagIds: [created.id] }));
       setNewTagName("");
@@ -173,46 +133,40 @@ export default function EditBlogPostPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/blog/${id}`, {
-        method: "PUT",
+      const res = await fetch("/api/noticias", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          slug: form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
           categoryIds: form.categoryIds,
           tagIds: form.tagIds,
         }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error || "Erro ao atualizar post");
+        toast.error(data.error || "Erro ao criar post");
         return;
       }
-      toast.success("Post atualizado com sucesso");
-      router.refresh();
+      const post = await res.json();
+      toast.success("Post criado com sucesso");
+      router.push(`/admin/noticias/${post.id}`);
     } catch (error) {
-      toast.error("Erro ao atualizar post");
+      toast.error("Erro ao criar post");
     } finally {
       setLoading(false);
     }
   };
 
-  if (fetching) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-muted-foreground">Carregando...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/blog">
+        <Link href="/admin/noticias">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">Editar post</h1>
+        <h1 className="text-2xl font-bold">Novo post</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -239,6 +193,7 @@ export default function EditBlogPostPage() {
                       id="slug"
                       value={form.slug}
                       onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                      placeholder="gerado a partir do título se vazio"
                     />
                   </div>
                 </div>
@@ -455,6 +410,7 @@ export default function EditBlogPostPage() {
                   <Input
                     value={form.canonicalUrl}
                     onChange={(e) => setForm({ ...form, canonicalUrl: e.target.value })}
+                    placeholder="opcional"
                   />
                 </div>
               </CardContent>
@@ -464,9 +420,9 @@ export default function EditBlogPostPage() {
 
         <div className="mt-6 flex gap-4">
           <Button type="submit" disabled={loading}>
-            {loading ? "Salvando..." : "Salvar"}
+            {loading ? "Salvando..." : "Criar post"}
           </Button>
-          <Link href="/admin/blog">
+          <Link href="/admin/noticias">
             <Button type="button" variant="outline">
               Cancelar
             </Button>

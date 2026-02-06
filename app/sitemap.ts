@@ -17,7 +17,7 @@ const staticPages = [
   { path: "/esg", priority: 0.7, changefreq: "monthly" },
   { path: "/contato", priority: 0.7, changefreq: "monthly" },
   { path: "/pacotes", priority: 0.9, changefreq: "daily" },
-  { path: "/blog", priority: 0.8, changefreq: "daily" },
+  { path: "/noticias", priority: 0.8, changefreq: "daily" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -170,13 +170,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Erro ao buscar landing pages para sitemap:", error);
   }
 
-  // Blog: índice + posts publicados
+  // Notícias: índice + posts publicados
   try {
     const { blogPosts } = await import("@/lib/db/schema");
     for (const locale of locales) {
-      const blogPath = locale === "pt" ? "/blog" : `/${locale}/blog`;
+      const noticiasPath = locale === "pt" ? "/noticias" : `/${locale}/noticias`;
       urls.push({
-        url: `${SITE_URL}${blogPath}`,
+        url: `${SITE_URL}${noticiasPath}`,
         lastModified: new Date(),
         changeFrequency: "daily",
         priority: 0.8,
@@ -184,7 +184,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           languages: Object.fromEntries(
             locales.map((loc) => [
               loc === "pt" ? "pt-BR" : loc === "en" ? "en-US" : "es-ES",
-              loc === "pt" ? `${SITE_URL}/blog` : `${SITE_URL}/${loc}/blog`,
+              loc === "pt" ? `${SITE_URL}/noticias` : `${SITE_URL}/${loc}/noticias`,
             ])
           ),
         },
@@ -196,7 +196,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .where(eq(blogPosts.status, "published"));
     for (const post of publishedPosts) {
       const path =
-        post.locale === "pt" ? `/blog/${post.slug}` : `/${post.locale}/blog/${post.slug}`;
+        post.locale === "pt" ? `/noticias/${post.slug}` : `/${post.locale}/noticias/${post.slug}`;
       urls.push({
         url: `${SITE_URL}${path}`,
         lastModified: post.updatedAt ? new Date(post.updatedAt) : new Date(),
@@ -207,15 +207,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             locales.map((loc) => [
               loc === "pt" ? "pt-BR" : loc === "en" ? "en-US" : "es-ES",
               loc === "pt"
-                ? `${SITE_URL}/blog/${post.slug}`
-                : `${SITE_URL}/${loc}/blog/${post.slug}`,
+                ? `${SITE_URL}/noticias/${post.slug}`
+                : `${SITE_URL}/${loc}/noticias/${post.slug}`,
             ])
           ),
         },
       });
     }
   } catch (error) {
-    console.error("Erro ao buscar blog para sitemap:", error);
+    console.error("Erro ao buscar notícias para sitemap:", error);
   }
 
   return urls;

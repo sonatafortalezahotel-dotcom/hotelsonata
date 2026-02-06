@@ -49,7 +49,7 @@ export function BlogFilters({
   currentCategory,
   currentTag,
   currentSort = "recent",
-  basePath = "/blog",
+  basePath = "/noticias",
   translations = {},
 }: BlogFiltersProps) {
   const router = useRouter();

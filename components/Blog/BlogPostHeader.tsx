@@ -29,7 +29,7 @@ export function BlogPostHeader({
   updatedAt,
   categories = [],
   tags = [],
-  basePath = "/blog",
+  basePath = "/noticias",
   publishedLabel = "Publicado em",
   updatedLabel = "Atualizado em",
   className,

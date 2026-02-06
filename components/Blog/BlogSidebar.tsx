@@ -33,7 +33,7 @@ interface BlogSidebarProps {
   activeCategorySlug?: string | null;
   activeTagSlug?: string | null;
   searchQuery?: string;
-  basePath?: string; // e.g. "/blog" or "/en/blog"
+  basePath?: string; // e.g. "/noticias" or "/en/noticias"
   translations?: {
     categories?: string;
     tags?: string;
@@ -55,7 +55,7 @@ export function BlogSidebar({
   activeCategorySlug,
   activeTagSlug,
   searchQuery,
-  basePath = "/blog",
+  basePath = "/noticias",
   translations = {},
 }: BlogSidebarProps) {
   const prefix = basePath.startsWith("/") && !basePath.startsWith(`/${locale}`)
@@ -67,13 +67,13 @@ export function BlogSidebar({
     tags: translations.tags ?? "Tags",
     recentPosts: translations.recentPosts ?? "Posts recentes",
     search: translations.search ?? "Buscar",
-    searchPlaceholder: translations.searchPlaceholder ?? "Buscar no blog...",
+    searchPlaceholder: translations.searchPlaceholder ?? "Buscar em notícias...",
   };
 
   return (
     <aside
       className="w-full lg:w-72 shrink-0 space-y-8"
-      aria-label="Sidebar do blog"
+      aria-label="Sidebar de notícias"
     >
       {/* Busca */}
       <section>
