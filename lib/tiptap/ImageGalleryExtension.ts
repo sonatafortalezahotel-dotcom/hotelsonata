@@ -62,15 +62,25 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
       {
         tag: 'div[data-gallery]',
         getAttrs: (node) => {
-          if (typeof node === 'string') return false;
+          if (typeof node === 'string') {
+            console.log("[ImageGallery] parseHTML: node é string, ignorando");
+            return false;
+          }
           const element = node as HTMLElement;
           const galleryData = element.getAttribute('data-gallery');
-          if (!galleryData) return false;
+          console.log("[ImageGallery] parseHTML: data-gallery =", galleryData);
+          
+          if (!galleryData) {
+            console.warn("[ImageGallery] parseHTML: sem data-gallery");
+            return false;
+          }
           
           try {
             const images = JSON.parse(galleryData);
+            console.log("[ImageGallery] parseHTML: parsed", images.length, "imagens");
             return Array.isArray(images) && images.length > 0 ? { images } : false;
-          } catch {
+          } catch (error) {
+            console.error("[ImageGallery] parseHTML: erro ao parsear JSON:", error, galleryData);
             return false;
           }
         },
