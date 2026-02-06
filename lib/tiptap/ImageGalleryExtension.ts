@@ -245,7 +245,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
             pointer-events: none;
           `;
           
-          images.forEach((_, index) => {
+          images.forEach((_: string, index: number) => {
             const dot = document.createElement("div");
             dot.style.cssText = `
               width: 8px;
