@@ -1,4 +1,4 @@
-import { Node, mergeAttributes } from "@tiptap/core";
+import { Node } from "@tiptap/core";
 
 export interface ImageGalleryOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -20,6 +20,8 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
   group: "block",
 
   atom: true,
+
+  draggable: true,
 
   addOptions() {
     return {
@@ -89,6 +91,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         src,
         alt: "",
         loading: "lazy",
+        class: "gallery-image",
       },
     ]);
 
@@ -135,7 +138,11 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
   },
 
   addNodeView() {
-    return ({ node, editor }) => {
+    return ({ node, editor, getPos }) => {
+      const container = document.createElement("div");
+      container.className = "image-gallery-editor-wrapper";
+      container.style.cssText = "position: relative; margin: 1rem 0;";
+
       const dom = document.createElement("div");
       dom.className = "image-gallery";
       dom.setAttribute("data-gallery", JSON.stringify(node.attrs.images));
@@ -143,13 +150,11 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 0.5rem;
-        margin: 1rem 0;
         cursor: pointer;
         border: 2px solid transparent;
         border-radius: 0.5rem;
         padding: 0.5rem;
         transition: border-color 0.2s;
-        position: relative;
       `;
 
       const images = node.attrs.images || [];
@@ -184,38 +189,46 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.2s;
+        z-index: 10;
       `;
-      dom.appendChild(badge);
 
       // Efeito hover
-      dom.addEventListener("mouseenter", () => {
+      container.addEventListener("mouseenter", () => {
         dom.style.borderColor = "hsl(var(--primary))";
         badge.style.opacity = "1";
       });
-      dom.addEventListener("mouseleave", () => {
+      container.addEventListener("mouseleave", () => {
         dom.style.borderColor = "transparent";
         badge.style.opacity = "0";
       });
 
       // Click para editar
-      dom.addEventListener("click", (e) => {
+      container.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         
         if (this.options.onEdit) {
-          // Selecionar o nó da galeria
-          const pos = editor.view.posAtDOM(dom, 0);
+          const pos = typeof getPos === 'function' ? getPos() : 0;
           editor.commands.setNodeSelection(pos);
-          
-          // Chamar callback de edição
           this.options.onEdit(node.attrs.images);
         }
       });
 
+      container.appendChild(dom);
+      container.appendChild(badge);
+
       return {
-        dom,
+        dom: container,
         contentDOM: null,
         ignoreMutation: () => true,
+        update: (updatedNode) => {
+          if (updatedNode.type.name !== this.name) {
+            return false;
+          }
+          // Garantir que data-gallery esteja atualizado
+          dom.setAttribute("data-gallery", JSON.stringify(updatedNode.attrs.images));
+          return true;
+        },
       };
     };
   },

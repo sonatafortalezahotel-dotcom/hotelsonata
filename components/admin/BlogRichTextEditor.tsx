@@ -149,6 +149,20 @@ export function BlogRichTextEditor({
       onUpdate: ({ editor: ed }) => {
         const html = ed.getHTML();
         console.log("[BlogEditor] HTML gerado:", html);
+        
+        // Debug: verificar se há galerias no documento
+        const doc = ed.state.doc;
+        let hasGallery = false;
+        doc.descendants((node) => {
+          if (node.type.name === "imageGallery") {
+            hasGallery = true;
+            console.log("[BlogEditor] Galeria encontrada no documento:", node.attrs.images);
+          }
+        });
+        if (!hasGallery) {
+          console.log("[BlogEditor] Nenhuma galeria encontrada no documento");
+        }
+        
         onChangeRef.current(html);
       },
     },
@@ -184,7 +198,19 @@ export function BlogRichTextEditor({
       initialContentSet.current = true;
       // Verificar se o conteúdo foi carregado corretamente
       setTimeout(() => {
-        console.log("[BlogEditor] Conteúdo após carregar:", editor.getHTML());
+        const loadedHtml = editor.getHTML();
+        console.log("[BlogEditor] HTML após carregar:", loadedHtml);
+        
+        // Verificar se há galerias no documento
+        const doc = editor.state.doc;
+        let galleryCount = 0;
+        doc.descendants((node) => {
+          if (node.type.name === "imageGallery") {
+            galleryCount++;
+            console.log(`[BlogEditor] Galeria ${galleryCount} carregada:`, node.attrs.images);
+          }
+        });
+        console.log(`[BlogEditor] Total de galerias carregadas: ${galleryCount}`);
       }, 100);
     }
   }, [editor, value]);
