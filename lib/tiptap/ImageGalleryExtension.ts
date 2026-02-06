@@ -78,11 +78,16 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
-    const images = HTMLAttributes.images || [];
+  renderHTML({ node, HTMLAttributes }) {
+    // Garantir que pegamos os atributos do nó
+    const images = node?.attrs?.images || HTMLAttributes.images || [];
+    
     if (!Array.isArray(images) || images.length === 0) {
-      return ["div", {}, ""];
+      console.warn("[ImageGallery] renderHTML: Sem imagens!", { node, HTMLAttributes });
+      return ["div", { class: "image-gallery-empty" }, ""];
     }
+
+    console.log("[ImageGallery] renderHTML chamado com", images.length, "imagens");
 
     // Criar os elementos img para cada imagem
     const imgElements = images.map((src: string) => [
@@ -159,25 +164,31 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
 
       const images = node.attrs.images || [];
       
+      // IMPORTANTE: Limpar conteúdo anterior
+      dom.innerHTML = '';
+      
       // Adicionar elementos img
       images.forEach((src: string) => {
         const img = document.createElement("img");
         img.src = src;
         img.alt = "";
         img.className = "gallery-image";
+        img.setAttribute("loading", "lazy");
         img.style.cssText = `
           width: 100%;
           height: 200px;
           object-fit: cover;
           border-radius: 0.375rem;
         `;
-        img.loading = "lazy";
         dom.appendChild(img);
       });
 
-      // Badge com número de imagens (absoluto dentro da própria div)
+      // Badge com número de imagens (NÃO será serializado pelo TipTap)
+      // Usar data-badge para não ser serializado como filho permanente
       const badge = document.createElement("div");
       badge.className = "gallery-badge";
+      badge.setAttribute("data-tiptap-ignore", "true"); // Ignorar na serialização
+      badge.setAttribute("contenteditable", "false");
       badge.textContent = `${images.length} ${images.length === 1 ? 'imagem' : 'imagens'}`;
       badge.style.cssText = `
         position: absolute;
@@ -226,10 +237,40 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           if (updatedNode.type.name !== this.name) {
             return false;
           }
-          // Atualizar data-gallery quando o nó mudar
-          dom.setAttribute("data-gallery", JSON.stringify(updatedNode.attrs.images));
+          const newImages = updatedNode.attrs.images || [];
+          
+          // Atualizar atributo data-gallery
+          dom.setAttribute("data-gallery", JSON.stringify(newImages));
+          
+          // Recriar imagens
+          dom.innerHTML = '';
+          newImages.forEach((src: string) => {
+            const img = document.createElement("img");
+            img.src = src;
+            img.alt = "";
+            img.className = "gallery-image";
+            img.setAttribute("loading", "lazy");
+            img.style.cssText = `
+              width: 100%;
+              height: 200px;
+              object-fit: cover;
+              border-radius: 0.375rem;
+            `;
+            dom.appendChild(img);
+          });
+          
+          // Recriar badge
+          const newBadge = document.createElement("div");
+          newBadge.className = "gallery-badge";
+          newBadge.setAttribute("data-tiptap-ignore", "true");
+          newBadge.setAttribute("contenteditable", "false");
+          newBadge.textContent = `${newImages.length} ${newImages.length === 1 ? 'imagem' : 'imagens'}`;
+          newBadge.style.cssText = badge.style.cssText;
+          dom.appendChild(newBadge);
+          
           return true;
         },
+        stopEvent: () => true,
       };
     };
   },
