@@ -112,7 +112,7 @@ export default function PackagesSection({
                     <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]">
                       <Image
                         src={room.imageUrl}
-                        alt={room.name}
+                        alt={room.name || room.code || "Quarto"}
                         fill
                         quality={90}
                         priority={sortedRooms.indexOf(room) < 2}
@@ -172,7 +172,7 @@ export default function PackagesSection({
                     <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]">
                       <Image
                         src={pkg.imageUrl}
-                        alt={pkg.name}
+                        alt={pkg.name || "Pacote"}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

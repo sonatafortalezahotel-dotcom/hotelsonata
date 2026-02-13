@@ -18,6 +18,8 @@ const staticPages = [
   { path: "/contato", priority: 0.7, changefreq: "monthly" },
   { path: "/pacotes", priority: 0.9, changefreq: "daily" },
   { path: "/noticias", priority: 0.8, changefreq: "daily" },
+  { path: "/reservas", priority: 0.9, changefreq: "daily" },
+  { path: "/trabalhe-conosco", priority: 0.7, changefreq: "monthly" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

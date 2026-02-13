@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { db } from "@/lib/db";
 import { packages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSEOMetadata, generateProductOfferStructuredData } from "@/lib/utils/seo";
+import { StructuredData } from "@/components/SEO/StructuredData";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 
@@ -69,11 +70,62 @@ export async function generateMetadata({
   }
 }
 
-export default function PackageLayout({
+export default async function PackageLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ id: string }> | { id: string };
 }) {
-  return children;
+  const resolvedParams = params instanceof Promise ? await params : params;
+  const id = resolvedParams.id;
+  const packageId = parseInt(id, 10);
+  let productData: { name: string; description: string; imageUrl: string; price: number | null } | null = null;
+
+  if (!isNaN(packageId)) {
+    try {
+      const rows = await db
+        .select({
+          name: packages.name,
+          description: packages.description,
+          imageUrl: packages.imageUrl,
+          price: packages.price,
+        })
+        .from(packages)
+        .where(eq(packages.id, packageId))
+        .limit(1);
+      if (rows.length > 0) {
+        const row = rows[0];
+        productData = {
+          name: row.name,
+          description: row.description ?? `Pacote ${row.name} - Hotel Sonata de Iracema`,
+          imageUrl: row.imageUrl,
+          price: row.price,
+        };
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const url = `${SITE_URL}/pacotes/${id}`;
+  const productStructuredData =
+    productData &&
+    generateProductOfferStructuredData({
+      name: productData.name,
+      description: productData.description,
+      image: productData.imageUrl,
+      url,
+      siteUrl: SITE_URL,
+      price: productData.price ?? undefined,
+      priceCurrency: "BRL",
+    });
+
+  return (
+    <>
+      {productStructuredData && <StructuredData data={productStructuredData} />}
+      {children}
+    </>
+  );
 }
 

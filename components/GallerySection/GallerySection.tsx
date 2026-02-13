@@ -47,7 +47,7 @@ export function GallerySection({
         >
           {images.map((img, index) => (
             <div
-              key={img.id}
+              key={`${img.id}-${index}-${img.imageUrl}`}
               className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
             >
               <Image
@@ -66,7 +66,7 @@ export function GallerySection({
       <div className={`hidden lg:grid ${columnsClass[columns]} gap-4`}>
         {images.map((img, index) => (
           <div
-            key={img.id}
+            key={`${img.id}-${index}-${img.imageUrl}`}
             className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
           >
             <Image

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,9 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
   const { isScrolled, scrollY } = useScrollBehavior(50);
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const { locale, setLocale, t } = useLanguage();
+  const pathname = usePathname();
+  const urlLocale = pathname && /^\/(en|es)(?:\/|$)/.test(pathname) ? (pathname.split("/")[1] as "en" | "es") : "pt";
+  const displayLocale = isMounted ? locale : urlLocale;
 
   // Garantir que o componente seja montado apenas no cliente para evitar erro de hidratação
   useEffect(() => {
@@ -94,7 +98,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
     if (editor?.editMode) {
       return <PageText page="global" section="header" fieldKey={fieldKey} locale={locale} as="span" />;
     }
-    return getPageContent("global", "header", fieldKey, locale, globalOverrides) || "";
+    return getPageContent("global", "header", fieldKey, displayLocale, globalOverrides) || "";
   };
 
   const languages = [
@@ -104,8 +108,8 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
   ];
 
   const currentLanguage = useMemo(
-    () => languages.find((lang) => lang.code === locale) || languages[0],
-    [locale]
+    () => languages.find((lang) => lang.code === displayLocale) || languages[0],
+    [displayLocale]
   );
 
   const headerClasses = cn(

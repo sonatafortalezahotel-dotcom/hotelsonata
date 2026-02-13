@@ -256,6 +256,38 @@ export default function SEOPage() {
   };
 
 
+  const openExampleLandingPage = () => {
+    fetch("/api/seo-landing-pages?limit=1")
+      .then((r) => r.json())
+      .then((data) => {
+        const list = data.data || data;
+        const page = Array.isArray(list) ? list[0] : null;
+        if (page) {
+          const path = page.locale !== "pt" ? `/${page.locale}/${page.slug}` : `/${page.slug}`;
+          window.open(path, "_blank");
+        } else {
+          alert("Nenhuma landing page no banco. Gere algumas primeiro.");
+        }
+      })
+      .catch(() => alert("Erro ao buscar landing page."));
+  };
+
+  const resetViews = async () => {
+    if (!confirm("Zerar o contador de visualizações de todas as landing pages? Útil antes do lançamento do site.")) return;
+    try {
+      const response = await fetch("/api/seo-landing-pages/reset-views", {
+        method: "POST",
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Erro ao zerar");
+      alert(`Visualizações zeradas. ${result.pagesUpdated} páginas atualizadas.`);
+      loadStats();
+    } catch (error) {
+      console.error("Erro ao zerar visualizações:", error);
+      alert("Erro ao zerar visualizações");
+    }
+  };
+
   const generatePages = async () => {
     try {
       const response = await fetch("/api/seo-landing-pages/generate", {
@@ -319,6 +351,12 @@ export default function SEOPage() {
             <Zap className="h-4 w-4 mr-2" />
             Gerar Landing Pages
           </Button>
+          <Button onClick={resetViews} variant="outline" size="sm" className="text-muted-foreground">
+            Zerar visualizações
+          </Button>
+          <Button onClick={openExampleLandingPage} variant="ghost" size="sm" title="Abre uma landing page do banco em nova aba (testar em localhost)">
+            Testar URL
+          </Button>
         </div>
       </div>
 
@@ -363,7 +401,7 @@ export default function SEOPage() {
               {stats.totalViews.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Total de acessos
+              Total de acessos (inclui bots, crawlers e desenvolvimento)
             </p>
           </CardContent>
         </Card>

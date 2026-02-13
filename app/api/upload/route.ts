@@ -4,7 +4,43 @@ import { uploadFile, generateUniqueFilename, isImageFile, isVideoFile, validateF
 // Tamanhos máximos permitidos (em bytes).
 // Imagens: 4MB — o cliente otimiza (resize + compressão) antes do upload; limite alinhado ao body do Vercel (~4.5MB).
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_VIDEO_SIZE = 1024 * 1024 * 1024; // 1GB
+
+// A partir deste tamanho (2MB), imagens são otimizadas no servidor com Sharp
+const SERVER_OPTIMIZE_THRESHOLD_BYTES = 2 * 1024 * 1024;
+
+const OPTIMIZABLE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+async function optimizeImageWithSharp(file: File): Promise<{ buffer: Buffer; ext: string; mime: string } | null> {
+  try {
+    const sharp = (await import("sharp")).default;
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const image = sharp(buffer);
+    const meta = await image.metadata();
+    const width = meta.width ?? 1920;
+    const height = meta.height ?? 1920;
+    const maxDim = 1920;
+    const needResize = width > maxDim || height > maxDim;
+
+    const pipeline = needResize
+      ? image.resize(maxDim, maxDim, { fit: "inside", withoutEnlargement: true })
+      : image;
+
+    const { data } = await pipeline
+      .webp({ quality: 90 })
+      .toBuffer({ resolveWithObject: true });
+
+    return {
+      buffer: data,
+      ext: "webp",
+      mime: "image/webp",
+    };
+  } catch (err) {
+    console.warn("Sharp optimization failed, uploading original:", err);
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -41,20 +77,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Gera nome único para o arquivo
-    const uniqueFilename = generateUniqueFilename(file.name);
+    let payload: File | Buffer = file;
+    let uniqueFilename = generateUniqueFilename(file.name);
 
-    // Faz o upload
-    const url = await uploadFile(file, uniqueFilename, {
+    // Otimização no servidor para imagens grandes (ex.: quando o cliente não otimizou)
+    if (
+      isImage &&
+      file.size >= SERVER_OPTIMIZE_THRESHOLD_BYTES &&
+      OPTIMIZABLE_IMAGE_TYPES.includes(file.type.toLowerCase())
+    ) {
+      const optimized = await optimizeImageWithSharp(file);
+      if (optimized) {
+        payload = optimized.buffer;
+        const base = uniqueFilename.replace(/\.[^.]+$/, "");
+        uniqueFilename = `${base}.${optimized.ext}`;
+      }
+    }
+
+    const url = await uploadFile(payload, uniqueFilename, {
       folder: folder || undefined,
       access,
     });
 
+    const size = Buffer.isBuffer(payload) ? payload.length : (payload as File).size;
+
     return NextResponse.json({
       url,
       filename: uniqueFilename,
-      size: file.size,
-      type: file.type,
+      size,
+      type: Buffer.isBuffer(payload) ? "image/webp" : file.type,
     });
   } catch (error) {
     console.error("Erro ao fazer upload:", error);

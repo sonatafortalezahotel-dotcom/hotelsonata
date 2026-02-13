@@ -90,8 +90,20 @@ export async function GET(request: Request) {
     const photos = await query;
 
     return NextResponse.json(photos);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Erro ao buscar galeria:", error);
+    const message = error instanceof Error ? error.message : "";
+    const isSchemaError =
+      typeof message === "string" &&
+      (message.includes("video_url") || message.includes("media_type") || message.includes("column") || message.includes("does not exist"));
+    if (isSchemaError) {
+      return NextResponse.json(
+        {
+          error: "Schema desatualizado. Execute no banco: scripts/migrate-gallery-video.sql ou npm run db:push",
+        },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "Erro ao buscar galeria" },
       { status: 500 }
@@ -102,11 +114,15 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, imageUrl, category, page, section, description, active, order } = body;
+    const { title, imageUrl, videoUrl, mediaType, category, page, section, description, active, order } = body;
 
-    if (!imageUrl || typeof imageUrl !== "string" || !imageUrl.trim()) {
+    const img = typeof imageUrl === "string" ? imageUrl.trim() : "";
+    const vid = typeof videoUrl === "string" ? videoUrl.trim() : "";
+    const type = mediaType === "video" ? "video" : "image";
+
+    if (!img && !vid) {
       return NextResponse.json(
-        { error: "imageUrl é obrigatório e deve ser uma URL válida" },
+        { error: "Informe imageUrl ou videoUrl" },
         { status: 400 }
       );
     }
@@ -115,21 +131,23 @@ export async function POST(request: Request) {
       .insert(gallery)
       .values({
         title: title || null,
-        imageUrl,
-        category: category || null, // Sistema antigo (compatibilidade)
-        page: page || null, // Sistema novo
-        section: section || null, // Sistema novo
-        description: description || null, // Sistema novo
+        imageUrl: img || null,
+        videoUrl: vid || null,
+        mediaType: type,
+        category: category || null,
+        page: page || null,
+        section: section || null,
+        description: description || null,
         active: active ?? true,
-        order: order || 0,
+        order: order ?? 0,
       })
       .returning();
 
     return NextResponse.json(newPhoto, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar foto na galeria:", error);
+    console.error("Erro ao criar item na galeria:", error);
     return NextResponse.json(
-      { error: "Erro ao criar foto na galeria" },
+      { error: "Erro ao criar item na galeria" },
       { status: 500 }
     );
   }

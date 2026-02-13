@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-command',
       'date-fns',
     ],
+    // Permite payloads grandes para upload de vídeo (até 1GB) em Server Actions
+    serverActions: {
+      bodySizeLimit: "1gb",
+    },
   },
 };
 

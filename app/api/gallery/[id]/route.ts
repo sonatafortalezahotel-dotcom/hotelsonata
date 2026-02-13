@@ -28,16 +28,17 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, imageUrl, category, page, section, description, active, order } = body;
+    const { title, imageUrl, videoUrl, mediaType, category, page, section, description, active, order } = body;
 
-    if (!imageUrl || typeof imageUrl !== "string" || !imageUrl.trim()) {
+    const img = typeof imageUrl === "string" ? imageUrl.trim() : "";
+    const vid = typeof videoUrl === "string" ? videoUrl.trim() : "";
+    if (!img && !vid) {
       return NextResponse.json(
-        { error: "imageUrl é obrigatório e deve ser uma URL válida" },
+        { error: "Informe imageUrl ou videoUrl" },
         { status: 400 }
       );
     }
 
-    // Verificar se a foto existe
     const [existingPhoto] = await db
       .select()
       .from(gallery)
@@ -46,17 +47,20 @@ export async function PUT(
 
     if (!existingPhoto) {
       return NextResponse.json(
-        { error: "Foto não encontrada" },
+        { error: "Item não encontrado" },
         { status: 404 }
       );
     }
 
-    // Atualizar a foto
+    const type = mediaType === "video" ? "video" : "image";
+
     const [updatedPhoto] = await db
       .update(gallery)
       .set({
         title: title !== undefined ? (title || null) : existingPhoto.title,
-        imageUrl,
+        imageUrl: img || null,
+        videoUrl: vid || null,
+        mediaType: type,
         category: category !== undefined ? (category || null) : existingPhoto.category,
         page: page !== undefined ? (page || null) : existingPhoto.page,
         section: section !== undefined ? (section || null) : existingPhoto.section,
@@ -122,12 +126,13 @@ export async function DELETE(
       .delete(gallery)
       .where(eq(gallery.id, id));
 
-    // Tentar deletar o arquivo físico do storage (se for uma URL do blob storage)
-    if (photo.imageUrl && photo.imageUrl.includes("blob.vercel-storage.com")) {
+    const urlsToDelete = [photo.imageUrl, photo.videoUrl].filter(
+      (u): u is string => !!u && typeof u === "string" && u.includes("blob.vercel-storage.com")
+    );
+    for (const url of urlsToDelete) {
       try {
-        await deleteFile(photo.imageUrl);
+        await deleteFile(url);
       } catch (fileError) {
-        // Log do erro mas não falha a operação se o arquivo não for encontrado
         console.warn("Erro ao deletar arquivo do storage (pode já ter sido deletado):", fileError);
       }
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Calendar as CalendarIcon, Users, Search, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
@@ -42,6 +43,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false); // Estado para expandir/colapsar no mobile
+  const pathname = usePathname();
+  const urlLocale = pathname && /^\/(en|es)(?:\/|$)/.test(pathname) ? (pathname.split("/")[1] as "en" | "es") : "pt";
+  const displayLocale = isMounted ? locale : urlLocale;
 
   // Set mounted state to prevent hydration mismatch with Radix UI IDs
   useEffect(() => {
@@ -75,7 +79,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
     if (editor?.editMode) {
       return <PageText page="global" section="bookingBar" fieldKey={fieldKey} locale={locale} as="span" />;
     }
-    return getPageContent("global", "bookingBar", fieldKey, locale, globalOverrides) || "";
+    return getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || "";
   };
   const labels = {
     pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
@@ -194,7 +198,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                                 {getLabel("checkIn")}
                               </span>
                               <span className="truncate text-xs font-medium">
-                                {checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate).split(' ')[0]}
+                                {checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate).split(' ')[0]}
                               </span>
                             </div>
                           </div>
@@ -243,7 +247,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                                 {getLabel("checkOut")}
                               </span>
                               <span className="truncate text-xs font-medium">
-                                {checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate).split(' ')[0]}
+                                {checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate).split(' ')[0]}
                               </span>
                             </div>
                           </div>
@@ -425,7 +429,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           <div className="flex items-center justify-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
+                              {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -458,7 +462,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       <div className="flex items-center justify-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
+                          {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}
                         </span>
                       </div>
                     </div>
@@ -486,7 +490,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           <div className="flex items-center justify-center gap-2 w-full">
                             <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                             <span className="truncate text-xs lg:text-sm">
-                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
+                              {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}
                             </span>
                           </div>
                         </div>
@@ -522,7 +526,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       <div className="flex items-center justify-center gap-2 w-full">
                         <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                         <span className="truncate text-xs lg:text-sm">
-                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", locale, globalOverrides) || t.selectDate)}
+                          {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}
                         </span>
                       </div>
                     </div>

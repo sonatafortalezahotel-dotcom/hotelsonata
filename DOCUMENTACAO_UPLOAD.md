@@ -246,8 +246,13 @@ if (validateFileSize(file, MAX_SIZE)) {
 - ✅ Vídeos: `video/*` (mp4, webm, mov, etc)
 
 ### Tamanhos Máximos
-- **Imagens:** 50MB
-- **Vídeos:** 100MB
+- **Imagens:** 4MB (otimização no cliente e, se necessário, no servidor reduz o tamanho antes do envio)
+- **Vídeos:** 1GB
+
+### Vídeos – compressão recomendada
+Não há compressão automática de vídeo no servidor. Para arquivos grandes:
+- **Recomendação:** comprimir o vídeo antes do upload (ex.: HandBrake, FFmpeg, ou ferramentas online) para reduzir tamanho e tempo de envio.
+- **Limite da API:** 1GB por arquivo. Em deploys como Vercel, o limite de body da requisição pode precisar ser configurado (ex.: `serverActions.bodySizeLimit` no `next.config`).
 
 ### Pastas Recomendadas
 - `quartos` - Imagens de quartos

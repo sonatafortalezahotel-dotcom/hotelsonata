@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Image,
+  Images,
   Package,
   Bed,
   CalendarDays,
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: BookOpen, label: "Reservas", href: "/admin/reservations" },
   { icon: Mail, label: "Contato", href: "/admin/contact" },
   { icon: Image, label: "Destaques", href: "/admin/highlights" },
+  { icon: Images, label: "Galeria", href: "/admin/gallery" },
   { icon: Package, label: "Pacotes", href: "/admin/packages" },
   { icon: Bed, label: "Quartos", href: "/admin/rooms" },
   { icon: CalendarDays, label: "Eventos", href: "/admin/events" },

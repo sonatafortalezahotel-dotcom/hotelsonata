@@ -21,7 +21,7 @@ const DEFAULTS: Required<OptimizeImageOptions> = {
   maxWidth: 1920,
   maxHeight: 1920,
   maxSizeBytes: 1572864, // 1.5 MB
-  quality: 0.88,
+  quality: 0.9, // Qualidade alta para evitar perda visível (0.88–0.92)
   preferWebP: true,
 };
 

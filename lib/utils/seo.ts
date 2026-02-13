@@ -320,6 +320,87 @@ export function generateLocalBusinessStructuredData(options: {
 }
 
 /**
+ * Gera Structured Data (JSON-LD) para Room (quarto), vinculado ao Hotel
+ */
+export function generateRoomStructuredData(options: {
+  name: string;
+  description: string;
+  image?: string;
+  url: string;
+  siteUrl?: string;
+  hotelUrl?: string;
+  hotelName?: string;
+  occupancy?: number; // maxGuests
+}): object {
+  const siteUrl = options.siteUrl ?? DEFAULT_SITE_URL;
+  const image = options.image
+    ? options.image.startsWith("http")
+      ? options.image
+      : `${siteUrl}${options.image}`
+    : `${siteUrl}/og-image.jpg`;
+  const structuredData: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Room",
+    name: options.name,
+    description: options.description,
+    image,
+    url: options.url,
+    ...(options.occupancy != null && { occupancy: { "@type": "QuantitativeValue", maxValue: options.occupancy } }),
+    ...(options.hotelUrl &&
+      options.hotelName && {
+        containedInPlace: {
+          "@type": "Hotel",
+          name: options.hotelName,
+          url: options.hotelUrl,
+        },
+      }),
+  };
+  return structuredData;
+}
+
+/**
+ * Gera Structured Data (JSON-LD) para Product + Offer (pacote promocional)
+ */
+export function generateProductOfferStructuredData(options: {
+  name: string;
+  description: string;
+  image: string;
+  url: string;
+  siteUrl?: string;
+  price?: number; // em centavos ou valor inteiro
+  priceCurrency?: string;
+  availability?: "InStock" | "OutOfStock" | "PreOrder";
+}): object {
+  const siteUrl = options.siteUrl ?? DEFAULT_SITE_URL;
+  const imageUrl = options.image.startsWith("http") ? options.image : `${siteUrl}${options.image}`;
+  const structuredData: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: options.name,
+    description: options.description,
+    image: imageUrl,
+    url: options.url,
+    ...(options.price != null && {
+      offers: {
+        "@type": "Offer",
+        url: options.url,
+        priceCurrency: options.priceCurrency ?? "BRL",
+        price: options.price,
+        availability: `https://schema.org/${options.availability ?? "InStock"}`,
+      },
+    }),
+  };
+  if (options.price == null) {
+    (structuredData as Record<string, unknown>).offers = {
+      "@type": "Offer",
+      url: options.url,
+      availability: "https://schema.org/InStock",
+    };
+  }
+  return structuredData;
+}
+
+/**
  * Gera Structured Data (JSON-LD) para BreadcrumbList
  */
 export function generateBreadcrumbStructuredData(

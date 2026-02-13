@@ -219,17 +219,19 @@ export const siteSettings = pgTable("site_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Tabela de galeria de fotos
+// Tabela de galeria de fotos e vídeos
 export const gallery = pgTable("gallery", {
   id: serial("id").primaryKey(),
   title: text("title"),
-  imageUrl: text("image_url").notNull(),
+  imageUrl: text("image_url"), // URL da imagem (null se for apenas vídeo)
+  videoUrl: text("video_url"), // URL do vídeo (opcional)
+  mediaType: varchar("media_type", { length: 10 }).default("image").notNull(), // "image" | "video"
   // Sistema antigo (mantido para compatibilidade)
   category: varchar("category", { length: 50 }), // "piscina", "recepcao", "restaurante", "quarto", "geral"
   // Sistema novo - Organização por página
   page: varchar("page", { length: 50 }), // "home", "lazer", "gastronomia", "esg", "contato"
   section: varchar("section", { length: 100 }), // "hero", "galeria-piscina", "cards-gastronomia", "photo-story", etc.
-  description: text("description"), // Descrição do que a imagem mostra
+  description: text("description"), // Descrição do que a imagem/vídeo mostra
   order: integer("order").default(0).notNull(),
   active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

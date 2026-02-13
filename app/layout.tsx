@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { PublicLayout } from "@/components/PublicLayout";
 import { StructuredData } from "@/components/SEO/StructuredData";
+import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { generateHotelStructuredData } from "@/lib/utils/seo";
 
 const inter = Inter({
@@ -88,6 +89,12 @@ export const metadata: Metadata = {
       "es-ES": `${SITE_URL}/es`,
     },
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 // Viewport deve ser exportado separadamente no Next.js 15+
@@ -126,6 +133,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <StructuredData data={hotelStructuredData} />
+        <WebVitalsReporter />
         <Providers>
           <Suspense fallback={null}>
             <PublicLayout>

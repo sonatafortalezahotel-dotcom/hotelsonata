@@ -53,15 +53,19 @@ export function useGallery(
       const response = await fetch(`/api/gallery?${params.toString()}`, { cache: "no-store" });
 
       if (!response.ok) {
-        throw new Error("Erro ao buscar galeria");
+        const msg = `Galeria: ${response.status} ${response.statusText}`;
+        setError(msg);
+        setPhotos([]);
+        return;
       }
 
       const data = await response.json();
-      setPhotos(data);
+      setPhotos(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido");
-      console.error("Erro ao buscar galeria:", err);
+      setPhotos([]);
+      console.warn("Galeria indisponível:", err instanceof Error ? err.message : err);
     } finally {
       setLoading(false);
     }

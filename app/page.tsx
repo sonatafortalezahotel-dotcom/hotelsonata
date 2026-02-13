@@ -697,6 +697,8 @@ export default function Home() {
                               src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
                               alt={item.titleStr}
                               fill
+                              quality={90}
+                              priority={index < 2}
                               className="object-cover transition-transform duration-700 group-hover:scale-110"
                               sizes="100vw"
                             />
@@ -735,8 +737,10 @@ export default function Home() {
                             src={getGalleryImageByPath(galleryPhotos, `gallery:home:photo-story:${index}`) || photo.imageUrl}
                             alt={item.titleStr}
                             fill
+                            quality={90}
+                            priority={index < 2}
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="25vw"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
                           />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />

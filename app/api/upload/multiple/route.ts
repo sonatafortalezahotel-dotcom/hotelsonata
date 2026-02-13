@@ -3,7 +3,7 @@ import { uploadMultipleFiles, generateUniqueFilename, isImageFile, isVideoFile, 
 
 // Tamanhos máximos permitidos (em bytes). Imagens: 4MB (cliente otimiza antes do upload).
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_VIDEO_SIZE = 1024 * 1024 * 1024; // 1GB
 
 export async function POST(request: Request) {
   try {
