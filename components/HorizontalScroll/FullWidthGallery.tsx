@@ -8,8 +8,15 @@ import { HorizontalScroll } from "@/components/HorizontalScroll";
 interface FullWidthGalleryProps {
   images: string[];
   interval?: number;
+  /** Altura do grid desktop (Tailwind). Ex: h-[500px] lg:h-[75vh] */
   height?: string;
+  /** Altura no mobile (Tailwind). Ex: h-[55vh]. Se não informado, usa h-[40vh]. */
+  mobileHeight?: string;
+  /** Qualidade da imagem Next/Image (1-100). Default 75. Use 100 para máxima. */
+  imageQuality?: number;
   className?: string;
+  /** Ao clicar numa imagem, índice dentro do array images (0-based) */
+  onImageClick?: (index: number) => void;
 }
 
 /**
@@ -21,7 +28,10 @@ export function FullWidthGallery({
   images,
   interval = 5000,
   height = "h-[400px] md:h-[500px] lg:h-[600px]",
+  mobileHeight = "h-[40vh]",
+  imageQuality = 75,
   className,
+  onImageClick,
 }: FullWidthGalleryProps) {
   const [positions, setPositions] = useState<number[]>([0, 1, 2, 3]);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -66,30 +76,39 @@ export function FullWidthGallery({
           showDots={true}
           gap={4}
         >
-          {allImages.map((imageSrc, index) => (
-            <div
-              key={index}
-              className={cn(
-                "relative overflow-hidden group cursor-pointer rounded-lg",
-                "h-[40vh]",
-                "transition-all duration-500",
-                isAnimating && "opacity-80 scale-95"
-              )}
-            >
-              <Image
-                src={imageSrc}
-                alt={`Imagem ${index + 1}`}
-                fill
+          {allImages.map((imageSrc, index) => {
+            const imageIndex = images.length >= 4 ? positions[index] % images.length : index;
+            return (
+              <div
+                key={index}
+                role={onImageClick ? "button" : undefined}
+                tabIndex={onImageClick ? 0 : undefined}
+                onClick={onImageClick ? () => onImageClick(imageIndex) : undefined}
+                onKeyDown={onImageClick ? (e) => e.key === "Enter" && onImageClick(imageIndex) : undefined}
                 className={cn(
-                  "object-cover rounded-lg",
-                  "transition-transform duration-700",
-                  "group-hover:scale-110"
+                  "relative overflow-hidden group rounded-lg",
+                  mobileHeight,
+                  "transition-all duration-500",
+                  onImageClick && "cursor-pointer",
+                  isAnimating && "opacity-80 scale-95"
                 )}
-                sizes="85vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
-            </div>
-          ))}
+              >
+                <Image
+                  src={imageSrc}
+                  alt={`Imagem ${index + 1}`}
+                  fill
+                  quality={imageQuality}
+                  className={cn(
+                    "object-cover rounded-lg",
+                    "transition-transform duration-700",
+                    "group-hover:scale-110"
+                  )}
+                  sizes="85vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+              </div>
+            );
+          })}
         </HorizontalScroll>
       </div>
 
@@ -98,12 +117,18 @@ export function FullWidthGallery({
         <div className={cn("hidden lg:grid lg:grid-cols-4 gap-0", height)}>
         {positions.map((imageIndex, positionIndex) => {
           const imageSrc = images[imageIndex % images.length];
+          const idx = imageIndex % images.length;
           return (
             <div
               key={`${positionIndex}-${imageIndex}`}
+              role={onImageClick ? "button" : undefined}
+              tabIndex={onImageClick ? 0 : undefined}
+              onClick={onImageClick ? () => onImageClick(idx) : undefined}
+              onKeyDown={onImageClick ? (e) => e.key === "Enter" && onImageClick(idx) : undefined}
               className={cn(
-                "relative overflow-hidden group cursor-pointer",
+                "relative overflow-hidden group",
                 "transition-all duration-500",
+                onImageClick && "cursor-pointer",
                 isAnimating && "opacity-90 scale-[0.98]"
               )}
             >
@@ -111,6 +136,7 @@ export function FullWidthGallery({
                 src={imageSrc}
                 alt={`Imagem ${imageIndex + 1}`}
                 fill
+                quality={imageQuality}
                 className={cn(
                   "object-cover",
                   "transition-transform duration-700",
@@ -127,11 +153,19 @@ export function FullWidthGallery({
       ) : (
         <div className={cn("hidden lg:grid lg:grid-cols-2 gap-0", height)}>
           {images.map((img, i) => (
-            <div key={i} className={cn("relative overflow-hidden group cursor-pointer")}>
+            <div
+              key={i}
+              role={onImageClick ? "button" : undefined}
+              tabIndex={onImageClick ? 0 : undefined}
+              onClick={onImageClick ? () => onImageClick(i) : undefined}
+              onKeyDown={onImageClick ? (e) => e.key === "Enter" && onImageClick(i) : undefined}
+              className={cn("relative overflow-hidden group", onImageClick && "cursor-pointer")}
+            >
               <Image 
                 src={img} 
                 alt={`Imagem ${i + 1}`} 
                 fill 
+                quality={imageQuality}
                 className="object-cover transition-transform duration-700 group-hover:scale-110" 
               />
             </div>

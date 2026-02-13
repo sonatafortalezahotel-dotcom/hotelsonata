@@ -3,6 +3,19 @@ import { db } from "@/lib/db";
 import { rooms, roomTranslations } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
+/** Garante que gallery seja sempre string[] para a página de quarto renderizar a galeria */
+function normalizeGallery(raw: unknown): string[] {
+  if (!raw || !Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      if (typeof item === "string") return item.trim() || null;
+      if (item && typeof item === "object" && "url" in item) return (item as { url: string }).url?.trim() || null;
+      if (item && typeof item === "object" && "imageUrl" in item) return (item as { imageUrl: string }).imageUrl?.trim() || null;
+      return null;
+    })
+    .filter((url): url is string => typeof url === "string" && url.length > 0);
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ code: string }> | { code: string } }
@@ -104,10 +117,12 @@ export async function GET(
         );
       }
 
-      return NextResponse.json(caseInsensitiveResult[0]);
+      const room = caseInsensitiveResult[0];
+      return NextResponse.json({ ...room, gallery: normalizeGallery(room.gallery) });
     }
 
-    return NextResponse.json(result[0]);
+    const room = result[0];
+    return NextResponse.json({ ...room, gallery: normalizeGallery(room.gallery) });
   } catch (error) {
     console.error("Erro ao buscar quarto:", error);
     return NextResponse.json(

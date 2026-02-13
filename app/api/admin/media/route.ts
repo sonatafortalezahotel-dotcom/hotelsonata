@@ -180,7 +180,7 @@ export async function GET(request: Request) {
             if (!blob.url || seenUrls.has(blob.url)) continue;
             seenUrls.add(blob.url);
             const pathname = blob.pathname ?? "";
-            const type: MediaItemType = isVideoPathnameOrType(pathname, blob.contentType)
+            const type: MediaItemType = isVideoPathnameOrType(pathname)
               ? "video"
               : "image";
             const name = (pathname.split("/").pop() ?? pathname) || "arquivo";

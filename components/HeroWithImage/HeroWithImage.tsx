@@ -16,6 +16,8 @@ interface HeroWithImageProps {
   height?: "small" | "medium" | "large" | "full";
   overlay?: "light" | "medium" | "dark";
   alignment?: "left" | "center" | "right";
+  /** Qualidade da imagem (1-100). Default 90. Use 100 para qualidade máxima. */
+  imageQuality?: number;
 }
 
 export function HeroWithImage({
@@ -29,6 +31,7 @@ export function HeroWithImage({
   height = "medium",
   overlay = "medium",
   alignment = "center",
+  imageQuality = 90,
 }: HeroWithImageProps) {
   // Altura do bloco da foto (maior para a imagem ir até o topo); resto (margin, padding, conteúdo) inalterado
   const heightClasses = {
@@ -83,7 +86,7 @@ export function HeroWithImage({
             sizes="100vw"
             className="object-cover"
             priority
-            quality={90}
+            quality={imageQuality}
             loading="eager"
           />
           {/* Overlay gradiente */}

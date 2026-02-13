@@ -307,7 +307,26 @@ export default function RoomDetailPage() {
   }
 
   const amenities = room.translatedAmenities || room.amenities || [];
-  const galleryImages = room.gallery || [];
+
+  // Normalizar galeria: pode vir como string[] ou como array de objetos { url?, imageUrl? } do JSONB
+  const galleryImages = (() => {
+    const raw = room.gallery;
+    if (!raw || !Array.isArray(raw)) return [];
+    const urls = raw
+      .map((item) =>
+        typeof item === "string" ? item : (item && typeof item === "object" ? (item as { url?: string; imageUrl?: string }).url ?? (item as { url?: string; imageUrl?: string }).imageUrl : null)
+      )
+      .filter((url): url is string => typeof url === "string" && url.trim() !== "");
+    return urls;
+  })();
+
+  // Incluir imagem principal na galeria se houver poucas fotos (para sempre mostrar algo)
+  const galleryWithHero =
+    galleryImages.length > 0
+      ? galleryImages
+      : room.imageUrl
+        ? [room.imageUrl]
+        : [];
 
   return (
     <>
@@ -317,8 +336,9 @@ export default function RoomDetailPage() {
         subtitle={room.shortDescription || room.description || ""}
         image={room.imageUrl || null}
         imageAlt={room.name || "Quarto Hotel Sonata"}
-        height="medium"
+        height="large"
         overlay="medium"
+        imageQuality={100}
       />
 
       {/* Botão Voltar */}
@@ -453,29 +473,39 @@ export default function RoomDetailPage() {
         </div>
       </div>
 
-      {/* Galeria 1: Horizontal 1x4 (primeiras 4 fotos) */}
-      {galleryImages.length >= 4 && (
+      {/* Galeria: primeiras fotos (1 a 4) – clicável para tela cheia */}
+      {galleryWithHero.length >= 1 && (
         <FullWidthGallery
-          images={galleryImages.slice(0, 4)}
+          images={galleryWithHero.slice(0, 4)}
           interval={4000}
-          height="h-[350px] md:h-[450px] lg:h-[550px]"
+          height="h-[450px] md:h-[600px] lg:h-[75vh] min-h-[500px]"
+          mobileHeight="h-[55vh]"
+          imageQuality={100}
+          onImageClick={(index) => handleImageClick(galleryWithHero, index)}
         />
       )}
 
-      {/* Galeria 2: Assimétrica Fullwidth (próximas 5 fotos) */}
-      {galleryImages.length >= 9 && (
+      {/* Galeria 2: Assimétrica (próximas 5 fotos) – clicável para tela cheia */}
+      {galleryWithHero.length >= 9 && (
         <AsymmetricGallery
-          images={galleryImages.slice(4, 9)}
+          images={galleryWithHero.slice(4, 9)}
           interval={5000}
+          desktopHeight="h-[85vh] min-h-[750px]"
+          mobileHeight="h-[55vh]"
+          imageQuality={100}
+          onImageClick={(index) => handleImageClick(galleryWithHero, 4 + index)}
         />
       )}
 
-      {/* Se tiver entre 4-8 fotos, usa só a horizontal com todas */}
-      {galleryImages.length >= 4 && galleryImages.length < 9 && (
+      {/* Se tiver entre 4 e 8 fotos, segunda linha horizontal – clicável para tela cheia */}
+      {galleryWithHero.length >= 4 && galleryWithHero.length < 9 && (
         <FullWidthGallery
-          images={galleryImages.slice(4)}
+          images={galleryWithHero.slice(4)}
           interval={4500}
-          height="h-[350px] md:h-[450px] lg:h-[550px]"
+          height="h-[450px] md:h-[600px] lg:h-[75vh] min-h-[500px]"
+          mobileHeight="h-[55vh]"
+          imageQuality={100}
+          onImageClick={(index) => handleImageClick(galleryWithHero, 4 + index)}
         />
       )}
 
