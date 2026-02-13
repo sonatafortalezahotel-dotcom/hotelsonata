@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { eventLeads } from "@/lib/db/schema";
 
 export async function GET() {
   try {
-    const leads = await db.select().from(eventLeads).orderBy(eventLeads.createdAt);
+    const leads = await db.select().from(eventLeads).orderBy(desc(eventLeads.createdAt));
     return NextResponse.json(leads);
   } catch (error) {
     console.error("Erro ao buscar leads de eventos:", error);

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Users, Heart, PartyPopper, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat } from "lucide-react";
+import { Briefcase, Users, Heart, PartyPopper, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat, CheckCircle2 } from "lucide-react";
 import { RoomCapacityTable } from "@/components/RoomCapacityTable";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { MasonrySwap } from "@/components/HorizontalScroll";
@@ -23,6 +23,18 @@ import { useEvents } from "@/lib/hooks/useEvents";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import { toast } from "sonner";
+
+const initialLeadFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  company: "",
+  eventType: "" as string,
+  eventDate: "",
+  guests: "",
+  message: "",
+};
 
 function EventosPageContent() {
   const { locale } = useLanguage();
@@ -32,6 +44,9 @@ function EventosPageContent() {
   const { photos: galleryPhotos, loading: galleryLoading, refetch: refetchGallery } = useGallery();
   const loading = eventsLoading || galleryLoading;
   const [mounted, setMounted] = useState(false);
+  const [leadForm, setLeadForm] = useState(initialLeadFormState);
+  const [leadFormLoading, setLeadFormLoading] = useState(false);
+  const [leadFormSuccess, setLeadFormSuccess] = useState(false);
 
   // Na página pública (sem editMode) usar só traduções estáticas; overrides do editor não aparecem aqui
   const contentOverrides = editor?.editMode ? (editor?.overrides ?? {}) : {};
@@ -499,27 +514,96 @@ function EventosPageContent() {
             <Card className="shadow-xl">
               <CardContent className="pt-6">
                 {mounted ? (
-                  <form className="space-y-6" suppressHydrationWarning>
+                  leadFormSuccess ? (
+                    <div className="text-center py-8 px-4">
+                      <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                        <CheckCircle2 className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
+                        Solicitação enviada com sucesso!
+                      </h3>
+                      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                        Entraremos em contato em breve.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setLeadFormSuccess(false)}
+                      >
+                        Enviar outra solicitação
+                      </Button>
+                    </div>
+                  ) : (
+                  <form
+                    className="space-y-6"
+                    suppressHydrationWarning
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (leadFormLoading) return;
+                      if (!leadForm.name?.trim() || !leadForm.email?.trim()) {
+                        toast.error("Preencha nome e email.");
+                        return;
+                      }
+                      if (!leadForm.eventType) {
+                        toast.error("Selecione o tipo de evento.");
+                        return;
+                      }
+                      setLeadFormLoading(true);
+                      try {
+                        const payload = {
+                          name: leadForm.name.trim(),
+                          email: leadForm.email.trim(),
+                          phone: leadForm.phone?.trim() || undefined,
+                          company: leadForm.company?.trim() || undefined,
+                          eventType: leadForm.eventType,
+                          eventDate: leadForm.eventDate || null,
+                          guests: leadForm.guests ? parseInt(leadForm.guests, 10) : undefined,
+                          message: leadForm.message?.trim() || undefined,
+                        };
+                        const res = await fetch("/api/event-leads", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(payload),
+                        });
+                        if (!res.ok) {
+                          const err = await res.json().catch(() => ({}));
+                          toast.error(err?.error || "Erro ao enviar. Tente novamente.");
+                          return;
+                        }
+                        toast.success("Solicitação enviada com sucesso! Entraremos em contato.");
+                        setLeadForm(initialLeadFormState);
+                        setLeadFormSuccess(true);
+                      } catch {
+                        toast.error("Erro ao enviar. Tente novamente.");
+                      } finally {
+                        setLeadFormLoading(false);
+                      }
+                    }}
+                  >
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="nome">{t.form.fields.name}</Label>
-                        <Input 
-                          id="nome" 
-                          required 
+                        <Input
+                          id="nome"
+                          required
                           placeholder={t.form.fields.name}
                           suppressHydrationWarning
                           autoComplete="name"
+                          value={leadForm.name}
+                          onChange={(e) => setLeadForm((p) => ({ ...p, name: e.target.value }))}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">{t.form.fields.email}</Label>
-                        <Input 
-                          id="email" 
-                          type="email" 
-                          required 
+                        <Input
+                          id="email"
+                          type="email"
+                          required
                           placeholder={t.form.fields.email}
                           suppressHydrationWarning
                           autoComplete="email"
+                          value={leadForm.email}
+                          onChange={(e) => setLeadForm((p) => ({ ...p, email: e.target.value }))}
                         />
                       </div>
                     </div>
@@ -527,21 +611,25 @@ function EventosPageContent() {
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="telefone">{t.form.fields.phone}</Label>
-                        <Input 
-                          id="telefone" 
-                          required 
+                        <Input
+                          id="telefone"
+                          required
                           placeholder={t.form.fields.phone}
                           suppressHydrationWarning
                           autoComplete="tel"
+                          value={leadForm.phone}
+                          onChange={(e) => setLeadForm((p) => ({ ...p, phone: e.target.value }))}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="empresa">{t.form.fields.company}</Label>
-                        <Input 
-                          id="empresa" 
+                        <Input
+                          id="empresa"
                           placeholder={t.form.fields.company}
                           suppressHydrationWarning
                           autoComplete="organization"
+                          value={leadForm.company}
+                          onChange={(e) => setLeadForm((p) => ({ ...p, company: e.target.value }))}
                         />
                       </div>
                     </div>
@@ -549,7 +637,11 @@ function EventosPageContent() {
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="tipo-evento">{t.form.fields.eventType}</Label>
-                        <Select required>
+                        <Select
+                          required
+                          value={leadForm.eventType || undefined}
+                          onValueChange={(v) => setLeadForm((p) => ({ ...p, eventType: v }))}
+                        >
                           <SelectTrigger id="tipo-evento" suppressHydrationWarning>
                             <SelectValue placeholder="Selecione" />
                           </SelectTrigger>
@@ -564,45 +656,52 @@ function EventosPageContent() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="data">{t.form.fields.date}</Label>
-                        <Input 
-                          id="data" 
-                          type="date" 
+                        <Input
+                          id="data"
+                          type="date"
                           required
                           suppressHydrationWarning
+                          value={leadForm.eventDate}
+                          onChange={(e) => setLeadForm((p) => ({ ...p, eventDate: e.target.value }))}
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="convidados">{t.form.fields.guests}</Label>
-                      <Input 
-                        id="convidados" 
-                        type="number" 
-                        required 
-                        placeholder="Ex: 50" 
-                        min="1"
+                      <Input
+                        id="convidados"
+                        type="number"
+                        required
+                        placeholder="Ex: 50"
+                        min={1}
                         suppressHydrationWarning
+                        value={leadForm.guests}
+                        onChange={(e) => setLeadForm((p) => ({ ...p, guests: e.target.value }))}
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="mensagem">{t.form.fields.message}</Label>
-                      <Textarea 
-                        id="mensagem" 
+                      <Textarea
+                        id="mensagem"
                         placeholder={t.form.fields.message}
                         rows={5}
                         suppressHydrationWarning
+                        value={leadForm.message}
+                        onChange={(e) => setLeadForm((p) => ({ ...p, message: e.target.value }))}
                       />
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full">
-                      {t.form.button}
+                    <Button type="submit" size="lg" className="w-full" disabled={leadFormLoading}>
+                      {leadFormLoading ? "Enviando..." : t.form.button}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">
                       {t.form.privacy}
                     </p>
                   </form>
+                  )
                 ) : (
                   <div className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">

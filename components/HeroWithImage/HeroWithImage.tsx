@@ -33,12 +33,12 @@ export function HeroWithImage({
   alignment = "center",
   imageQuality = 90,
 }: HeroWithImageProps) {
-  // Altura do bloco da foto (maior para a imagem ir até o topo); resto (margin, padding, conteúdo) inalterado
+  // Altura do bloco da foto — mobile mais alto para melhor presença do título e imagem
   const heightClasses = {
-    small: "h-[50vh] lg:h-[60vh]",
-    medium: "h-[60vh] lg:h-[70vh]",
-    large: "h-[70vh] lg:h-[80vh]",
-    full: "h-[70vh] lg:h-[80vh]"
+    small: "h-[60vh] lg:h-[60vh]",
+    medium: "h-[70vh] lg:h-[70vh]",
+    large: "h-[75vh] lg:h-[80vh]",
+    full: "h-[75vh] lg:h-[80vh]"
   };
 
   // Gradiente preto para o texto ler bem; topo mais escuro evita faixa branca

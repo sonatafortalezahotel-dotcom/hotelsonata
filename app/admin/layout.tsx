@@ -22,6 +22,7 @@ import {
   Layout,
   FileText,
   Mail,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -38,6 +39,7 @@ const menuItems = [
   { icon: Package, label: "Pacotes", href: "/admin/packages" },
   { icon: Bed, label: "Quartos", href: "/admin/rooms" },
   { icon: CalendarDays, label: "Eventos", href: "/admin/events" },
+  { icon: Users, label: "Leads de Eventos", href: "/admin/event-leads" },
   { icon: MapPin, label: "Pontos Turísticos", href: "/admin/nearby-attractions" },
   { icon: Award, label: "Certificações", href: "/admin/certifications" },
   { icon: Instagram, label: "Redes Sociais", href: "/admin/social-media" },
