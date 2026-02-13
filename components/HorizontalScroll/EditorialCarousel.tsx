@@ -34,22 +34,21 @@ export function EditorialCarousel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const totalItems = Array.isArray(children) ? children.length : children ? 1 : 0;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (currentIndex >= totalItems && totalItems > 0) setCurrentIndex(0);
   }, [totalItems, currentIndex]);
 
-  // Autoplay
+  // Autoplay (sempre rodando, sem pausar no hover)
   useEffect(() => {
-    if (!autoplay || isHovered || totalItems === 0) return;
+    if (!autoplay || totalItems === 0) return;
 
     const interval = setInterval(() => {
       goToNext();
     }, autoplayInterval);
 
     return () => clearInterval(interval);
-  }, [autoplay, autoplayInterval, isHovered, currentIndex, totalItems]);
+  }, [autoplay, autoplayInterval, currentIndex, totalItems]);
 
   const goToNext = () => {
     const nextIndex = (currentIndex + 1) % totalItems;
@@ -90,8 +89,6 @@ export function EditorialCarousel({
   return (
     <div 
       className={cn("relative w-full overflow-hidden group", className)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Container Fullwidth - Imagens Coladas */}
       <div

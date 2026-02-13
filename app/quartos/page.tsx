@@ -117,7 +117,7 @@ function RoomsPageContentWrapper() {
             getPageContent("quartos", "hero", "badge", locale, overrides) || "Conforto & Aconchego"
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 
@@ -150,9 +150,9 @@ function RoomsPageContentWrapper() {
         </div>
       </section>
 
-      {/* Rooms Section */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Rooms Section - bloco em full largura */}
+      <section className="py-16 lg:py-24 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="mb-12 lg:mb-16 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t.section.title}

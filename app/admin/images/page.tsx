@@ -154,7 +154,7 @@ export default function ImagesAdminPage() {
             id: "evento-corporativo",
             name: "Eventos Corporativos",
             description: "⚠️ Gerenciado em /admin/events",
-            whereAppears: "Página de Eventos - Eventos Corporativos (gerenciado em /admin/events)",
+            whereAppears: "Página de Eventos - Hero e Eventos Corporativos (gerenciado em /admin/events)",
             recommendedImages: 0,
           },
           {
@@ -170,6 +170,13 @@ export default function ImagesAdminPage() {
             description: "⚠️ Gerenciado em /admin/events",
             whereAppears: "Página de Eventos - Núpcias (gerenciado em /admin/events)",
             recommendedImages: 0,
+          },
+          {
+            id: "galeria",
+            name: "Galeria (grid da página)",
+            description: "9 slots do bloco de fotos na página /eventos (também editáveis no ?editMode=1)",
+            whereAppears: "Página de Eventos - Bloco de galeria com 9 fotos (ordem 0 a 8)",
+            recommendedImages: 9,
           },
         ],
         imageCount: 0,

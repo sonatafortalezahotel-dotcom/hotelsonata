@@ -34,7 +34,6 @@ export function ElegantCarousel({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Calcular largura do item
   const getItemWidthClass = () => {
@@ -85,9 +84,9 @@ export function ElegantCarousel({
     };
   }, [children, totalItems]);
 
-  // Autoplay
+  // Autoplay (sempre rodando, sem pausar no hover)
   useEffect(() => {
-    if (!autoplay || isHovered) return;
+    if (!autoplay) return;
 
     const interval = setInterval(() => {
       const container = scrollRef.current;
@@ -102,7 +101,7 @@ export function ElegantCarousel({
     }, autoplayInterval);
 
     return () => clearInterval(interval);
-  }, [autoplay, autoplayInterval, isHovered, canScrollRight]);
+  }, [autoplay, autoplayInterval, canScrollRight]);
 
   const scroll = (direction: "left" | "right") => {
     const container = scrollRef.current;
@@ -139,8 +138,6 @@ export function ElegantCarousel({
   return (
     <div 
       className={cn("relative", className)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Container com scroll */}
       <div

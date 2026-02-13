@@ -63,8 +63,8 @@ export default function RoomsPageContent() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-        {[...Array(8)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 w-full">
+        {[...Array(6)].map((_, i) => (
           <RoomCardSkeleton key={i} />
         ))}
       </div>
@@ -84,7 +84,7 @@ export default function RoomsPageContent() {
   return (
     <>
       {/* Mobile: Scroll Horizontal */}
-      <div className="lg:hidden">
+      <div className="lg:hidden w-full">
         <HorizontalScroll 
           itemWidth="85" 
           showArrows={false} 
@@ -97,8 +97,8 @@ export default function RoomsPageContent() {
         </HorizontalScroll>
       </div>
 
-      {/* Desktop: Grid Normal */}
-      <div className="hidden lg:grid lg:grid-cols-4 gap-6 md:gap-8">
+      {/* Desktop: Grid full largura, cards maiores (3 colunas) */}
+      <div className="hidden lg:grid w-full lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
         {rooms.map((room) => (
           <RoomCard key={room.id} room={room} />
         ))}

@@ -29,9 +29,24 @@ function EventosPageContent() {
   const t = getPageTranslation(locale, "events");
   const editor = useEditor();
   const { events, loading: eventsLoading } = useEvents(true, locale);
-  const { photos: galleryPhotos, loading: galleryLoading } = useGallery();
+  const { photos: galleryPhotos, loading: galleryLoading, refetch: refetchGallery } = useGallery();
   const loading = eventsLoading || galleryLoading;
   const [mounted, setMounted] = useState(false);
+
+  // Na página pública (sem editMode) usar só traduções estáticas; overrides do editor não aparecem aqui
+  const contentOverrides = editor?.editMode ? (editor?.overrides ?? {}) : {};
+
+  // Refetch da galeria quando fotos forem adicionadas/alteradas (edit mode ou admin), para aparecer na página
+  useEffect(() => {
+    const onGalleryUpdated = () => refetchGallery(true);
+    window.addEventListener("gallery-updated", onGalleryUpdated);
+    return () => window.removeEventListener("gallery-updated", onGalleryUpdated);
+  }, [refetchGallery]);
+
+  // Em modo edição, recarregar galeria ao montar para que imagens já salvas (ex.: config auditório/escolar/coquetel) apareçam
+  useEffect(() => {
+    if (editor?.editMode) refetchGallery(true);
+  }, [editor?.editMode, refetchGallery]);
 
   // Buscar todas as imagens usando useMemo para evitar múltiplas chamadas
   const eventosImages = useMemo(() => {
@@ -54,6 +69,7 @@ function EventosPageContent() {
     const corporativoGallery = filterBySection("evento-corporativo");
     const casamentoGallery = filterBySection("evento-casamento");
     const nupciasGallery = filterBySection("evento-nupcias");
+    const galeriaSection = filterBySection("galeria");
 
     // Hero preferencialmente vem da galeria corporativa, depois de outras seções
     const heroFromGallery =
@@ -62,7 +78,7 @@ function EventosPageContent() {
       nupciasGallery[0]?.imageUrl ||
       null;
 
-    // Galeria principal: combinar imagens da galeria + imagens dos eventos
+    // Galeria principal: corporativo + casamento + núpcias + galeria (fotos adicionadas no edit mode)
     const galleryImages: Array<{ imageUrl: string; title?: string | null; category?: string | null }> = [];
 
     const pushImage = (url: any) => {
@@ -71,11 +87,9 @@ function EventosPageContent() {
       galleryImages.push({ imageUrl: url });
     };
 
-    [...corporativoGallery, ...casamentoGallery, ...nupciasGallery].forEach(
+    [...corporativoGallery, ...casamentoGallery, ...nupciasGallery, ...galeriaSection].forEach(
       (p: any) => pushImage(p.imageUrl),
     );
-
-    events.forEach((ev: any) => pushImage(ev.imageUrl));
 
     return {
       hero: heroFromGallery,
@@ -83,6 +97,22 @@ function EventosPageContent() {
       gallery: galleryImages,
     };
   }, [events, galleryPhotos]);
+
+  // Na página pública a galeria usa só fotos da galeria (page=eventos); em edit mode incluímos também imagens da API de eventos
+  const publicGalleryImages = useMemo(() => {
+    const isEditMode = editor?.editMode === true;
+    if (isEditMode) return eventosImages.gallery;
+    return eventosImages.gallery.filter(
+      (p) =>
+        p?.imageUrl &&
+        galleryPhotos.some(
+          (img: any) =>
+            img?.active &&
+            (img.page ?? "").toString().toLowerCase().trim() === "eventos" &&
+            img.imageUrl === p.imageUrl
+        )
+    );
+  }, [editor?.editMode, eventosImages.gallery, galleryPhotos]);
 
   useEffect(() => {
     setMounted(true);
@@ -110,13 +140,13 @@ function EventosPageContent() {
     <>
       {/* Hero Section com Imagem */}
       <HeroWithImage
-        title={editor?.editMode ? <PageText page="eventos" section="hero" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "hero", "title", locale, editor?.overrides ?? {}) || t.hero.title)}
-        subtitle={editor?.editMode ? <PageText page="eventos" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "hero", "subtitle", locale, editor?.overrides ?? {}) || t.hero.subtitle)}
+        title={editor?.editMode ? <PageText page="eventos" section="hero" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "hero", "title", locale, contentOverrides) || t.hero.title)}
+        subtitle={editor?.editMode ? <PageText page="eventos" section="hero" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "hero", "subtitle", locale, contentOverrides) || t.hero.subtitle)}
         image={mounted ? (getGalleryImageByPath(galleryPhotos, "gallery:eventos:evento-corporativo:0") || events[0]?.imageUrl || eventosImages.hero || "/Sobre Hotel/Eventos/eventos-1.jpg") : undefined}
         imageNode={editor?.editMode && mounted ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:eventos:evento-corporativo:0") || events[0]?.imageUrl || eventosImages.hero || ""} alt="Hero" path="gallery:eventos:evento-corporativo:0" className="absolute inset-0 w-full h-full" /> : undefined}
         imageAlt="Espaço para Eventos - Hotel Sonata"
         icon={(() => {
-          const overrides = editor?.overrides ?? {};
+          const overrides = contentOverrides;
           const heroIconName = getPageContentIcon("hero", "icon", overrides, "Briefcase");
           const HeroIconComponent = getIcon(heroIconName) ?? Briefcase;
           return editor?.editMode
@@ -127,10 +157,10 @@ function EventosPageContent() {
           editor?.editMode ? (
             <PageText page="eventos" section="hero" fieldKey="badge" locale={locale} as="span" />
           ) : (
-            getPageContent("eventos", "hero", "badge", locale, editor?.overrides ?? {}) || t.hero.badge
+            getPageContent("eventos", "hero", "badge", locale, contentOverrides) || t.hero.badge
           )
         }
-        height="large"
+        height="medium"
         overlay="dark"
       />
 
@@ -140,13 +170,13 @@ function EventosPageContent() {
           <div className="text-center mb-12 lg:mb-16">
             <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
               <Building2 className="h-4 w-4 mr-2 inline" />
-              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "gallery", "badge", locale, editor?.overrides ?? {}) || t.gallery.badge)}
+              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "gallery", "badge", locale, contentOverrides) || t.gallery.badge)}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "gallery", "title", locale, editor?.overrides ?? {}) || t.gallery.title)}
+              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "gallery", "title", locale, contentOverrides) || t.gallery.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "gallery", "subtitle", locale, editor?.overrides ?? {}) || t.gallery.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "gallery", "subtitle", locale, contentOverrides) || t.gallery.subtitle)}
             </p>
           </div>
           
@@ -160,7 +190,7 @@ function EventosPageContent() {
             </div>
           ) : (
             <MasonrySwap
-              images={eventosImages.gallery
+              images={publicGalleryImages
                 .map(photo => photo.imageUrl)
                 .filter(img => img && typeof img === 'string' && img.trim() !== '')}
               interval={5000}
@@ -174,23 +204,23 @@ function EventosPageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "facilities", "title", locale, editor?.overrides ?? {}) || t.facilities.title)}
+              {editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "facilities", "title", locale, contentOverrides) || t.facilities.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "facilities", "subtitle", locale, editor?.overrides ?? {}) || t.facilities.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "facilities", "subtitle", locale, contentOverrides) || t.facilities.subtitle)}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {facilities.map((facility, index) => {
-              const overrides = editor?.overrides ?? {};
+              const overrides = contentOverrides;
               const iconName = getPageContentIcon("facilities", `${facility.key}.icon`, overrides, facilityDefaultIcons[facility.key] ?? "Lightbulb");
               const ResolvedIcon = getIcon(iconName) ?? facility.icon;
               const facilityIcon = editor?.editMode
                 ? <EditableIcon page="eventos" section="facilities" fieldKey={`${facility.key}.icon`} locale={locale} defaultIconName={facilityDefaultIcons[facility.key] ?? "Lightbulb"} defaultIcon={facility.icon} iconClassName="h-8 w-8 text-purple-600" />
                 : <ResolvedIcon className="h-8 w-8 text-purple-600" />;
-              const titleContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.title`, locale, editor?.overrides ?? {}) || facility.title);
-              const descContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.description`, locale, editor?.overrides ?? {}) || facility.description);
+              const titleContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.title`, locale, contentOverrides) || facility.title);
+              const descContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.description`, locale, contentOverrides) || facility.description);
               return (
                 <Card key={index} className="text-center hover:shadow-xl transition-all duration-300">
                   <CardContent className="pt-8 pb-6">
@@ -208,23 +238,23 @@ function EventosPageContent() {
           <div className="mt-12 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-2xl p-8">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-4">{editor?.editMode ? <PageText page="eventos" section="access" fieldKey="title" locale={locale} as="span" /> : (getPageContent("eventos", "access", "title", locale, editor?.overrides ?? {}) || t.access.title)}</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">{editor?.editMode ? <PageText page="eventos" section="access" fieldKey="title" locale={locale} as="span" /> : (getPageContent("eventos", "access", "title", locale, contentOverrides) || t.access.title)}</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   {t.access.items.map((item, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <Check className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                      <span>{editor?.editMode ? <PageText page="eventos" section="access" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "access", `items.${index}`, locale, editor?.overrides ?? {}) || item)}</span>
+                      <span>{editor?.editMode ? <PageText page="eventos" section="access" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "access", `items.${index}`, locale, contentOverrides) || item)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-4">{editor?.editMode ? <PageText page="eventos" section="included" fieldKey="title" locale={locale} as="span" /> : (getPageContent("eventos", "included", "title", locale, editor?.overrides ?? {}) || t.included.title)}</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">{editor?.editMode ? <PageText page="eventos" section="included" fieldKey="title" locale={locale} as="span" /> : (getPageContent("eventos", "included", "title", locale, contentOverrides) || t.included.title)}</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   {t.included.items.map((item, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <Check className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                      <span>{editor?.editMode ? <PageText page="eventos" section="included" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "included", `items.${index}`, locale, editor?.overrides ?? {}) || item)}</span>
+                      <span>{editor?.editMode ? <PageText page="eventos" section="included" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "included", `items.${index}`, locale, contentOverrides) || item)}</span>
                     </li>
                   ))}
                 </ul>
@@ -239,13 +269,13 @@ function EventosPageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
-              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "capacity", "badge", locale, editor?.overrides ?? {}) || t.capacity.badge)}
+              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "capacity", "badge", locale, contentOverrides) || t.capacity.badge)}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "title", locale, editor?.overrides ?? {}) || t.capacity.title)}
+              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "title", locale, contentOverrides) || t.capacity.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "subtitle", locale, editor?.overrides ?? {}) || t.capacity.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "subtitle", locale, contentOverrides) || t.capacity.subtitle)}
             </p>
           </div>
 
@@ -253,7 +283,7 @@ function EventosPageContent() {
 
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground mb-6">
-              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "note", locale, editor?.overrides ?? {}) || t.capacity.note)}
+              {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "capacity", "note", locale, contentOverrides) || t.capacity.note)}
             </p>
           </div>
         </div>
@@ -264,10 +294,10 @@ function EventosPageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "configurations", "title", locale, editor?.overrides ?? {}) || t.configurations.title)}
+              {editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "configurations", "title", locale, contentOverrides) || t.configurations.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "configurations", "subtitle", locale, editor?.overrides ?? {}) || t.configurations.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "configurations", "subtitle", locale, contentOverrides) || t.configurations.subtitle)}
             </p>
           </div>
           
@@ -286,8 +316,8 @@ function EventosPageContent() {
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.auditorium.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.auditorium.title", locale, editor?.overrides ?? {}) || t.configurations.items.auditorium.title)}</h3>
-                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.auditorium.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.auditorium.description", locale, editor?.overrides ?? {}) || t.configurations.items.auditorium.description)}</p>
+                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.auditorium.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.auditorium.title", locale, contentOverrides) || t.configurations.items.auditorium.title)}</h3>
+                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.auditorium.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.auditorium.description", locale, contentOverrides) || t.configurations.items.auditorium.description)}</p>
               </div>
             </div>
 
@@ -305,8 +335,8 @@ function EventosPageContent() {
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.school.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.school.title", locale, editor?.overrides ?? {}) || t.configurations.items.school.title)}</h3>
-                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.school.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.school.description", locale, editor?.overrides ?? {}) || t.configurations.items.school.description)}</p>
+                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.school.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.school.title", locale, contentOverrides) || t.configurations.items.school.title)}</h3>
+                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.school.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.school.description", locale, contentOverrides) || t.configurations.items.school.description)}</p>
               </div>
             </div>
 
@@ -324,8 +354,8 @@ function EventosPageContent() {
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.banquet.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.banquet.title", locale, editor?.overrides ?? {}) || t.configurations.items.banquet.title)}</h3>
-                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.banquet.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.banquet.description", locale, editor?.overrides ?? {}) || t.configurations.items.banquet.description)}</p>
+                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.banquet.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.banquet.title", locale, contentOverrides) || t.configurations.items.banquet.title)}</h3>
+                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.banquet.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.banquet.description", locale, contentOverrides) || t.configurations.items.banquet.description)}</p>
               </div>
             </div>
 
@@ -343,8 +373,8 @@ function EventosPageContent() {
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.cocktail.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.cocktail.title", locale, editor?.overrides ?? {}) || t.configurations.items.cocktail.title)}</h3>
-                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.cocktail.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.cocktail.description", locale, editor?.overrides ?? {}) || t.configurations.items.cocktail.description)}</p>
+                <h3 className="text-2xl font-bold mb-2">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.cocktail.title" locale={locale} as="span" className="text-white" /> : (getPageContent("eventos", "configurations", "items.cocktail.title", locale, contentOverrides) || t.configurations.items.cocktail.title)}</h3>
+                <p className="text-white/90">{editor?.editMode ? <PageText page="eventos" section="configurations" fieldKey="items.cocktail.description" locale={locale} as="span" className="text-white/90" /> : (getPageContent("eventos", "configurations", "items.cocktail.description", locale, contentOverrides) || t.configurations.items.cocktail.description)}</p>
               </div>
             </div>
           </div>
@@ -356,13 +386,13 @@ function EventosPageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "badge", locale, editor?.overrides ?? {}) || t.layout.badge)}
+              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "badge", locale, contentOverrides) || t.layout.badge)}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "title", locale, editor?.overrides ?? {}) || t.layout.title)}
+              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "title", locale, contentOverrides) || t.layout.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "subtitle", locale, editor?.overrides ?? {}) || t.layout.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "subtitle", locale, contentOverrides) || t.layout.subtitle)}
             </p>
           </div>
 
@@ -378,6 +408,8 @@ function EventosPageContent() {
                     fill
                     className="object-contain p-4 md:p-8"
                     priority
+                    quality={100}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1536px"
                   />
                 )}
               </div>
@@ -386,10 +418,10 @@ function EventosPageContent() {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground mb-6">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "note", locale, editor?.overrides ?? {}) || t.layout.note)}
+              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "note", locale, contentOverrides) || t.layout.note)}
             </p>
             <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "button", locale, editor?.overrides ?? {}) || t.layout.button)}
+              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "button", locale, contentOverrides) || t.layout.button)}
             </Button>
           </div>
         </div>
@@ -400,24 +432,24 @@ function EventosPageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              {editor?.editMode ? <PageText page="eventos" section="types" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "types", "title", locale, editor?.overrides ?? {}) || t.types.title)}
+              {editor?.editMode ? <PageText page="eventos" section="types" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "types", "title", locale, contentOverrides) || t.types.title)}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {editor?.editMode ? <PageText page="eventos" section="types" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "types", "subtitle", locale, editor?.overrides ?? {}) || t.types.subtitle)}
+              {editor?.editMode ? <PageText page="eventos" section="types" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "types", "subtitle", locale, contentOverrides) || t.types.subtitle)}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {eventTypes.map((event, index) => {
-              const overrides = editor?.overrides ?? {};
+              const overrides = contentOverrides;
               const iconName = getPageContentIcon("eventTypes", `${event.key}.icon`, overrides, eventTypeDefaultIcons[event.key] ?? "Briefcase");
               const ResolvedIcon = getIcon(iconName) ?? event.icon;
               const eventIcon = editor?.editMode
                 ? <EditableIcon page="eventos" section="eventTypes" fieldKey={`${event.key}.icon`} locale={locale} defaultIconName={eventTypeDefaultIcons[event.key] ?? "Briefcase"} defaultIcon={event.icon} iconClassName="h-8 w-8 text-purple-600" />
                 : <ResolvedIcon className="h-8 w-8 text-purple-600" />;
-              const titleContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.title`, locale, editor?.overrides ?? {}) || event.title);
-              const descContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.description`, locale, editor?.overrides ?? {}) || event.description);
-              const capacityContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.capacity`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.capacity`, locale, editor?.overrides ?? {}) || event.capacity);
+              const titleContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.title`, locale, contentOverrides) || event.title);
+              const descContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.description`, locale, contentOverrides) || event.description);
+              const capacityContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.capacity`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.capacity`, locale, contentOverrides) || event.capacity);
               return (
                 <Card key={index} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                   <CardHeader>
@@ -439,7 +471,7 @@ function EventosPageContent() {
                       {event.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.features.${idx}`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.features.${idx}`, locale, editor?.overrides ?? {}) || feature)}</span>
+                          <span className="text-sm text-muted-foreground">{editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.features.${idx}`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.features.${idx}`, locale, contentOverrides) || feature)}</span>
                         </div>
                       ))}
                     </div>
@@ -457,10 +489,10 @@ function EventosPageContent() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                {editor?.editMode ? <PageText page="eventos" section="form" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "form", "title", locale, editor?.overrides ?? {}) || t.form.title)}
+                {editor?.editMode ? <PageText page="eventos" section="form" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "form", "title", locale, contentOverrides) || t.form.title)}
               </h2>
               <p className="text-lg text-muted-foreground">
-                {editor?.editMode ? <PageText page="eventos" section="form" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "form", "subtitle", locale, editor?.overrides ?? {}) || t.form.subtitle)}
+                {editor?.editMode ? <PageText page="eventos" section="form" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "form", "subtitle", locale, contentOverrides) || t.form.subtitle)}
               </p>
             </div>
 
@@ -596,23 +628,23 @@ function EventosPageContent() {
       <section className="py-16 lg:py-24 bg-gradient-to-br from-purple-600/90 to-purple-700 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "title", locale, editor?.overrides ?? {}) || t.cta.title)}
+            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "title", locale, contentOverrides) || t.cta.title)}
           </h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto text-white/90">
-            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "subtitle", locale, editor?.overrides ?? {}) || t.cta.subtitle)}
+            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "subtitle", locale, contentOverrides) || t.cta.subtitle)}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
               href="tel:+5585999999999"
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-purple-700 hover:bg-white/90 h-11 px-8"
             >
-              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="call" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "call", locale, editor?.overrides ?? {}) || t.cta.call)}
+              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="call" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "call", locale, contentOverrides) || t.cta.call)}
             </a>
             <a 
               href="https://wa.me/5585999999999"
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-2 border-white text-white hover:bg-white/10 h-11 px-8"
             >
-              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="whatsapp" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "whatsapp", locale, editor?.overrides ?? {}) || t.cta.whatsapp)}
+              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="whatsapp" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "whatsapp", locale, contentOverrides) || t.cta.whatsapp)}
             </a>
           </div>
         </div>

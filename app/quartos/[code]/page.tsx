@@ -317,7 +317,7 @@ export default function RoomDetailPage() {
         subtitle={room.shortDescription || room.description || ""}
         image={room.imageUrl || null}
         imageAlt={room.name || "Quarto Hotel Sonata"}
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

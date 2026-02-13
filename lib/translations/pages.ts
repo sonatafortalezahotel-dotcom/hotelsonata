@@ -54,7 +54,7 @@ export const pageTranslations = {
       },
       breakfast: {
         badge: "Gastronomia Regional",
-        title: "Café da Manhã Premiado",
+        title: "Café da Manhã",
         description: "Comece seu dia com um café da manhã inesquecível. Nossa seleção especial inclui frutas tropicais frescas, pães artesanais, tapiocas preparadas na hora, e o melhor café regional.",
         scheduleTitle: "Horário",
         scheduleWeekday: "Segunda a Sexta: 6h30 às 10h",
@@ -112,7 +112,7 @@ export const pageTranslations = {
             restaurant: { title: "Restaurante com Vista", description: "Ambiente elegante e aconchegante com vista para o mar. O cenário perfeito para suas refeições, seja um almoço executivo ou um jantar romântico." },
             seafood: { title: "Frutos do Mar Frescos", description: "Trabalhamos somente com frutos do mar frescos, direto dos pescadores locais. Lagosta, camarão, peixe e outros delícias do oceano preparados com maestria." },
             chef: { title: "Chef's Special", description: "Nosso chef cria pratos exclusivos que mesclam técnicas contemporâneas com os sabores tradicionais da culinária cearense." },
-            breakfast: { title: "Café da Manhã Premiado", description: "Reconhecido pelos hóspedes como um dos melhores cafés da manhã de Fortaleza. Variedade, qualidade e vista para o mar." }
+            breakfast: { title: "Café da Manhã", description: "Reconhecido pelos hóspedes como um dos melhores cafés da manhã de Fortaleza. Variedade, qualidade e vista para o mar." }
         }
       }
     },
@@ -1093,7 +1093,7 @@ export const pageTranslations = {
       },
       breakfast: {
         badge: "Gastronomía Regional",
-        title: "Desayuno Premiado",
+        title: "Desayuno",
         description: "Comienza tu día con un desayuno inolvidable. Nuestra selección especial incluye frutas tropicales frescas, panes artesanales, tapiocas preparadas al momento y el mejor café regional.",
         scheduleTitle: "Horario",
         scheduleWeekday: "Lunes a Viernes: 6h30 a 10h",
@@ -1151,7 +1151,7 @@ export const pageTranslations = {
             restaurant: { title: "Restaurante con Vista", description: "Ambiente elegante y acogedor con vista al mar. El escenario perfecto para tus comidas, sea un almuerzo ejecutivo o una cena romántica." },
             seafood: { title: "Mariscos Frescos", description: "Trabajamos solo con mariscos frescos, directo de los pescadores locales. Langosta, camarón, pescado y otras delicias del océano preparados con maestría." },
             chef: { title: "Especial del Chef", description: "Nuestro chef crea platos exclusivos que mezclan técnicas contemporáneas con los sabores tradicionales de la cocina cearense." },
-            breakfast: { title: "Desayuno Premiado", description: "Reconocido por los huéspedes como uno de los mejores desayunos de Fortaleza. Variedad, calidad y vista al mar." }
+            breakfast: { title: "Desayuno", description: "Reconocido por los huéspedes como uno de los mejores desayunos de Fortaleza. Variedad, calidad y vista al mar." }
         }
       }
     },
@@ -2147,7 +2147,7 @@ export const pageTranslations = {
       },
       breakfast: {
         badge: "Regional Gastronomy",
-        title: "Award-winning Breakfast",
+        title: "Breakfast",
         description: "Start your day with an unforgettable breakfast. Our special selection includes fresh tropical fruits, artisan breads, tapiocas prepared to order, and the best regional coffee.",
         scheduleTitle: "Schedule",
         scheduleWeekday: "Monday to Friday: 6:30 AM to 10 AM",
@@ -2205,7 +2205,7 @@ export const pageTranslations = {
             restaurant: { title: "Restaurant with View", description: "Elegant and cozy environment with sea view. The perfect setting for your meals, whether a business lunch or a romantic dinner." },
             seafood: { title: "Fresh Seafood", description: "We work only with fresh seafood, direct from local fishermen. Lobster, shrimp, fish and other ocean delights prepared with mastery." },
             chef: { title: "Chef's Special", description: "Our chef creates exclusive dishes that mix contemporary techniques with traditional Ceará cuisine flavors." },
-            breakfast: { title: "Award-winning Breakfast", description: "Recognized by guests as one of the best breakfasts in Fortaleza. Variety, quality and sea view." }
+            breakfast: { title: "Breakfast", description: "Recognized by guests as one of the best breakfasts in Fortaleza. Variety, quality and sea view." }
         }
       }
     },

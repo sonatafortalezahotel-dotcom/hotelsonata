@@ -293,7 +293,7 @@ export default function PackageDetailPage() {
         subtitle={pkg.description || ""}
         image={heroImage || pkg.imageUrl}
         imageAlt={pkg.name}
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

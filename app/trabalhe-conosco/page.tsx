@@ -187,7 +187,7 @@ export default function TrabalheConoscoPage() {
             getPageContent("trabalhe", "hero", "badge", locale, overrides) || t.hero.badge
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

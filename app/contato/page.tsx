@@ -153,7 +153,7 @@ function ContatoPageContent() {
             getPageContent("contato", "hero", "badge", locale, editor?.overrides ?? {}) || t.hero.badge
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

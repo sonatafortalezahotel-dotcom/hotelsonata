@@ -26,22 +26,23 @@ export function HeroWithImage({
   imageNode,
   icon,
   badge,
-  height = "large",
+  height = "medium",
   overlay = "medium",
   alignment = "center",
 }: HeroWithImageProps) {
-  // Altura padronizada para todas as imagens de títulos
+  // Altura do bloco da foto (maior para a imagem ir até o topo); resto (margin, padding, conteúdo) inalterado
   const heightClasses = {
-    small: "h-[40vh] lg:h-[50vh]",
-    medium: "h-[50vh] lg:h-[60vh]",
+    small: "h-[50vh] lg:h-[60vh]",
+    medium: "h-[60vh] lg:h-[70vh]",
     large: "h-[70vh] lg:h-[80vh]",
     full: "h-[70vh] lg:h-[80vh]"
   };
 
+  // Gradiente preto para o texto ler bem; topo mais escuro evita faixa branca
   const overlayClasses = {
-    light: "bg-gradient-to-b from-black/40 via-black/30 to-black/50",
-    medium: "bg-gradient-to-b from-black/60 via-black/40 to-black/70",
-    dark: "bg-gradient-to-b from-black/70 via-black/60 to-black/80"
+    light: "bg-gradient-to-b from-black/75 via-black/40 to-black/60",
+    medium: "bg-gradient-to-b from-black/80 via-black/50 to-black/75",
+    dark: "bg-gradient-to-b from-black/90 via-black/65 to-black/85"
   };
 
   const alignmentClasses = {
@@ -54,9 +55,10 @@ export function HeroWithImage({
   const hasImage = image && image.trim() !== "";
   const hasImageNode = imageNode != null;
 
+  // Margem negativa bem alta: foto sobe até o topo e cobre qualquer branco (layout/edit); padding-top mantém título abaixo do header
   return (
     <section 
-      className={`relative ${heightClasses[height]} -mt-20 lg:-mt-28 pt-36 lg:pt-52 flex items-center justify-center overflow-hidden`}
+      className={`relative ${heightClasses[height]} -mt-48 lg:-mt-56 pt-72 lg:pt-80 flex items-center justify-center overflow-hidden`}
     >
       {/* Imagem de Fundo com Parallax */}
       {hasImageNode ? (
@@ -91,8 +93,8 @@ export function HeroWithImage({
         <div className={`absolute inset-0 z-0 bg-gradient-to-br from-primary/20 to-primary/40 ${overlayClasses[overlay]}`} />
       )}
 
-      {/* Conteúdo */}
-      <div className={`relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-white flex flex-col ${alignmentClasses[alignment]}`}>
+      {/* Conteúdo: -mt sobe o bloco (ícone, título, subtítulo) */}
+      <div className={`relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-white flex flex-col -mt-16 lg:-mt-24 ${alignmentClasses[alignment]}`}>
         {icon && (
           <div className="mb-6 drop-shadow-2xl">
             {icon}

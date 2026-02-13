@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Edit2, Image as ImageIcon } from "lucide-react";
 
@@ -24,6 +24,11 @@ export function EditableImage({
   aspectRatio = "auto",
 }: EditableImageProps) {
   const [imageError, setImageError] = useState(false);
+
+  // Quando a URL da imagem muda (ex.: após salvar no editor), resetar erro para exibir a nova imagem
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
 
   const aspectClasses = {
     video: "aspect-video",

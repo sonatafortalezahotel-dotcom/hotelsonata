@@ -108,23 +108,37 @@ export default function PackagesSection({
                     href={`/quartos/${room.code}`}
                     className="group relative overflow-hidden"
                   >
-                    {/* Imagem de Fundo */}
+                    {/* Imagem de Fundo - qualidade alta para exibição em destaque */}
                     <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]">
                       <Image
                         src={room.imageUrl}
                         alt={room.name}
                         fill
+                        quality={90}
+                        priority={sortedRooms.indexOf(room) < 2}
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 640px"
                       />
                       
                       {/* Overlay Gradiente */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                       
-                      {/* Texto Sobreposto (nome/descrição vêm das traduções por idioma; se faltar, mostra fallback) */}
+                      {/* Texto Sobreposto (nome/descrição vêm das traduções por idioma; quebra de linha após a primeira palavra) */}
                       <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-10">
                         <h3 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-3 drop-shadow-2xl">
-                          {room.name || room.code || (locale === "es" ? "Habitación" : locale === "en" ? "Room" : "Quarto")}
+                          {(() => {
+                            const name = room.name || room.code || (locale === "es" ? "Habitación" : locale === "en" ? "Room" : "Quarto");
+                            const parts = String(name).trim().split(/\s+/);
+                            if (parts.length >= 2) {
+                              return (
+                                <>
+                                  <span className="block">{parts[0]}</span>
+                                  <span className="block">{parts.slice(1).join(" ")}</span>
+                                </>
+                              );
+                            }
+                            return name;
+                          })()}
                         </h3>
                         {(room.shortDescription || room.description) && (
                           <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed mb-4">

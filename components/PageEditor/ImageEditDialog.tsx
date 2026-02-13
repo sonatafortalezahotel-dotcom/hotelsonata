@@ -67,9 +67,9 @@ export function ImageEditDialog({
     }
   }, [open, currentImage]);
 
-  // Load gallery images when gallery tab is opened
+  // Load gallery images when gallery tab is opened (sempre recarrega ao abrir a aba para mostrar as que já existem)
   useEffect(() => {
-    if (open && activeTab === "gallery" && galleryImages.length === 0) {
+    if (open && activeTab === "gallery") {
       loadGalleryImages();
     }
   }, [open, activeTab]);
@@ -79,8 +79,23 @@ export function ImageEditDialog({
     try {
       const response = await fetch("/api/gallery?active=true");
       if (response.ok) {
-        const data = await response.json();
-        setGalleryImages(data);
+        const raw = await response.json();
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray((raw as { photos?: unknown[] })?.photos)
+            ? (raw as { photos: GalleryImage[] }).photos
+            : Array.isArray((raw as { data?: unknown[] })?.data)
+              ? (raw as { data: GalleryImage[] }).data
+              : [];
+        const normalized: GalleryImage[] = list.map((item: Record<string, unknown>) => ({
+          id: Number(item.id),
+          imageUrl: String(item.imageUrl ?? (item as Record<string, unknown>).image_url ?? ""),
+          title: item.title != null ? String(item.title) : undefined,
+          page: item.page != null ? String(item.page) : undefined,
+          section: item.section != null ? String(item.section) : undefined,
+          order: item.order != null ? Number(item.order) : undefined,
+        }));
+        setGalleryImages(normalized);
       } else {
         toast.error("Erro ao carregar galeria");
       }

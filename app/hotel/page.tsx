@@ -212,7 +212,7 @@ function HotelPageContent() {
         imageAlt="Hotel Sonata de Iracema - Vista da Piscina"
         icon={heroIcon}
         badge={heroBadge}
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

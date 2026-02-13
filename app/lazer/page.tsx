@@ -269,7 +269,7 @@ function LazerPageContent() {
             getPageContent("lazer", "hero", "badge", locale, overrides) || "Lazer & Bem-Estar"
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 

@@ -120,7 +120,7 @@ function ESGPageContent() {
             getPageContent("esg", "hero", "badge", locale, editor?.overrides ?? {}) || t.hero.badge
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 
@@ -362,24 +362,6 @@ function ESGPageContent() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Certificações */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-green-600/5 to-green-600/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
-            {editor?.editMode ? <PageText page="esg" section="certifications" fieldKey="title" locale={locale} as="span" /> : (getPageContent("esg", "certifications", "title", locale, editor?.overrides ?? {}) || t.certifications.title)}
-          </h2>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-            {editor?.editMode ? <PageText page="esg" section="certifications" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("esg", "certifications", "subtitle", locale, editor?.overrides ?? {}) || t.certifications.subtitle)}
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-8 items-center opacity-60">
-            <div className="text-muted-foreground">
-              {editor?.editMode ? <PageText page="esg" section="certifications" fieldKey="pending" locale={locale} as="span" /> : (getPageContent("esg", "certifications", "pending", locale, editor?.overrides ?? {}) || t.certifications.pending)}
             </div>
           </div>
         </div>

@@ -98,7 +98,7 @@ function GastronomiaPageContent() {
             getPageContent("gastronomia", "hero", "badge", locale, editor?.overrides ?? {}) || "Sabores Regionais"
           )
         }
-        height="large"
+        height="medium"
         overlay="medium"
       />
 
