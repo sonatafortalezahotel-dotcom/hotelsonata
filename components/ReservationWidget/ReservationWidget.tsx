@@ -6,8 +6,6 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -24,15 +22,12 @@ import {
 } from "@/components/ui/select";
 import {
   Calendar as CalendarIcon,
-  Users,
   CheckCircle2,
-  Loader2,
-  AlertCircle,
-  CreditCard,
 } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
+import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
 import { toast } from "sonner";
 
 interface ReservationWidgetProps {
@@ -67,18 +62,7 @@ export default function ReservationWidget({
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
   const [promoCode, setPromoCode] = useState("");
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [showGuestForm, setShowGuestForm] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-
-  // Dados do hóspede
-  const [guestName, setGuestName] = useState("");
-  const [guestEmail, setGuestEmail] = useState("");
-  const [guestPhone, setGuestPhone] = useState("");
-  const [guestDocument, setGuestDocument] = useState("");
-  const [specialRequests, setSpecialRequests] = useState("");
 
   // Set mounted state to prevent hydration mismatch with Radix UI IDs
   useEffect(() => {
@@ -96,7 +80,7 @@ export default function ReservationWidget({
       checking: "Verificando...",
       available: "Disponível",
       unavailable: "Indisponível",
-      continue: "Continuar com Reserva",
+      continue: "Fazer reserva",
       guestInfo: "Dados do Hóspede",
       name: "Nome Completo",
       namePlaceholder: "Seu nome completo",
@@ -130,7 +114,7 @@ export default function ReservationWidget({
       checking: "Verificando...",
       available: "Disponible",
       unavailable: "No Disponible",
-      continue: "Continuar con Reserva",
+      continue: "Hacer reserva",
       guestInfo: "Datos del Huésped",
       name: "Nombre Completo",
       namePlaceholder: "Su nombre completo",
@@ -164,7 +148,7 @@ export default function ReservationWidget({
       checking: "Checking...",
       available: "Available",
       unavailable: "Unavailable",
-      continue: "Continue to Reservation",
+      continue: "Make reservation",
       guestInfo: "Guest Information",
       name: "Full Name",
       namePlaceholder: "Your full name",
@@ -200,18 +184,12 @@ export default function ReservationWidget({
     return formatPriceCurrency(price, locale);
   };
 
-  const handleCheckAvailability = async () => {
+  /** Redireciona para o site de reservas Omnibees (book.omnibees.com) – gestão é feita lá */
+  const handleGoToOmnibees = () => {
     if (!checkIn || !checkOut) {
-      toast.error(
-        locale === "en"
-          ? "Please select check-in and check-out dates"
-          : locale === "es"
-          ? "Por favor seleccione las fechas de entrada y salida"
-          : "Por favor, selecione as datas de check-in e check-out"
-      );
+      toast.error(t.selectDate);
       return;
     }
-
     if (checkOut <= checkIn) {
       toast.error(
         locale === "en"
@@ -222,7 +200,6 @@ export default function ReservationWidget({
       );
       return;
     }
-
     const totalGuests = parseInt(adults) + parseInt(children);
     if (totalGuests > maxGuests) {
       toast.error(
@@ -235,161 +212,34 @@ export default function ReservationWidget({
       return;
     }
 
-    setCheckingAvailability(true);
-    setIsAvailable(null);
-
     try {
-      const checkInStr = format(checkIn, "yyyy-MM-dd");
-      const checkOutStr = format(checkOut, "yyyy-MM-dd");
-
-      const response = await fetch(
-        `/api/reservations?checkin=${checkInStr}&checkout=${checkOutStr}&roomId=${roomId}&adults=${adults}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao verificar disponibilidade");
-      }
-
-      const data = await response.json();
-      const roomData = data.rooms?.find((r: any) => r.id === roomId);
-
-      if (!roomData) {
-        throw new Error("Quarto não encontrado");
-      }
-
-      const available = roomData.available ?? false;
-      setIsAvailable(available);
-
-      if (available) {
-        toast.success(
-          locale === "en"
-            ? "Room is available!"
-            : locale === "es"
-            ? "¡Habitación disponible!"
-            : "Quarto disponível!"
-        );
-      } else {
-        toast.error(
-          locale === "en"
-            ? "Room is not available for the selected dates"
-            : locale === "es"
-            ? "La habitación no está disponible para las fechas seleccionadas"
-            : "Quarto não está disponível para as datas selecionadas"
-        );
-      }
-    } catch (error: any) {
-      console.error("Erro ao verificar disponibilidade:", error);
-      toast.error(
-        locale === "en"
-          ? "Error checking availability. Please try again"
-          : locale === "es"
-          ? "Error al verificar disponibilidad. Por favor intente nuevamente"
-          : "Erro ao verificar disponibilidade. Por favor, tente novamente"
-      );
-      setIsAvailable(false);
-    } finally {
-      setCheckingAvailability(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!checkIn || !checkOut) {
-      toast.error(t.selectDate);
-      return;
-    }
-
-    if (!guestName.trim()) {
-      toast.error(
-        locale === "en"
-          ? "Please enter your full name"
-          : locale === "es"
-          ? "Por favor ingrese su nombre completo"
-          : "Por favor, informe seu nome completo"
-      );
-      return;
-    }
-
-    if (!guestEmail.trim()) {
-      toast.error(
-        locale === "en"
-          ? "Please enter your email"
-          : locale === "es"
-          ? "Por favor ingrese su correo"
-          : "Por favor, informe seu e-mail"
-      );
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
-      toast.error(
-        locale === "en"
-          ? "Invalid email address"
-          : locale === "es"
-          ? "Correo electrónico inválido"
-          : "E-mail inválido"
-      );
-      return;
-    }
-
-    if (!guestPhone.trim()) {
-      toast.error(
-        locale === "en"
-          ? "Please enter your phone number"
-          : locale === "es"
-          ? "Por favor ingrese su teléfono"
-          : "Por favor, informe seu telefone"
-      );
-      return;
-    }
-
-    setSubmitting(true);
-
-    try {
-      const checkInStr = format(checkIn, "yyyy-MM-dd");
-      const checkOutStr = format(checkOut, "yyyy-MM-dd");
-
-      const response = await fetch("/api/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomId,
-          checkIn: checkInStr,
-          checkOut: checkOutStr,
-          adults: parseInt(adults),
-          children: parseInt(children),
-          guestName: guestName.trim(),
-          guestEmail: guestEmail.trim(),
-          guestPhone: guestPhone.trim(),
-          guestDocument: guestDocument.trim() || undefined,
-          promoCode: promoCode.trim() || undefined,
-          specialRequests: specialRequests.trim() || undefined,
-        }),
+      const omnibeesUrl = buildOmnibeesUrl({
+        checkIn,
+        checkOut,
+        adults,
+        children,
+        promoCode: promoCode.trim() || undefined,
+        locale: locale as "pt" | "es" | "en",
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Erro ao processar reserva");
-      }
-
       toast.success(
         locale === "en"
-          ? "Reservation confirmed successfully!"
+          ? "Redirecting to booking system..."
           : locale === "es"
-          ? "¡Reserva confirmada con éxito!"
-          : "Reserva confirmada com sucesso!"
+          ? "Redirigiendo al sistema de reservas..."
+          : "Redirecionando para o sistema de reservas..."
       );
-
-      if (onReservationComplete) {
-        onReservationComplete(data.reservation.id, data.reservation.confirmationNumber);
-      }
+      setTimeout(() => {
+        window.location.href = omnibeesUrl;
+      }, 500);
     } catch (error: any) {
-      console.error("Erro ao processar reserva:", error);
-      toast.error(error.message || "Erro ao processar reserva");
-    } finally {
-      setSubmitting(false);
+      console.error("Erro ao redirecionar:", error);
+      toast.error(
+        locale === "en"
+          ? "An error occurred. Please try again."
+          : locale === "es"
+          ? "Ocurrió un error. Por favor intente nuevamente."
+          : "Ocorreu um erro. Por favor, tente novamente."
+      );
     }
   };
 
@@ -433,8 +283,6 @@ export default function ReservationWidget({
                       if (date && checkOut && date >= checkOut) {
                         setCheckOut(null);
                       }
-                      setIsAvailable(null);
-                      setShowGuestForm(false);
                     }}
                     disabled={(date) => date < new Date()}
                     initialFocus
@@ -484,11 +332,7 @@ export default function ReservationWidget({
                   <Calendar
                     mode="single"
                     selected={checkOut || undefined}
-                    onSelect={(date) => {
-                      setCheckOut(date || null);
-                      setIsAvailable(null);
-                      setShowGuestForm(false);
-                    }}
+                    onSelect={(date) => setCheckOut(date || null)}
                     disabled={(date) => {
                       if (!checkIn) return date < new Date();
                       return date <= checkIn;
@@ -523,11 +367,7 @@ export default function ReservationWidget({
             <Label>{t.adults}</Label>
             <Select
               value={adults}
-              onValueChange={(value) => {
-                setAdults(value);
-                setIsAvailable(null);
-                setShowGuestForm(false);
-              }}
+              onValueChange={setAdults}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -545,11 +385,7 @@ export default function ReservationWidget({
             <Label>{t.children}</Label>
             <Select
               value={children}
-              onValueChange={(value) => {
-                setChildren(value);
-                setIsAvailable(null);
-                setShowGuestForm(false);
-              }}
+              onValueChange={setChildren}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -565,55 +401,8 @@ export default function ReservationWidget({
           </div>
         </div>
 
-        {/* Verificar Disponibilidade */}
-        {checkIn && checkOut && (
-          <Button
-            onClick={handleCheckAvailability}
-            disabled={checkingAvailability}
-            className="w-full"
-            size="lg"
-          >
-            {checkingAvailability ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t.checking}
-              </>
-            ) : (
-              t.checkAvailability
-            )}
-          </Button>
-        )}
-
-        {/* Status de Disponibilidade */}
-        {isAvailable !== null && (
-          <div
-            className={cn(
-              "p-3 rounded-lg border",
-              isAvailable
-                ? "bg-green-50 border-green-200"
-                : "bg-red-50 border-red-200"
-            )}
-          >
-            <div className="flex items-center gap-2">
-              {isAvailable ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-red-600" />
-              )}
-              <p
-                className={cn(
-                  "text-sm font-medium",
-                  isAvailable ? "text-green-800" : "text-red-800"
-                )}
-              >
-                {isAvailable ? t.available : t.unavailable}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Cálculo de Preço */}
-        {isAvailable && checkIn && checkOut && nights > 0 && totalPrice > 0 && (
+        {/* Estimativa de preço (quando tem datas) */}
+        {checkIn && checkOut && nights > 0 && totalPrice > 0 && (
           <div className="space-y-3 pt-3 border-t">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">
@@ -632,104 +421,10 @@ export default function ReservationWidget({
           </div>
         )}
 
-        {/* Formulário do Hóspede (aparece após verificar disponibilidade) */}
-        {showGuestForm && isAvailable && checkIn && checkOut && (
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold">{t.guestInfo}</h3>
-
-            <div className="space-y-2">
-              <Label>
-                {t.name} <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                placeholder={t.namePlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>
-                {t.email} <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                type="email"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                placeholder={t.emailPlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>
-                {t.phone} <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                type="tel"
-                value={guestPhone}
-                onChange={(e) => setGuestPhone(e.target.value)}
-                placeholder={t.phonePlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t.document}</Label>
-              <Input
-                value={guestDocument}
-                onChange={(e) => setGuestDocument(e.target.value)}
-                placeholder={t.documentPlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t.promoCode}</Label>
-              <Input
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder={t.promoCodePlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t.specialRequests}</Label>
-              <Textarea
-                value={specialRequests}
-                onChange={(e) => setSpecialRequests(e.target.value)}
-                placeholder={t.specialRequestsPlaceholder}
-                rows={3}
-              />
-            </div>
-
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                submitting ||
-                !guestName.trim() ||
-                !guestEmail.trim() ||
-                !guestPhone.trim()
-              }
-              size="lg"
-              className="w-full"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t.processing}
-                </>
-              ) : (
-                <>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  {t.confirm}
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-
-        {/* Botão para mostrar formulário se disponível */}
-        {isAvailable && checkIn && checkOut && !showGuestForm && (
+        {/* Botão para ir ao site de reservas (book.omnibees.com) */}
+        {checkIn && checkOut && (
           <Button
-            onClick={() => setShowGuestForm(true)}
+            onClick={handleGoToOmnibees}
             size="lg"
             className="w-full"
           >

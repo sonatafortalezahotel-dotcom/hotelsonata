@@ -9,10 +9,14 @@ interface EditorialCarouselProps {
   className?: string;
   autoplay?: boolean;
   autoplayInterval?: number;
+  /** Pausar autoplay quando o mouse estiver em cima do carrossel */
+  pauseAutoplayOnHover?: boolean;
   showNavigation?: boolean;
   /** Quando true, setas ficam sempre visíveis (útil em editMode para rolar sem esperar) */
   navigationAlwaysVisible?: boolean;
   showProgress?: boolean;
+  /** Exibir contador no canto (ex: 1 / 3). Default true */
+  showCounter?: boolean;
 }
 
 /**
@@ -27,28 +31,40 @@ export function EditorialCarousel({
   className,
   autoplay = false,
   autoplayInterval = 5000,
+  pauseAutoplayOnHover = true,
   showNavigation = true,
   navigationAlwaysVisible = false,
   showProgress = true,
+  showCounter = true,
 }: EditorialCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const totalItems = Array.isArray(children) ? children.length : children ? 1 : 0;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (currentIndex >= totalItems && totalItems > 0) setCurrentIndex(0);
   }, [totalItems, currentIndex]);
 
-  // Autoplay (sempre rodando, sem pausar no hover)
+  // Autoplay: pausa quando pauseAutoplayOnHover e o cursor está em cima
   useEffect(() => {
     if (!autoplay || totalItems === 0) return;
+    if (pauseAutoplayOnHover && isHovered) return;
 
     const interval = setInterval(() => {
-      goToNext();
+      const container = scrollRef.current;
+      if (!container) return;
+      const current = Math.round(container.scrollLeft / container.clientWidth);
+      const nextIndex = (current + 1) % totalItems;
+      setCurrentIndex(nextIndex);
+      container.scrollTo({
+        left: container.clientWidth * nextIndex,
+        behavior: "smooth",
+      });
     }, autoplayInterval);
 
     return () => clearInterval(interval);
-  }, [autoplay, autoplayInterval, currentIndex, totalItems]);
+  }, [autoplay, autoplayInterval, totalItems, pauseAutoplayOnHover, isHovered]);
 
   const goToNext = () => {
     const nextIndex = (currentIndex + 1) % totalItems;
@@ -87,8 +103,10 @@ export function EditorialCarousel({
     : 0;
 
   return (
-    <div 
+    <div
       className={cn("relative w-full overflow-hidden group", className)}
+      onMouseEnter={() => pauseAutoplayOnHover && setIsHovered(true)}
+      onMouseLeave={() => pauseAutoplayOnHover && setIsHovered(false)}
     >
       {/* Container Fullwidth - Imagens Coladas */}
       <div
@@ -168,8 +186,8 @@ export function EditorialCarousel({
         </div>
       )}
 
-      {/* Contador - Canto Inferior Direito */}
-      {totalItems > 1 && (
+      {/* Contador - Canto Inferior Direito (opcional) */}
+      {showCounter && totalItems > 1 && (
         <div className="absolute bottom-4 md:bottom-8 right-4 md:right-8 z-20">
           <div className="px-4 py-2 rounded-full backdrop-blur-md bg-black/30 border border-white/20">
             <span className="text-white text-sm md:text-base font-medium tabular-nums">

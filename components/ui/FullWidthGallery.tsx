@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 
 interface FullWidthGalleryImage {
@@ -25,23 +27,43 @@ interface FullWidthGalleryProps {
    */
   height?: string;
   className?: string;
+  /** Se false, não exibe overlay com título e contador (ex: "Foto 1", "1 / 4"). Default true */
+  showCaption?: boolean;
+  /** Autoplay: troca de slide sozinho. Roda sempre, mesmo com mouse em cima. Default true quando há múltiplas imagens */
+  autoplay?: boolean;
+  /** Intervalo do autoplay em ms. Default 5000 */
+  autoplayInterval?: number;
 }
 
 export function FullWidthGallery({
   images,
   height = "h-[320px] md:h-[480px]",
   className,
+  showCaption = true,
+  autoplay = true,
+  autoplayInterval = 5000,
 }: FullWidthGalleryProps) {
   const validImages = (images || []).filter(
     (image) =>
       typeof image?.src === "string" && image.src.trim().length > 0,
   );
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const hasMultiple = validImages.length > 1;
+
+  // Autoplay: roda sempre (mesmo com mouse em cima). Hooks devem vir antes de qualquer return.
+  useEffect(() => {
+    if (!hasMultiple || !autoplay || !api) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, autoplayInterval);
+
+    return () => clearInterval(interval);
+  }, [hasMultiple, autoplay, autoplayInterval, api]);
 
   if (validImages.length === 0) {
     return null;
   }
-
-  const hasMultiple = validImages.length > 1;
 
   return (
     <div className={cn("relative w-full", className)}>
@@ -51,6 +73,7 @@ export function FullWidthGallery({
           loop: hasMultiple,
           align: "start",
         }}
+        setApi={setApi}
       >
         <CarouselContent>
           {validImages.map((image, index) => (
@@ -71,8 +94,8 @@ export function FullWidthGallery({
                   quality={90}
                 />
 
-                {/* Overlay com título opcional */}
-                {(image.title || hasMultiple) && (
+                {/* Overlay com título opcional e contador */}
+                {showCaption && (image.title || hasMultiple) && (
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
                     <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4">
                       {image.title && (

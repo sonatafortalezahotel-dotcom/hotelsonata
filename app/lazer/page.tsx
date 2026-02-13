@@ -311,6 +311,7 @@ function LazerPageContent() {
               })
               .filter((img) => img.src)}
             height="h-[400px] md:h-[600px]"
+            showCaption={false}
           />
         )}
       </ContentSection>
@@ -352,9 +353,11 @@ function LazerPageContent() {
       <EditorialCarousel
         autoplay={!editor?.editMode}
         autoplayInterval={5000}
+        pauseAutoplayOnHover={true}
         showNavigation={true}
         navigationAlwaysVisible={!!editor?.editMode}
         showProgress={true}
+        showCounter={false}
       >
         {lazerImagesWithDistributed.academia.galeria.map((photo, index) => {
           const path = `gallery:lazer:galeria-academia:${index}`;
