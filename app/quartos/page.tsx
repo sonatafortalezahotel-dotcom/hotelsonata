@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { useEditor } from "@/lib/context/EditorContext";
@@ -10,6 +11,14 @@ import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import RoomsPageContent from "./RoomsPageContent";
 import Image from "next/image";
 import { HeroWithImage } from "@/components/HeroWithImage";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { EditorialCarousel } from "@/components/HorizontalScroll";
 import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";
 import { useGallery } from "@/lib/hooks/useGallery";
@@ -120,6 +129,22 @@ function RoomsPageContentWrapper() {
         height="medium"
         overlay="medium"
       />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{locale === "en" ? "Rooms" : locale === "es" ? "Habitaciones" : "Quartos"}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
       {/* Destaques dos Quartos */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">

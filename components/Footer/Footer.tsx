@@ -148,7 +148,7 @@ export default function Footer() {
                       key={social.name}
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 text-primary-foreground hover:bg-primary-foreground/10"
+                      className="h-11 w-11 min-h-[44px] min-w-[44px] text-primary-foreground hover:bg-primary-foreground/10 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                       asChild
                     >
                       <a
@@ -156,8 +156,9 @@ export default function Footer() {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={social.name}
+                        aria-label={`Abrir ${social.name} do Hotel Sonata em nova janela`}
                       >
-                        <Icon className="h-5 w-5" />
+                        <Icon className="h-5 w-5" aria-hidden />
                       </a>
                     </Button>
                   );

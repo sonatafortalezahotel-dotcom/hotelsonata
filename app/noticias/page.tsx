@@ -286,6 +286,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   return (
     <div className="container mx-auto px-4 pt-12 pb-8 lg:pt-16 lg:pb-12">
+      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
+        <ol className="flex flex-wrap gap-x-2 gap-y-1">
+          <li>
+            <Link href="/" className="hover:text-foreground">Home</Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li className="text-foreground" aria-current="page">
+            {locale === "en" ? "News" : locale === "es" ? "Noticias" : "Notícias"}
+          </li>
+        </ol>
+      </nav>
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         <div className="flex-1 min-w-0">
           <div className="mb-6">

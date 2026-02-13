@@ -359,22 +359,23 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero/Carrossel - Usa highlights do banco de dados ou fallback para vídeo fixo */}
-      <div className="relative -mt-20 lg:-mt-28">
+      {/* Hero/Carrossel - Mobile: 90px de respiro no topo; vídeo rola, formulário embaixo */}
+      <div className="relative -mt-20 pt-[90px] lg:-mt-28 lg:pt-0">
         {highlights && highlights.length > 0 ? (
           <VideoCarousel highlights={highlights} locale={locale} galleryPhotos={galleryPhotos} />
         ) : (
-          <Hero videoId="xptckGz4eH8" height="100vh" />
+          <div className="w-full aspect-video lg:aspect-auto lg:h-screen">
+            <Hero videoId="xptckGz4eH8" height="full" />
+          </div>
         )}
       </div>
-      
-      {/* Formulário de reserva posicionado no meio da divisão */}
-      <div className="relative z-10 -mt-32 lg:-mt-40">
+
+      {/* Formulário de reserva - Mobile: 50px de espaço do vídeo; Desktop: sobrepõe o hero */}
+      <div className="relative z-10 mt-[50px] lg:mt-0 lg:-mt-40">
         <ReservationForm />
       </div>
 
-      {/* Seção de Quartos e Pacotes - integrada com banco de dados */}
-      {/* Padding top adicional para compensar a sobreposição do formulário */}
+      {/* Seção de Quartos e Pacotes */}
       <div className="pt-12 lg:pt-16">
         <PackagesSection
           rooms={rooms}

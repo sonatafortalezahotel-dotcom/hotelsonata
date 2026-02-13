@@ -167,7 +167,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       className={cn(
         "transition-all duration-300 w-full left-0 right-0",
         isHomePage 
-          ? "z-[50] sticky top-20 lg:top-20 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home, sticky abaixo do header (header z-[60])
+          ? "z-[50] sticky top-24 lg:top-24 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home: colado ao header (h-24 = 6rem)
           : "fixed bottom-0 lg:sticky lg:top-24 z-[40] bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Outras páginas: mobile fixo bottom, desktop sticky abaixo do header
       )}
     >
@@ -187,12 +187,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <Button
                           variant="ghost"
                           className={cn(
-                            "w-full justify-between text-left font-normal h-9 bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
+                            "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                             "text-xs"
                           )}
+                          aria-label={`${getLabel("checkIn")}: ${checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
                         >
                           <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                            <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                            <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                             <div className="flex flex-col items-start min-w-0 flex-1">
                               <span className="text-[10px] text-white/60 uppercase font-medium leading-tight">
                                 {getLabel("checkIn")}
@@ -217,11 +218,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   ) : (
                     <Button
                       variant="ghost"
-                      className="w-full justify-between text-left font-normal h-9 bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
+                      className="w-full justify-between text-left font-normal min-h-[44px] bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
                       disabled
+                      aria-label={getLabel("checkIn")}
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                        <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                         <span className="text-xs">{getLabel("checkIn")}</span>
                       </div>
                     </Button>
@@ -236,12 +238,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <Button
                           variant="ghost"
                           className={cn(
-                            "w-full justify-between text-left font-normal h-9 bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
+                            "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                             "text-xs"
                           )}
+                          aria-label={`${getLabel("checkOut")}: ${checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
                         >
                           <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                            <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                            <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                             <div className="flex flex-col items-start min-w-0 flex-1">
                               <span className="text-[10px] text-white/60 uppercase font-medium leading-tight">
                                 {getLabel("checkOut")}
@@ -269,11 +272,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   ) : (
                     <Button
                       variant="ghost"
-                      className="w-full justify-between text-left font-normal h-9 bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
+                      className="w-full justify-between text-left font-normal min-h-[44px] bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
                       disabled
+                      aria-label={getLabel("checkOut")}
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                        <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                         <span className="text-xs">{getLabel("checkOut")}</span>
                       </div>
                     </Button>
@@ -283,13 +287,14 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                 {/* Botão de busca compacto */}
                 <Button
                   onClick={handleReserve}
-                  className="h-9 px-3 flex-shrink-0 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md"
+                  className="min-h-[44px] min-w-[44px] px-3 flex-shrink-0 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   disabled={isLoading}
+                  aria-label={locale === "en" ? "Search availability" : locale === "es" ? "Buscar disponibilidad" : "Pesquisar disponibilidade"}
                 >
                   {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    <Loader2 className="h-4 w-4 animate-spin text-white" aria-hidden />
                   ) : (
-                    <Search className="h-4 w-4 text-white" />
+                    <Search className="h-4 w-4 text-white" aria-hidden />
                   )}
                 </Button>
 
@@ -297,8 +302,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                 <Button
                   variant="ghost"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="h-9 w-9 flex-shrink-0 bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-0"
-                  aria-label={isExpanded ? "Recolher" : "Expandir"}
+                  className="min-h-[44px] min-w-[44px] flex-shrink-0 bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-0 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  aria-label={isExpanded ? "Recolher opções de hóspedes e cupom" : "Expandir opções de hóspedes e cupom"}
                 >
                   {isExpanded ? (
                     <ChevronUp className="h-4 w-4" />
@@ -319,25 +324,26 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "w-full justify-between text-left font-normal h-8 bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
+                              "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                               "text-xs"
                             )}
+                            aria-label={`${getLabel("guests")}: ${formattedGuests}`}
                           >
                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <Users className="h-3.5 w-3.5 flex-shrink-0 text-white" />
+                              <Users className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                               <span className="truncate text-xs">
                                 {formattedGuests}
                               </span>
                             </div>
-                            <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 text-white/70 ml-2" />
+                            <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-4" align="start">
                           <div className="space-y-4 min-w-[200px]">
                             <div>
-                              <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
+                              <label id="booking-bar-adults-label" className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                               <Select value={adults} onValueChange={setAdults}>
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-adults-label">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -350,9 +356,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               </Select>
                             </div>
                             <div>
-                              <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
+                              <label id="booking-bar-children-label" className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
                               <Select value={children} onValueChange={setChildren}>
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-children-label">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -391,8 +397,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
 
                   {/* Campo de Cupom */}
                   <div className="flex-1">
-                    <div className="flex items-center h-8 px-2 bg-black/20 border border-white/20 rounded-md">
-                      <Tag className="h-3.5 w-3.5 flex-shrink-0 text-white mr-2" />
+                    <label id="booking-bar-promo-label" className="sr-only">{getLabel("promoCode")}</label>
+                    <div className="flex items-center min-h-[44px] px-2 bg-black/20 border border-white/20 rounded-md">
+                      <Tag className="h-3.5 w-3.5 flex-shrink-0 text-white mr-2" aria-hidden />
                       <Input
                         id="promoCode"
                         type="text"
@@ -401,6 +408,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                         className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs"
                         maxLength={20}
+                        aria-labelledby="booking-bar-promo-label"
                       />
                     </div>
                   </div>

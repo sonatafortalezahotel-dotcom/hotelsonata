@@ -17,6 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { HeroWithImage } from "@/components/HeroWithImage";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
@@ -297,14 +305,27 @@ export default function PackageDetailPage() {
         overlay="medium"
       />
 
-      {/* Botão Voltar */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="max-w-[180px] sm:max-w-none truncate">{pkg.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <Button
           variant="ghost"
           onClick={() => router.back()}
           className="mb-4"
+          aria-label={t.back}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden />
           {t.back}
         </Button>
       </div>

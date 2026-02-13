@@ -186,17 +186,17 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetContent side="right" className="w-[min(400px,100vw-2rem)] sm:w-[400px]">
                 <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
+                  <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
                 </SheetHeader>
-                <nav className="flex flex-col gap-4 mt-8">
+                <nav className="flex flex-col gap-1 mt-8" role="navigation" aria-label="Menu principal">
                   {menuItems.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-lg font-medium hover:text-primary transition-colors"
+                      className="min-h-[44px] flex items-center px-4 py-3 text-lg font-medium hover:text-primary hover:bg-accent/50 active:bg-accent transition-colors rounded-lg -mx-2"
                     >
                       {getNavLabel(item.fieldKey)}
                     </Link>
@@ -252,25 +252,31 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6" role="navigation">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "relative text-sm font-medium transition-colors group",
-                  textColor
-                )}
-              >
-                <span>
-                  {getNavLabel(item.fieldKey)}
-                </span>
-                <span
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 transition-all duration-300 group-hover:w-3/4 bg-primary-foreground"
-                  aria-hidden="true"
-                />
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-6" role="navigation" aria-label="Menu principal">
+            {menuItems.map((item) => {
+              const pathWithoutLocale = pathname?.replace(/^\/(en|es)(?=\/|$)/, "") || "";
+              const isCurrent = pathWithoutLocale === item.href || (item.href !== "/" && pathWithoutLocale.startsWith(item.href + "/"));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "relative text-sm font-medium transition-colors group",
+                    textColor,
+                    isCurrent && "underline underline-offset-4"
+                  )}
+                  aria-current={isCurrent ? "page" : undefined}
+                >
+                  <span>
+                    {getNavLabel(item.fieldKey)}
+                  </span>
+                  <span
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 transition-all duration-300 group-hover:w-3/4 bg-primary-foreground"
+                    aria-hidden="true"
+                  />
+                </Link>
+              );
+            })}
 
             <ThemeToggle
               variant="ghost"

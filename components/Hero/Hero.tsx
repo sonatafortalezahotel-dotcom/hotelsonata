@@ -241,10 +241,10 @@ export default function Hero({
         />
       )}
 
-      {/* Loading state */}
+      {/* Loading state - fundo visível para não parecer tela preta enquanto o vídeo carrega */}
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/20">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-foreground/20 border-t-primary-foreground" />
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/60 dark:bg-primary/50 backdrop-blur-sm">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-foreground/30 border-t-primary-foreground" aria-hidden />
         </div>
       )}
     </section>

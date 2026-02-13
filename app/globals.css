@@ -230,6 +230,17 @@ img {
   border-width: 0;
 }
 
+/* Acessibilidade - Redução de movimento (WCAG 2.1) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Garantir que o footer não tenha elementos decorativos indesejados */
 footer {
   position: relative;

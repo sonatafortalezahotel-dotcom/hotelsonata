@@ -127,7 +127,7 @@ export default function VideoCarousel({
   }, [videoInfo]);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative w-full aspect-video lg:aspect-auto lg:h-screen overflow-hidden">
       {/* Video/Image Background */}
       <div className="absolute inset-0 w-full overflow-hidden">
         {currentItem.videoUrl && videoInfo ? (
@@ -189,7 +189,7 @@ export default function VideoCarousel({
                 />
               )
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+              <div className="w-full h-full bg-gradient-to-br from-primary/40 via-primary/30 to-primary/50 dark:from-primary/30 dark:via-primary/20 dark:to-primary/40" />
             )
           )
         ) : (
@@ -214,23 +214,23 @@ export default function VideoCarousel({
               />
             )
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+            <div className="w-full h-full bg-gradient-to-br from-primary/40 via-primary/30 to-primary/50 dark:from-primary/30 dark:via-primary/20 dark:to-primary/40" />
           )
         )}
-        {/* Overlay gradient - pointer-events-none para permitir clicar na imagem no modo edição */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        {/* Overlay gradient - mais suave no rodapé para evitar faixa preta e melhorar transição */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/30 via-black/15 to-black/45" />
       </div>
 
-      {/* Content - pointer-events-none para cliques na imagem; pointer-events-auto só no bloco de texto/CTA */}
+      {/* Content - sombras fortes para contraste em qualquer fundo (acessibilidade) */}
       <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8 pointer-events-none">
-        <div className="pointer-events-auto">
+        <div className="pointer-events-auto [text-shadow:0_1px_2px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6)]">
           {(currentItem.title || editor?.editMode) && (
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-lg">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
               {getTitle(currentIndex)}
             </h1>
           )}
           {(currentItem.description || editor?.editMode) && (
-            <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mb-6 sm:mb-8 drop-shadow-md">
+            <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mb-6 sm:mb-8 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
               {getDescription(currentIndex)}
             </p>
           )}

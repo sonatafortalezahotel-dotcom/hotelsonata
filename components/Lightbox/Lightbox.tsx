@@ -61,6 +61,9 @@ export default function Lightbox({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={title || "Visualização de imagem"}
       className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
       onClick={onClose}
     >
@@ -68,10 +71,11 @@ export default function Lightbox({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
+        className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 min-h-[44px] min-w-[44px] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         onClick={onClose}
+        aria-label="Fechar lightbox"
       >
-        <X className="h-6 w-6" />
+        <X className="h-6 w-6" aria-hidden />
       </Button>
 
       {/* Navegação */}
@@ -80,24 +84,26 @@ export default function Lightbox({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute left-4 z-10 text-white hover:bg-white/20"
+            className="absolute left-4 z-10 text-white hover:bg-white/20 min-h-[44px] min-w-[44px] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             onClick={(e) => {
               e.stopPropagation();
               goToPrevious();
             }}
+            aria-label="Imagem anterior"
           >
-            <ChevronLeft className="h-8 w-8" />
+            <ChevronLeft className="h-8 w-8" aria-hidden />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-4 z-10 text-white hover:bg-white/20"
+            className="absolute right-4 z-10 text-white hover:bg-white/20 min-h-[44px] min-w-[44px] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             onClick={(e) => {
               e.stopPropagation();
               goToNext();
             }}
+            aria-label="Próxima imagem"
           >
-            <ChevronRight className="h-8 w-8" />
+            <ChevronRight className="h-8 w-8" aria-hidden />
           </Button>
         </>
       )}
@@ -144,10 +150,11 @@ export default function Lightbox({
                 setCurrentIndex(index);
               }}
               className={cn(
-                "h-2 rounded-full transition-all",
+                "h-2 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center -m-2",
                 index === currentIndex ? "bg-white w-8" : "bg-white/50 w-2 hover:bg-white/75"
               )}
-              aria-label={`Ir para imagem ${index + 1}`}
+              aria-label={`Ir para imagem ${index + 1} de ${images.length}`}
+              aria-current={index === currentIndex ? "true" : undefined}
             />
           ))}
         </div>

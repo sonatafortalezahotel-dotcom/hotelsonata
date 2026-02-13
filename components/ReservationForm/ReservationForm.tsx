@@ -150,33 +150,35 @@ export default function ReservationForm({
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Barra de Pesquisa Horizontal */}
-          <div className="bg-black/40 dark:bg-black/60 backdrop-blur-md rounded-lg shadow-2xl p-4 lg:p-5 border border-slate-800/50 dark:border-slate-700/60">
+          {/* Barra de Pesquisa Horizontal - Mobile: azul do tema; Desktop: fundo escuro */}
+          <div className="bg-primary lg:bg-black/40 lg:dark:bg-black/60 backdrop-blur-md rounded-lg shadow-2xl p-4 lg:p-5 border border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60">
             <div className="flex flex-col lg:flex-row items-stretch gap-0 lg:gap-0">
               {/* Campo de Check-in */}
-              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+              <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
+                        id="reservation-checkin"
                         className={cn(
-                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
+                        aria-label={`${getLabel("checkIn")}: ${checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
                             {getLabel("checkIn")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
-                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                             <span className="truncate text-xs lg:text-sm">
                               {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                             </span>
                           </div>
                         </div>
-                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -193,51 +195,54 @@ export default function ReservationForm({
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                      "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                       "text-sm lg:text-base"
                     )}
                     disabled
+                    aria-label={getLabel("checkIn")}
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
                         {getLabel("checkIn")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
-                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                         <span className="truncate text-xs lg:text-sm">
                           {checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                         </span>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                   </Button>
                 )}
               </div>
 
               {/* Campo de Check-out */}
-              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+              <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
+                        id="reservation-checkout"
                         className={cn(
-                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
+                        aria-label={`${getLabel("checkOut")}: ${checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
                             {getLabel("checkOut")}
                           </span>
                           <div className="flex items-center gap-2 w-full">
-                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                            <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                             <span className="truncate text-xs lg:text-sm">
                               {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                             </span>
                           </div>
                         </div>
-                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -257,54 +262,57 @@ export default function ReservationForm({
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                      "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                       "text-sm lg:text-base"
                     )}
                     disabled
+                    aria-label={getLabel("checkOut")}
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
                         {getLabel("checkOut")}
                       </span>
                       <div className="flex items-center gap-2 w-full">
-                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                        <CalendarIcon className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                         <span className="truncate text-xs lg:text-sm">
                           {checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}
                         </span>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                   </Button>
                 )}
               </div>
 
               {/* Campo de Hóspedes */}
-              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+              <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
                 {isMounted ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
+                        id="reservation-guests"
                         className={cn(
-                          "w-full justify-between text-left font-normal h-12 lg:h-14 bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
+                          "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
+                        aria-label={`${getLabel("guests")}: ${formattedGuests}`}
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
+                          <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                           <span className="truncate text-xs lg:text-sm">
                             {formattedGuests}
                           </span>
                         </div>
-                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-4" align="start">
                       <div className="space-y-4 min-w-[200px]">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
+                          <label id="reservation-adults-label" className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                           <Select value={adults} onValueChange={setAdults}>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full" aria-labelledby="reservation-adults-label">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -317,9 +325,9 @@ export default function ReservationForm({
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
+                          <label id="reservation-children-label" className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
                           <Select value={children} onValueChange={setChildren}>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full" aria-labelledby="reservation-children-label">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -361,9 +369,10 @@ export default function ReservationForm({
               </div>
 
               {/* Campo de Cupom */}
-              <div className="flex-1 border-r-0 lg:border-r border-slate-800/50 dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
-                <div className="flex items-center h-12 lg:h-14 px-3">
-                  <Tag className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white mr-2" />
+              <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
+                <label htmlFor="promoCode" className="sr-only">{getLabel("promoCode")}</label>
+                <div className="flex items-center h-12 lg:h-14 min-h-[44px] px-3">
+                  <Tag className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white mr-2" aria-hidden />
                   <Input
                     id="promoCode"
                     type="text"
@@ -372,6 +381,7 @@ export default function ReservationForm({
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs lg:text-sm"
                     maxLength={20}
+                    aria-label={getLabel("promoCode")}
                   />
                 </div>
               </div>
@@ -380,8 +390,9 @@ export default function ReservationForm({
               <div className="flex-shrink-0">
                 <Button
                   onClick={handleReserve}
-                  className="w-full lg:w-auto h-12 lg:h-14 px-6 lg:px-8 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+                  className="w-full lg:w-auto h-12 lg:h-14 min-h-[44px] px-6 lg:px-8 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   disabled={isLoading}
+                  aria-label={locale === "en" ? "Search availability" : locale === "es" ? "Buscar disponibilidad" : "Pesquisar disponibilidade"}
                 >
                   {isLoading ? (
                     <>
