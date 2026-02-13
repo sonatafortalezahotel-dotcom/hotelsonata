@@ -311,6 +311,19 @@ export const eventLeads = pgTable("event_leads", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Tabela de mensagens do formulário de contato
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  subject: text("subject"),
+  message: text("message"),
+  status: varchar("status", { length: 20 }).default("new").notNull(), // "new", "read", "replied", "closed"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Tabela de pontos turísticos próximos
 export const nearbyAttractions = pgTable("nearby_attractions", {
   id: serial("id").primaryKey(),

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Clock, MessageCircle, Instagram, Facebook } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Instagram, Facebook, CheckCircle2 } from "lucide-react";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { FullWidthGallery, AsymmetricGallery } from "@/components/HorizontalScroll";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { PageText, PageImage } from "@/components/PageEditor";
 import { useEffect, useState, useMemo } from "react";
+import { toast } from "sonner";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
@@ -62,6 +63,9 @@ function ContatoPageContent() {
   const t = getPageTranslation(locale, "contact");
   const editor = useEditor();
   const [contactInfo, setContactInfo] = useState<any>(null);
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(false);
   const { photos: galleryPhotos } = useGallery();
 
   // Buscar todas as imagens usando useMemo
@@ -136,6 +140,36 @@ function ContatoPageContent() {
     }
     fetchContactData();
   }, []);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    try {
+      const response = await fetch("/api/contact-messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          subject: formData.subject || undefined,
+          message: formData.message || undefined,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast.error(data?.error || "Erro ao enviar mensagem. Tente novamente.");
+        return;
+      }
+      toast.success("Mensagem enviada com sucesso! Entraremos em contato em até 24 horas.");
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      setFormSuccess(true);
+    } catch (error) {
+      toast.error("Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   return (
     <>
@@ -290,46 +324,94 @@ function ContatoPageContent() {
               </h2>
               <Card className="shadow-xl">
                 <CardContent className="pt-6">
-                  <form className="space-y-6">
+                  {formSuccess ? (
+                    <div className="text-center py-8 px-4">
+                      <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                        <CheckCircle2 className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
+                        Mensagem enviada com sucesso!
+                      </h3>
+                      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                        Entraremos em contato em até 24 horas.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setFormSuccess(false)}
+                      >
+                        Enviar outra mensagem
+                      </Button>
+                    </div>
+                  ) : (
+                  <form className="space-y-6" onSubmit={handleContactSubmit}>
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="nome">{t.form.fields.name}</Label>
-                        <Input id="nome" required placeholder={t.form.placeholders.name} />
+                        <Input
+                          id="nome"
+                          required
+                          placeholder={t.form.placeholders.name}
+                          value={formData.name}
+                          onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">{t.form.fields.email}</Label>
-                        <Input id="email" type="email" required placeholder={t.form.placeholders.email} />
+                        <Input
+                          id="email"
+                          type="email"
+                          required
+                          placeholder={t.form.placeholders.email}
+                          value={formData.email}
+                          onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="telefone">{t.form.fields.phone}</Label>
-                      <Input id="telefone" required placeholder={t.form.placeholders.phone} />
+                      <Input
+                        id="telefone"
+                        required
+                        placeholder={t.form.placeholders.phone}
+                        value={formData.phone}
+                        onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="assunto">{t.form.fields.subject}</Label>
-                      <Input id="assunto" required placeholder={t.form.placeholders.subject} />
+                      <Input
+                        id="assunto"
+                        required
+                        placeholder={t.form.placeholders.subject}
+                        value={formData.subject}
+                        onChange={(e) => setFormData((p) => ({ ...p, subject: e.target.value }))}
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="mensagem">{t.form.fields.message}</Label>
-                      <Textarea 
-                        id="mensagem" 
+                      <Textarea
+                        id="mensagem"
                         required
                         placeholder={t.form.placeholders.message}
                         rows={6}
+                        value={formData.message}
+                        onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
                       />
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full">
-                      {t.form.button}
+                    <Button type="submit" size="lg" className="w-full" disabled={formLoading}>
+                      {formLoading ? "Enviando..." : t.form.button}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">
                       {t.form.response}
                     </p>
                   </form>
+                  )}
                 </CardContent>
               </Card>
             </div>

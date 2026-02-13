@@ -27,7 +27,7 @@ export function ImageUpload({
   folder = "hotel-sonata",
   label = "Imagem",
   required = false,
-  accept = "image/*",
+  accept = "image/*,image/heic,image/heif,.heic,.heif",
   maxSizeMB = 50,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
@@ -205,7 +205,7 @@ export function ImageUpload({
       )}
 
       <p className="text-xs text-muted-foreground">
-        Formatos aceitos: JPG, PNG, WEBP. Tamanho máximo: {maxSizeMB}MB
+        Formatos aceitos: JPG, PNG, WEBP, HEIC. Tamanho máximo: {maxSizeMB}MB
       </p>
     </div>
   );

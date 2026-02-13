@@ -505,7 +505,7 @@ export function BlogRichTextEditor({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,image/heic,image/heif,.heic,.heif"
           className="hidden"
           onChange={handleImageFile}
         />

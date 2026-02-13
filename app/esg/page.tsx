@@ -309,7 +309,7 @@ function ESGPageContent() {
                   <div className="w-full h-full bg-gradient-to-br from-green-600/20 to-emerald-600/20" />
                 );
               })()}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} />
               <div className="absolute bottom-8 left-8 right-8 text-white">
                 <h3 className="text-3xl font-bold mb-2">
                   {editor?.editMode ? <PageText page="esg" section="social" fieldKey="together" locale={locale} as="span" className="text-white" /> : (getPageContent("esg", "social", "together", locale, editor?.overrides ?? {}) || t.social.together)}

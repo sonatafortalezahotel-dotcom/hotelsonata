@@ -388,7 +388,7 @@ export function SectionBlockEditor({
                       <div className="border-2 border-dashed rounded-lg p-6 text-center">
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/*,image/heic,image/heif,.heic,.heif"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {

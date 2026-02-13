@@ -275,7 +275,7 @@ export function ImageEditDialog({
                       <Input
                         id="file-upload"
                         type="file"
-                        accept="image/*"
+                        accept="image/*,image/heic,image/heif,.heic,.heif"
                         onChange={handleFileUpload}
                         disabled={uploading}
                         className="hidden"

@@ -20,6 +20,7 @@ import {
   Search,
   Layout,
   FileText,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +31,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: Layout, label: "Editor Visual", href: "/admin/visual-editor" },
   { icon: BookOpen, label: "Reservas", href: "/admin/reservations" },
+  { icon: Mail, label: "Contato", href: "/admin/contact" },
   { icon: Image, label: "Destaques", href: "/admin/highlights" },
   { icon: Package, label: "Pacotes", href: "/admin/packages" },
   { icon: Bed, label: "Quartos", href: "/admin/rooms" },
