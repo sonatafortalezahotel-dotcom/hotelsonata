@@ -48,8 +48,8 @@ function EventosPageContent() {
   const [leadFormLoading, setLeadFormLoading] = useState(false);
   const [leadFormSuccess, setLeadFormSuccess] = useState(false);
 
-  // Na página pública (sem editMode) usar só traduções estáticas; overrides do editor não aparecem aqui
-  const contentOverrides = editor?.editMode ? (editor?.overrides ?? {}) : {};
+  // Overrides do editor (salvos no BD): em edit mode permitem editar; em ambos os modos exibem o valor salvo (ex.: subtítulo do hero).
+  const contentOverrides = editor?.overrides ?? {};
 
   // Refetch da galeria quando fotos forem adicionadas/alteradas (edit mode ou admin), para aparecer na página
   useEffect(() => {
@@ -175,7 +175,7 @@ function EventosPageContent() {
             getPageContent("eventos", "hero", "badge", locale, contentOverrides) || t.hero.badge
           )
         }
-        height="medium"
+        height="large"
         overlay="dark"
       />
 
