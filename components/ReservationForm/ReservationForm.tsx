@@ -165,7 +165,7 @@ export default function ReservationForm({
                           "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
-                        aria-label={`${getLabel("checkIn")}: ${checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
+                        aria-label={`${getLabelStr("checkIn", t.checkIn)}: ${checkIn ? format(checkIn, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
@@ -199,7 +199,7 @@ export default function ReservationForm({
                       "text-sm lg:text-base"
                     )}
                     disabled
-                    aria-label={getLabel("checkIn")}
+                    aria-label={getLabelStr("checkIn", t.checkIn)}
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
@@ -229,7 +229,7 @@ export default function ReservationForm({
                           "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
-                        aria-label={`${getLabel("checkOut")}: ${checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
+                        aria-label={`${getLabelStr("checkOut", t.checkOut)}: ${checkOut ? format(checkOut, "dd/MM/yyyy", { locale: dateLocale }) : getLabelStr("selectDate", t.selectDate)}`}
                       >
                         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                           <span className="text-xs text-white/70 uppercase font-medium">
@@ -266,7 +266,7 @@ export default function ReservationForm({
                       "text-sm lg:text-base"
                     )}
                     disabled
-                    aria-label={getLabel("checkOut")}
+                    aria-label={getLabelStr("checkOut", t.checkOut)}
                   >
                     <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
                       <span className="text-xs text-white/70 uppercase font-medium">
@@ -296,7 +296,7 @@ export default function ReservationForm({
                           "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
-                        aria-label={`${getLabel("guests")}: ${formattedGuests}`}
+                        aria-label={`${getLabelStr("guests", t.guests)}: ${formattedGuests}`}
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
@@ -381,7 +381,7 @@ export default function ReservationForm({
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     className="h-auto bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-xs lg:text-sm"
                     maxLength={20}
-                    aria-label={getLabel("promoCode")}
+                    aria-label={getLabelStr("promoCode", t.promoCode)}
                   />
                 </div>
               </div>

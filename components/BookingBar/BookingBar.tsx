@@ -75,18 +75,21 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
 
   const editor = useEditor();
   const globalOverrides = editor?.globalOverrides ?? {};
-  const getLabel = (fieldKey: string) => {
-    if (editor?.editMode) {
-      return <PageText page="global" section="bookingBar" fieldKey={fieldKey} locale={locale} as="span" />;
-    }
-    return getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || "";
-  };
   const labels = {
     pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
     es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
     en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", guests: "Guests", promoCode: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
   };
   const t = labels[locale as keyof typeof labels] || labels.pt;
+  const getLabel = (fieldKey: string) => {
+    if (editor?.editMode) {
+      return <PageText page="global" section="bookingBar" fieldKey={fieldKey} locale={locale} as="span" />;
+    }
+    return getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || (t as Record<string, string>)[fieldKey] || "";
+  };
+  /** Sempre string, para uso em aria-label (não aceita ReactNode). */
+  const getLabelAria = (fieldKey: string): string =>
+    getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || (t as Record<string, string>)[fieldKey] || "";
   const dateLocale = locale === "pt" ? ptBR : undefined;
 
   // Formatar hóspedes igual ao ReservationForm
@@ -190,7 +193,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                             "text-xs"
                           )}
-                          aria-label={`${getLabel("checkIn")}: ${checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
+                          aria-label={`${getLabelAria("checkIn")}: ${checkIn ? format(checkIn, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
                         >
                           <div className="flex items-center gap-1.5 flex-1 min-w-0">
                             <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
@@ -220,7 +223,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       variant="ghost"
                       className="w-full justify-between text-left font-normal min-h-[44px] bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
                       disabled
-                      aria-label={getLabel("checkIn")}
+                      aria-label={getLabelAria("checkIn")}
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
@@ -241,7 +244,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                             "text-xs"
                           )}
-                          aria-label={`${getLabel("checkOut")}: ${checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
+                          aria-label={`${getLabelAria("checkOut")}: ${checkOut ? format(checkOut, "dd/MM", { locale: dateLocale }) : (getPageContent("global", "bookingBar", "selectDate", displayLocale, globalOverrides) || t.selectDate)}`}
                         >
                           <div className="flex items-center gap-1.5 flex-1 min-w-0">
                             <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
@@ -274,7 +277,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       variant="ghost"
                       className="w-full justify-between text-left font-normal min-h-[44px] bg-black/20 text-white border border-white/20 rounded-md p-2 text-xs"
                       disabled
-                      aria-label={getLabel("checkOut")}
+                      aria-label={getLabelAria("checkOut")}
                     >
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
@@ -327,7 +330,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                               "text-xs"
                             )}
-                            aria-label={`${getLabel("guests")}: ${formattedGuests}`}
+                            aria-label={`${getLabelAria("guests")}: ${formattedGuests}`}
                           >
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                               <Users className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
