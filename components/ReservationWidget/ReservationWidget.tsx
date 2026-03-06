@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
+import { es } from "date-fns/locale/es";
+import { enUS } from "date-fns/locale/en-US";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -100,7 +102,6 @@ export default function ReservationWidget({
       nights: "noites",
       total: "Total",
       breakfastIncluded: "Café da manhã incluído",
-      freeCancellation: "Cancelamento gratuito até 24h antes",
       bestRate: "Melhor tarifa garantida",
       selectDate: "Selecione a data",
     },
@@ -134,7 +135,6 @@ export default function ReservationWidget({
       nights: "noches",
       total: "Total",
       breakfastIncluded: "Desayuno incluido",
-      freeCancellation: "Cancelación gratuita hasta 24h antes",
       bestRate: "Mejor tarifa garantizada",
       selectDate: "Seleccione la fecha",
     },
@@ -168,14 +168,13 @@ export default function ReservationWidget({
       nights: "nights",
       total: "Total",
       breakfastIncluded: "Breakfast included",
-      freeCancellation: "Free cancellation up to 24h before",
       bestRate: "Best rate guaranteed",
       selectDate: "Select date",
     },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.pt;
-  const dateLocale = locale === "pt" ? ptBR : undefined;
+  const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
 
   const nights = checkIn && checkOut ? differenceInDays(checkOut, checkIn) : 0;
   const totalPrice = nights > 0 && basePrice > 0 ? nights * basePrice : 0;
@@ -286,6 +285,7 @@ export default function ReservationWidget({
                     }}
                     disabled={(date) => date < new Date()}
                     initialFocus
+                    locale={dateLocale}
                   />
                 </PopoverContent>
               </Popover>
@@ -338,6 +338,7 @@ export default function ReservationWidget({
                       return date <= checkIn;
                     }}
                     initialFocus
+                    locale={dateLocale}
                   />
                 </PopoverContent>
               </Popover>
@@ -437,10 +438,6 @@ export default function ReservationWidget({
           <div className="flex items-start gap-2">
             <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
             <p className="text-muted-foreground">{t.breakfastIncluded}</p>
-          </div>
-          <div className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-            <p className="text-muted-foreground">{t.freeCancellation}</p>
           </div>
           <div className="flex items-start gap-2">
             <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />

@@ -560,7 +560,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Quartos e Acomodações"
               }
               altPrefix={`${page.h1 || page.title} - Quarto`}
-              columns={4}
+              columns={3}
             />
 
             <GallerySection
@@ -573,7 +573,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Gastronomia"
               }
               altPrefix={`${page.h1 || page.title} - Gastronomia`}
-              columns={4}
+              columns={3}
             />
 
             <GallerySection
@@ -586,7 +586,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Lazer e Atividades"
               }
               altPrefix={`${page.h1 || page.title} - Lazer`}
-              columns={4}
+              columns={3}
             />
 
             <GallerySection

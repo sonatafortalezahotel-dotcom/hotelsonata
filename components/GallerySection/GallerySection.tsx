@@ -21,7 +21,7 @@ export function GallerySection({
   images,
   title,
   altPrefix,
-  columns = 4,
+  columns = 3,
 }: GallerySectionProps) {
   if (images.length === 0) {
     return null;

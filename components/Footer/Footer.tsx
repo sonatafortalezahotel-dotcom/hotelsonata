@@ -136,7 +136,15 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6">
             {/* Logo e Descrição */}
             <div className="col-span-1 md:col-span-2 lg:col-span-3">
-              <h3 className="text-2xl font-bold mb-4">Hotel Sonata de Iracema</h3>
+              <Link href="/" className="inline-block mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg">
+                <Image
+                  src="/Logo/logo-soneto (1).png"
+                  alt="Logo"
+                  width={120}
+                  height={120}
+                  className="object-contain h-24 w-24 sm:h-28 sm:w-28"
+                />
+              </Link>
               <p className="text-primary-foreground/80 mb-6 leading-relaxed text-sm">
                 {getFooterText("description", t.description)}
               </p>

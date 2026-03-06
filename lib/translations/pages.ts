@@ -414,9 +414,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atendimento Personalizado",
-        subtitle: "Prefere falar diretamente com nossa equipe de eventos?",
-        call: "Ligar Agora",
-        whatsapp: "WhatsApp"
+        button: "Entre em contato com nossa equipe"
       },
       access: {
         title: "Acesso e Localização",
@@ -560,9 +558,9 @@ export const pageTranslations = {
         important: "Informações importantes:",
         rule1: "Pets devem ficar próximos aos tutores (no colo ou caixa de transporte)",
         rule2: "Evitar permanência na área do restaurante",
-        fee: "Taxa de <strong class=\"text-foreground\">R$ 70 por diária</strong> pet"
+        fee: ""
       },
-      button: "Ver Todos os Apartamentos"
+      button: "Entre em contato com nossa equipe"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -1453,9 +1451,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atención Personalizada",
-        subtitle: "¿Prefieres hablar directamente con nuestro equipo de eventos?",
-        call: "Llamar Ahora",
-        whatsapp: "WhatsApp"
+        button: "Contáctanos por WhatsApp"
       },
       access: {
         title: "Acceso y Ubicación",
@@ -1599,9 +1595,9 @@ export const pageTranslations = {
         important: "Informaciones importantes:",
         rule1: "Las mascotas deben permanecer cerca de sus tutores (en brazos o caja de transporte)",
         rule2: "Evitar permanencia en el área del restaurante",
-        fee: "Tarifa de <strong class=\"text-foreground\">R$ 70 por diaria</strong> mascota"
+        fee: ""
       },
-      button: "Ver Todos los Apartamentos"
+      button: "Entre en contacto con nuestro equipo"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -2507,9 +2503,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Personalized Service",
-        subtitle: "Prefer to speak directly with our events team?",
-        call: "Call Now",
-        whatsapp: "WhatsApp"
+        button: "Contact our team on WhatsApp"
       },
       access: {
         title: "Access and Location",
@@ -2653,9 +2647,9 @@ export const pageTranslations = {
         important: "Important information:",
         rule1: "Pets must stay close to their guardians (in arms or transport carrier)",
         rule2: "Avoid staying in the restaurant area",
-        fee: "Fee of <strong class=\"text-foreground\">R$ 70 per night</strong> per pet"
+        fee: ""
       },
-      button: "View All Apartments"
+      button: "Get in touch with our team"
     },
     // Serviços de Lazer
     leisureServices: {

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Users, Tag, Search, Loader2, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
+import { es } from "date-fns/locale/es";
+import { enUS } from "date-fns/locale/en-US";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,8 +130,8 @@ export default function ReservationForm({
     }
   };
 
-  // Locale para formatação de datas
-  const dateLocale = locale === "pt" ? ptBR : undefined;
+  // Locale para formatação de datas e calendário
+  const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
 
   // Formatar hóspedes
   const adultsCount = parseInt(adults);
@@ -188,6 +190,7 @@ export default function ReservationForm({
                         onSelect={setCheckIn}
                         disabled={(date) => date < new Date()}
                         initialFocus
+                        locale={dateLocale}
                       />
                     </PopoverContent>
                   </Popover>
@@ -255,6 +258,7 @@ export default function ReservationForm({
                           return date <= checkIn;
                         }}
                         initialFocus
+                        locale={dateLocale}
                       />
                     </PopoverContent>
                   </Popover>

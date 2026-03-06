@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Users, Heart, PartyPopper, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat, CheckCircle2 } from "lucide-react";
+import { Briefcase, Heart, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat, CheckCircle2 } from "lucide-react";
 import { RoomCapacityTable } from "@/components/RoomCapacityTable";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { MasonrySwap } from "@/components/HorizontalScroll";
@@ -143,12 +143,10 @@ function EventosPageContent() {
     { key: "gastronomy", icon: ChefHat, title: t.facilities.items.gastronomy.title, description: t.facilities.items.gastronomy.description }
   ];
 
-  const eventTypeDefaultIcons: Record<string, string> = { corporate: "Briefcase", wedding: "Heart", anniversary: "Users", social: "PartyPopper" };
+  const eventTypeDefaultIcons: Record<string, string> = { corporate: "Briefcase", wedding: "Heart" };
   const eventTypes = [
     { key: "corporate", icon: Briefcase, title: t.types.items.corporate.title, description: t.types.items.corporate.description, capacity: t.types.items.corporate.capacity, features: t.types.items.corporate.features },
-    { key: "wedding", icon: Heart, title: t.types.items.wedding.title, description: t.types.items.wedding.description, capacity: t.types.items.wedding.capacity, features: t.types.items.wedding.features },
-    { key: "anniversary", icon: Users, title: t.types.items.anniversary.title, description: t.types.items.anniversary.description, capacity: t.types.items.anniversary.capacity, features: t.types.items.anniversary.features },
-    { key: "social", icon: PartyPopper, title: t.types.items.social.title, description: t.types.items.social.description, capacity: t.types.items.social.capacity, features: t.types.items.social.features }
+    { key: "wedding", icon: Heart, title: t.types.items.wedding.title, description: t.types.items.wedding.description, capacity: t.types.items.wedding.capacity, features: t.types.items.wedding.features }
   ];
 
   return (
@@ -180,10 +178,10 @@ function EventosPageContent() {
       />
 
       {/* Galeria Visual de Espaços - MASONRY ANIMADO */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20">
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
-            <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
+            <Badge className="mb-4 bg-primary hover:bg-primary/90 text-primary-foreground text-base px-4 py-2">
               <Building2 className="h-4 w-4 mr-2 inline" />
               {editor?.editMode ? <PageText page="eventos" section="gallery" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "gallery", "badge", locale, contentOverrides) || t.gallery.badge)}
             </Badge>
@@ -232,14 +230,14 @@ function EventosPageContent() {
               const iconName = getPageContentIcon("facilities", `${facility.key}.icon`, overrides, facilityDefaultIcons[facility.key] ?? "Lightbulb");
               const ResolvedIcon = getIcon(iconName) ?? facility.icon;
               const facilityIcon = editor?.editMode
-                ? <EditableIcon page="eventos" section="facilities" fieldKey={`${facility.key}.icon`} locale={locale} defaultIconName={facilityDefaultIcons[facility.key] ?? "Lightbulb"} defaultIcon={facility.icon} iconClassName="h-8 w-8 text-purple-600" />
-                : <ResolvedIcon className="h-8 w-8 text-purple-600" />;
+                ? <EditableIcon page="eventos" section="facilities" fieldKey={`${facility.key}.icon`} locale={locale} defaultIconName={facilityDefaultIcons[facility.key] ?? "Lightbulb"} defaultIcon={facility.icon} iconClassName="h-8 w-8 text-primary" />
+                : <ResolvedIcon className="h-8 w-8 text-primary" />;
               const titleContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.title`, locale, contentOverrides) || facility.title);
               const descContent = editor?.editMode ? <PageText page="eventos" section="facilities" fieldKey={`items.${facility.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "facilities", `items.${facility.key}.description`, locale, contentOverrides) || facility.description);
               return (
                 <Card key={index} className="text-center hover:shadow-xl transition-all duration-300">
                   <CardContent className="pt-8 pb-6">
-                    <div className="mx-auto w-16 h-16 bg-purple-600/10 rounded-full flex items-center justify-center mb-4">
+                    <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                       {facilityIcon}
                     </div>
                     <h3 className="text-xl font-bold text-foreground mb-2">{titleContent}</h3>
@@ -250,14 +248,14 @@ function EventosPageContent() {
             })}
           </div>
 
-          <div className="mt-12 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-2xl p-8">
+          <div className="mt-12 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 rounded-2xl p-8">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-xl font-bold text-foreground mb-4">{editor?.editMode ? <PageText page="eventos" section="access" fieldKey="title" locale={locale} as="span" /> : (getPageContent("eventos", "access", "title", locale, contentOverrides) || t.access.title)}</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   {t.access.items.map((item, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                       <span>{editor?.editMode ? <PageText page="eventos" section="access" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "access", `items.${index}`, locale, contentOverrides) || item)}</span>
                     </li>
                   ))}
@@ -268,7 +266,7 @@ function EventosPageContent() {
                 <ul className="space-y-2 text-muted-foreground">
                   {t.included.items.map((item, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                       <span>{editor?.editMode ? <PageText page="eventos" section="included" fieldKey={`items.${index}`} locale={locale} as="span" /> : (getPageContent("eventos", "included", `items.${index}`, locale, contentOverrides) || item)}</span>
                     </li>
                   ))}
@@ -283,7 +281,7 @@ function EventosPageContent() {
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 lg:mb-16">
-            <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
+            <Badge className="mb-4 bg-primary hover:bg-primary/90 text-primary-foreground text-base px-4 py-2">
               {editor?.editMode ? <PageText page="eventos" section="capacity" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "capacity", "badge", locale, contentOverrides) || t.capacity.badge)}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
@@ -326,7 +324,7 @@ function EventosPageContent() {
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image src={imageUrl} alt="Setup Auditório" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600/20 to-indigo-600/20" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/30" />
                 );
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
@@ -345,7 +343,7 @@ function EventosPageContent() {
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image src={imageUrl} alt="Setup Escolar" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600/20 to-indigo-600/20" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/30" />
                 );
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
@@ -364,7 +362,7 @@ function EventosPageContent() {
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image src={imageUrl} alt="Setup Banquete" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600/20 to-indigo-600/20" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/30" />
                 );
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
@@ -383,7 +381,7 @@ function EventosPageContent() {
                 return imageUrl && imageUrl.trim() !== "" ? (
                   <Image src={imageUrl} alt="Setup Coquetel" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600/20 to-indigo-600/20" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/30" />
                 );
               })()}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent ${editor?.editMode ? "pointer-events-none" : ""}`} aria-hidden />
@@ -397,10 +395,10 @@ function EventosPageContent() {
       </section>
 
       {/* Planta do Espaço */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/10 dark:to-gray-950">
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/5 to-background dark:from-primary/10 dark:to-gray-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <Badge className="mb-4 bg-purple-600 hover:bg-purple-700 text-base px-4 py-2">
+            <Badge className="mb-4 bg-primary hover:bg-primary/90 text-primary-foreground text-base px-4 py-2">
               {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="badge" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "badge", locale, contentOverrides) || t.layout.badge)}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
@@ -411,7 +409,7 @@ function EventosPageContent() {
             </p>
           </div>
 
-          <Card className="overflow-hidden border-2 border-purple-200 dark:border-purple-900 shadow-2xl">
+          <Card className="overflow-hidden border-2 border-primary/20 dark:border-primary/30 shadow-2xl">
             <CardContent className="p-0">
               <div className="relative aspect-[16/10] bg-white dark:bg-gray-900">
                 {editor?.editMode ? (
@@ -435,7 +433,7 @@ function EventosPageContent() {
             <p className="text-sm text-muted-foreground mb-6">
               {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "note", locale, contentOverrides) || t.layout.note)}
             </p>
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "button", locale, contentOverrides) || t.layout.button)}
             </Button>
           </div>
@@ -460,8 +458,8 @@ function EventosPageContent() {
               const iconName = getPageContentIcon("eventTypes", `${event.key}.icon`, overrides, eventTypeDefaultIcons[event.key] ?? "Briefcase");
               const ResolvedIcon = getIcon(iconName) ?? event.icon;
               const eventIcon = editor?.editMode
-                ? <EditableIcon page="eventos" section="eventTypes" fieldKey={`${event.key}.icon`} locale={locale} defaultIconName={eventTypeDefaultIcons[event.key] ?? "Briefcase"} defaultIcon={event.icon} iconClassName="h-8 w-8 text-purple-600" />
-                : <ResolvedIcon className="h-8 w-8 text-purple-600" />;
+                ? <EditableIcon page="eventos" section="eventTypes" fieldKey={`${event.key}.icon`} locale={locale} defaultIconName={eventTypeDefaultIcons[event.key] ?? "Briefcase"} defaultIcon={event.icon} iconClassName="h-8 w-8 text-primary" />
+                : <ResolvedIcon className="h-8 w-8 text-primary" />;
               const titleContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.title`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.title`, locale, contentOverrides) || event.title);
               const descContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.description`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.description`, locale, contentOverrides) || event.description);
               const capacityContent = editor?.editMode ? <PageText page="eventos" section="types" fieldKey={`items.${event.key}.capacity`} locale={locale} as="span" /> : (getPageContent("eventos", "types", `items.${event.key}.capacity`, locale, contentOverrides) || event.capacity);
@@ -469,10 +467,10 @@ function EventosPageContent() {
                 <Card key={index} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="p-3 bg-purple-600/10 rounded-lg">
+                      <div className="p-3 bg-primary/10 rounded-lg">
                         {eventIcon}
                       </div>
-                      <Badge className="bg-purple-600 hover:bg-purple-700">
+                      <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground">
                         {capacityContent}
                       </Badge>
                     </div>
@@ -648,8 +646,6 @@ function EventosPageContent() {
                           <SelectContent>
                             <SelectItem value="corporativo">{t.form.eventTypes.corporate}</SelectItem>
                             <SelectItem value="casamento">{t.form.eventTypes.wedding}</SelectItem>
-                            <SelectItem value="boda">{t.form.eventTypes.anniversary}</SelectItem>
-                            <SelectItem value="social">{t.form.eventTypes.social}</SelectItem>
                             <SelectItem value="outro">{t.form.eventTypes.other}</SelectItem>
                           </SelectContent>
                         </Select>
@@ -724,28 +720,19 @@ function EventosPageContent() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-purple-600/90 to-purple-700 text-white">
+      <section className="py-16 lg:py-24 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-8">
             {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "title", locale, contentOverrides) || t.cta.title)}
           </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto text-white/90">
-            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="subtitle" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "subtitle", locale, contentOverrides) || t.cta.subtitle)}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="tel:+5585999999999"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-purple-700 hover:bg-white/90 h-11 px-8"
-            >
-              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="call" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "call", locale, contentOverrides) || t.cta.call)}
-            </a>
-            <a 
-              href="https://wa.me/5585999999999"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-2 border-white text-white hover:bg-white/10 h-11 px-8"
-            >
-              {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="whatsapp" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "whatsapp", locale, contentOverrides) || t.cta.whatsapp)}
-            </a>
-          </div>
+          <a
+            href="https://wa.me/5585991454982"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-12 px-8"
+          >
+            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "button", locale, contentOverrides) || t.cta.button)}
+          </a>
         </div>
       </section>
     </>

@@ -232,6 +232,22 @@ export default function Home() {
   const [highlights, setHighlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Ordem dos quartos na home: luxo → superior → standard (demais mantêm ordem)
+  const ROOM_ORDER = ["luxo", "superior", "standard"];
+  const roomsOrdered = useMemo(() => {
+    if (!rooms.length) return [];
+    return [...rooms].sort((a, b) => {
+      const codeA = (a.code || "").toLowerCase().trim();
+      const codeB = (b.code || "").toLowerCase().trim();
+      const ia = ROOM_ORDER.indexOf(codeA);
+      const ib = ROOM_ORDER.indexOf(codeB);
+      if (ia === -1 && ib === -1) return 0;
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+  }, [rooms]);
+
   // Buscar imagens para cada seção usando useMemo para evitar múltiplas chamadas
   const homeImages = useMemo(() => {
     if (!galleryPhotos || galleryPhotos.length === 0) {
@@ -370,15 +386,15 @@ export default function Home() {
         )}
       </div>
 
-      {/* Formulário de reserva - Mobile: 50px de espaço do vídeo; Desktop: sobrepõe o hero */}
-      <div className="relative z-10 mt-[50px] lg:mt-0 lg:-mt-40">
+      {/* Formulário de reserva - Mobile: 50px de espaço do vídeo; Desktop: sobe e fica no meio entre hero e seção abaixo */}
+      <div className="relative z-10 mt-[50px] lg:mt-0 lg:-mt-72">
         <ReservationForm />
       </div>
 
       {/* Seção de Quartos e Pacotes */}
       <div className="pt-12 lg:pt-16">
         <PackagesSection
-          rooms={rooms}
+          rooms={roomsOrdered}
           packages={packages}
           title={
             editor?.editMode ? (
@@ -509,13 +525,6 @@ export default function Home() {
                   <PageText page="home" section="experiences" fieldKey="cards.rooms.title" locale={locale} as="span" />
                 ) : (
                   getPageContent("home", "experiences", "cards.rooms.title", locale, overrides) || t.experiences.cards.rooms.title
-                )
-              }
-              subtitle={
-                editor?.editMode ? (
-                  <PageText page="home" section="experiences" fieldKey="cards.rooms.badge" locale={locale} as="span" />
-                ) : (
-                  getPageContent("home", "experiences", "cards.rooms.badge", locale, overrides) || t.experiences.cards.rooms.badge
                 )
               }
               description={
@@ -718,9 +727,9 @@ export default function Home() {
                   })}
                 </HorizontalScroll>
               </div>
-              {/* Desktop: 4 colunas */}
-              <div className="hidden lg:grid lg:grid-cols-4 gap-0">
-                {homeImages.photoStoryPhotos.slice(0, 4).map((photo, index) => {
+              {/* Desktop: 1x3 colunas */}
+              <div className="hidden lg:grid lg:grid-cols-3 gap-0">
+                {homeImages.photoStoryPhotos.slice(0, 3).map((photo, index) => {
                   const item = getPhotoStoryItem(index);
                   if (!photo.imageUrl || photo.imageUrl.trim() === "") return null;
                   return (

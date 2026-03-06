@@ -20,9 +20,9 @@ interface FullWidthGalleryProps {
 }
 
 /**
- * Galeria Fullwidth Horizontal - 4 fotos lado a lado trocando
- * Desktop: 1 linha com 4 fotos
- * Mobile: 2x2 grid
+ * Galeria Fullwidth Horizontal - 3 fotos lado a lado trocando (1x3)
+ * Desktop: 1 linha com 3 fotos
+ * Mobile: carrossel horizontal
  */
 export function FullWidthGallery({
   images,
@@ -33,11 +33,11 @@ export function FullWidthGallery({
   className,
   onImageClick,
 }: FullWidthGalleryProps) {
-  const [positions, setPositions] = useState<number[]>([0, 1, 2, 3]);
+  const [positions, setPositions] = useState<number[]>([0, 1, 2]);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (images.length < 4) return;
+    if (images.length < 3) return;
 
     const timer = setInterval(() => {
       setIsAnimating(true);
@@ -62,7 +62,7 @@ export function FullWidthGallery({
   }
 
   // Preparar todas as imagens (mapear para formato usado no carrossel)
-  const allImages = images.length >= 4 
+  const allImages = images.length >= 3 
     ? positions.map((imageIndex) => images[imageIndex % images.length])
     : images;
 
@@ -112,9 +112,9 @@ export function FullWidthGallery({
         </HorizontalScroll>
       </div>
 
-      {/* Desktop: Grid Horizontal 1x4 */}
-      {images.length >= 4 ? (
-        <div className={cn("hidden lg:grid lg:grid-cols-4 gap-0", height)}>
+      {/* Desktop: Grid Horizontal 1x3 */}
+      {images.length >= 3 ? (
+        <div className={cn("hidden lg:grid lg:grid-cols-3 gap-0", height)}>
         {positions.map((imageIndex, positionIndex) => {
           const imageSrc = images[imageIndex % images.length];
           const idx = imageIndex % images.length;
@@ -142,7 +142,7 @@ export function FullWidthGallery({
                   "transition-transform duration-700",
                   "group-hover:scale-110"
                 )}
-                sizes="25vw"
+                sizes="33vw"
                 priority={positionIndex === 0}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -41,7 +41,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      <AwardsSection />
+      {isHomePage && <AwardsSection />}
       {/* Barreira visual para evitar vazamento de gradiente */}
       <div 
         className="h-0 w-full"

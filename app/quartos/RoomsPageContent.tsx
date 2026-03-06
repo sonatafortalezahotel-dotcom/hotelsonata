@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import RoomCard from "@/components/RoomCard";
 import { RoomCardSkeleton } from "@/components/LoadingStates";
 import { HorizontalScroll } from "@/components/HorizontalScroll";
+
+// Mesma ordem da home: luxo → superior → standard
+const ROOM_ORDER = ["luxo", "superior", "standard"];
 
 interface Room {
   id: number;
@@ -61,6 +64,20 @@ export default function RoomsPageContent() {
     fetchRooms();
   }, [locale]);
 
+  const roomsOrdered = useMemo(() => {
+    if (!rooms.length) return [];
+    return [...rooms].sort((a, b) => {
+      const codeA = (a.code || "").toLowerCase().trim();
+      const codeB = (b.code || "").toLowerCase().trim();
+      const ia = ROOM_ORDER.indexOf(codeA);
+      const ib = ROOM_ORDER.indexOf(codeB);
+      if (ia === -1 && ib === -1) return 0;
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+  }, [rooms]);
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 w-full">
@@ -71,7 +88,7 @@ export default function RoomsPageContent() {
     );
   }
 
-  if (rooms.length === 0) {
+  if (roomsOrdered.length === 0) {
     return (
       <div className="text-center py-16">
         <p className="text-muted-foreground text-lg">
@@ -91,7 +108,7 @@ export default function RoomsPageContent() {
           showDots={true}
           gap={4}
         >
-          {rooms.map((room) => (
+          {roomsOrdered.map((room) => (
             <RoomCard key={room.id} room={room} />
           ))}
         </HorizontalScroll>
@@ -99,7 +116,7 @@ export default function RoomsPageContent() {
 
       {/* Desktop: Grid full largura, cards maiores (3 colunas) */}
       <div className="hidden lg:grid w-full lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-        {rooms.map((room) => (
+        {roomsOrdered.map((room) => (
           <RoomCard key={room.id} room={room} />
         ))}
       </div>

@@ -35,11 +35,19 @@ export function EditorialSlide({
   };
 
   const textPositionClasses = {
-    left: "items-start justify-center text-left pl-8 md:pl-16 lg:pl-24",
-    center: "items-center justify-center text-center px-8",
-    right: "items-end justify-center text-right pr-8 md:pr-16 lg:pr-24",
-    "bottom-left": "items-start justify-end text-left pb-12 md:pb-16 lg:pb-20 pl-8 md:pl-16 lg:pl-24",
-    "bottom-right": "items-end justify-end text-right pb-12 md:pb-16 lg:pb-20 pr-8 md:pr-16 lg:pr-24",
+    left: "items-start justify-center pl-8 md:pl-16 lg:pl-24",
+    center: "items-center justify-center px-8",
+    right: "items-end justify-center pr-8 md:pr-16 lg:pr-24",
+    "bottom-left": "items-start justify-end pb-12 md:pb-16 lg:pb-20 pl-8 md:pl-16 lg:pl-24",
+    "bottom-right": "items-end justify-end pb-12 md:pb-16 lg:pb-20 pr-8 md:pr-16 lg:pr-24",
+  };
+
+  const textAlignClasses = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+    "bottom-left": "text-left",
+    "bottom-right": "text-right",
   };
 
   const hasValidImageUrl =
@@ -68,12 +76,15 @@ export function EditorialSlide({
       {/* Overlay Gradiente - pointer-events-none para permitir clicar na imagem no modo edição */}
       <div className={cn("absolute inset-0 pointer-events-none", overlayClasses[overlay])} />
 
-      {/* Texto Sobreposto - pointer-events-none no container para cliques na imagem; pointer-events-auto só no bloco de texto */}
+      {/* Texto Sobreposto - bloco único com mesma largura para título, subtítulo e descrição na mesma régua */}
       <div className={cn(
         "absolute inset-0 flex flex-col z-10 pointer-events-none",
         textPositionClasses[textPosition]
       )}>
-        <div className="pointer-events-auto">
+        <div className={cn(
+          "pointer-events-auto max-w-2xl lg:max-w-3xl",
+          textAlignClasses[textPosition]
+        )}>
           {subtitle && (
             <p className="text-white/90 text-sm md:text-base lg:text-lg font-light uppercase tracking-widest mb-2 md:mb-3">
               {subtitle}
@@ -85,7 +96,7 @@ export function EditorialSlide({
           </h2>
 
           {description && (
-            <p className="text-white/90 text-base md:text-lg lg:text-xl font-light max-w-xl leading-relaxed">
+            <p className="text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed">
               {description}
             </p>
           )}

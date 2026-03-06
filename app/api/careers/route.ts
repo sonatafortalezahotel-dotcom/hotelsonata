@@ -33,7 +33,7 @@ const createTransporter = () => {
 };
 
 // Email do RH - será configurado via variável de ambiente
-const RH_EMAIL = process.env.RH_EMAIL || "rh@hotelsonata.com.br";
+const RH_EMAIL = process.env.RH_EMAIL || "vagas@hotelsonata.com.br";
 const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "dev@opendreams.com.br";
 const FROM_NAME = process.env.SMTP_FROM_NAME || "Open Dreams";
 

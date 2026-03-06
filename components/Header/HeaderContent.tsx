@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react"
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown, Star } from "lucide-react";
+import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -133,8 +133,8 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
           {/* Logo */}
           <Link 
             href="/"
-            className="flex items-center gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg transition-transform hover:scale-105"
-            aria-label="Hotel Sonata de Iracema - Página inicial"
+            className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg transition-transform hover:scale-105"
+            aria-label="Página inicial"
           >
             <div className="relative h-28 w-28 sm:h-44 sm:w-44 flex-shrink-0">
               <Image
@@ -145,21 +145,6 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                 priority
                 sizes="(max-width: 640px) 112px, 176px"
               />
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className={cn("h-8 sm:h-12 w-px bg-primary-foreground/30")} aria-hidden="true" />
-              <div>
-                <h1 className={cn("text-sm sm:text-lg font-bold tracking-tight", textColor)}>
-                  Hotel Sonata
-                </h1>
-                <p className={cn("text-[10px] sm:text-xs opacity-80", textColor)}>
-                  de Iracema
-                </p>
-                <p className={cn("text-[9px] sm:text-[10px] mt-0.5 flex items-center gap-1", "text-yellow-400")}>
-                  <Star className="h-2 w-2 sm:h-2.5 sm:w-2.5 fill-yellow-400 text-yellow-400" />
-                  4.5 Traveller's Choice • 99/100
-                </p>
-              </div>
             </div>
           </Link>
 

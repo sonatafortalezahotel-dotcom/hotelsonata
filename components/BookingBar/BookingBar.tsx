@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Calendar as CalendarIcon, Users, Search, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
+import { es } from "date-fns/locale/es";
+import { enUS } from "date-fns/locale/en-US";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -90,7 +92,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   /** Sempre string, para uso em aria-label (não aceita ReactNode). */
   const getLabelAria = (fieldKey: string): string =>
     getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || (t as Record<string, string>)[fieldKey] || "";
-  const dateLocale = locale === "pt" ? ptBR : undefined;
+  const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
 
   // Formatar hóspedes igual ao ReservationForm
   const adultsCount = parseInt(adults);
@@ -215,6 +217,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           onSelect={setCheckIn}
                           disabled={(date) => date < new Date()}
                           initialFocus
+                          locale={dateLocale}
                         />
                       </PopoverContent>
                     </Popover>
@@ -269,6 +272,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             return date <= checkIn;
                           }}
                           initialFocus
+                          locale={dateLocale}
                         />
                       </PopoverContent>
                     </Popover>
@@ -454,6 +458,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         onSelect={setCheckIn}
                         disabled={(date) => date < new Date()}
                         initialFocus
+                        locale={dateLocale}
                       />
                     </PopoverContent>
                   </Popover>
@@ -518,6 +523,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           return date <= checkIn;
                         }}
                         initialFocus
+                        locale={dateLocale}
                       />
                     </PopoverContent>
                   </Popover>
