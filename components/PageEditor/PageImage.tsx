@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useEditor } from "@/lib/context/EditorContext";
 import { EditableImage } from "@/components/admin/EditableImage";
 import { ImageEditDialog } from "./ImageEditDialog";
+import { cn } from "@/lib/utils";
 
 interface PageImageProps {
   src: string;
@@ -56,12 +58,15 @@ export function PageImage({
   }
 
   return (
-    <div className={className}>
+    <div className={cn("relative w-full h-full min-h-[120px]", className)}>
       {displaySrc ? (
-        <img
+        <Image
           src={displaySrc}
           alt={alt}
-          className="h-full w-full object-cover"
+          fill
+          quality={100}
+          sizes="100vw"
+          className="object-cover"
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">

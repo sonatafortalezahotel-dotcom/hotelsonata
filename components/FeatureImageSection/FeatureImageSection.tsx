@@ -18,6 +18,8 @@ interface FeatureImageSectionProps {
   ctaText?: string;
   ctaLink?: string;
   backgroundColor?: "white" | "muted" | "primary";
+  /** Qualidade da imagem Next/Image (1-100). Default 100 para resolução máxima. */
+  imageQuality?: number;
 }
 
 export function FeatureImageSection({
@@ -31,7 +33,8 @@ export function FeatureImageSection({
   features,
   ctaText,
   ctaLink,
-  backgroundColor = "white"
+  backgroundColor = "white",
+  imageQuality = 100,
 }: FeatureImageSectionProps) {
   const bgClasses = {
     white: "bg-background",
@@ -89,6 +92,7 @@ export function FeatureImageSection({
                   src={image}
                   alt={imageAlt}
                   fill
+                  quality={imageQuality}
                   className="object-cover hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
