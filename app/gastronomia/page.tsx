@@ -9,14 +9,12 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { getPageContent, getPageContentIcon, getPageContentTags } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon, EditableTagList } from "@/components/PageEditor";
-import Image from "next/image";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { MasonrySwap, HorizontalScroll } from "@/components/HorizontalScroll";
+import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { useGastronomy } from "@/lib/hooks/useGastronomy";
 import { useGallery } from "@/lib/hooks/useGallery";
-import { getGalleryImageTitle } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 function GastronomiaPageContent() {
@@ -311,64 +309,33 @@ function GastronomiaPageContent() {
           </div>
         </div>
 
-        {editor?.editMode ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 container mx-auto px-4 sm:px-6 lg:px-8">
-            {Array.from({ length: 6 }, (_, i) => gastronomiaImages.galeriaCafe[i]).map((photo, i) => (
-              <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:galeria-cafe:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:gastronomia:galeria-cafe:${i}`} aspectRatio="auto" className="w-full h-full" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* Mobile: Carrossel Horizontal */}
-            <div className="lg:hidden">
-              <HorizontalScroll 
-                itemWidth="full" 
-                showArrows={false} 
-                showDots={true}
-                gap={0}
-              >
-                {gastronomiaImages.galeriaCafe
-                  .slice(0, 4)
-                  .map((photo, index) => (
-                    <div key={index} className="group relative overflow-hidden">
-                      <div className="relative w-full h-[400px]">
-                        <Image
-                          src={photo.imageUrl}
-                          alt={`Café da manhã ${index + 1}`}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="100vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      </div>
-                    </div>
-                  ))}
-              </HorizontalScroll>
-            </div>
-
-            {/* Desktop: 4 colunas */}
-            <div className="hidden lg:grid lg:grid-cols-4 gap-0">
-              {gastronomiaImages.galeriaCafe
-                .slice(0, 4)
-                .map((photo, index) => (
-                  <div key={index} className="group relative overflow-hidden">
-                    <div className="relative w-full h-[500px]">
-                      <Image
-                        src={photo.imageUrl}
-                        alt={`Café da manhã ${index + 1}`}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="25vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    </div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {editor?.editMode ? (
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = gastronomiaImages.galeriaCafe[i];
+                const path = `gallery:gastronomia:galeria-cafe:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
                   </div>
-                ))}
+                );
+              })}
             </div>
-          </>
-        )}
+          ) : (
+            <GalleryOneLeftTwoRight
+              images={gastronomiaImages.galeriaCafe
+                .map((p) => p.imageUrl)
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
+              interval={5000}
+            />
+          )}
+        </div>
       </section>
 
       {/* PhotoStory - Experiência Gastronômica */}
@@ -417,19 +384,28 @@ function GastronomiaPageContent() {
           </div>
           
           {editor?.editMode ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }, (_, i) => gastronomiaImages.galeriaRestaurante[i]).map((photo, i) => (
-                <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                  <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:galeria-restaurante:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:gastronomia:galeria-restaurante:${i}`} aspectRatio="auto" className="w-full h-full" />
-                </div>
-              ))}
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = gastronomiaImages.galeriaRestaurante[i];
+                const path = `gallery:gastronomia:galeria-restaurante:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <MasonrySwap
+            <GalleryOneLeftTwoRight
               images={gastronomiaImages.galeriaRestaurante
-                .map(photo => photo.imageUrl)
-                .filter(img => img && typeof img === "string" && img.trim() !== "")}
-              interval={4500}
+                .map((p) => p.imageUrl)
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
+              interval={5000}
             />
           )}
         </div>

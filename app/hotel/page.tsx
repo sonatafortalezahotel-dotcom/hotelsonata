@@ -16,7 +16,7 @@ import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { FeatureImageSection } from "@/components/FeatureImageSection";
-import { AsymmetricGallery } from "@/components/HorizontalScroll";
+import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
@@ -177,6 +177,22 @@ function HotelPageContent() {
       .filter(img => img.src);
   }, [hotelImages.galeria]);
 
+  // Galeria 1+2: usar sempre galleryPhotos (page=hotel, section=galeria) para a troca pelo editor refletir; até 12 para rotatividade
+  const hotelGaleriaOneTwoRight = useMemo(() => {
+    const normalized = (v: string | null | undefined) => (v ?? "").toString().toLowerCase().trim();
+    return (galleryPhotos || [])
+      .filter(
+        (p: { page?: string | null; section?: string | null; imageUrl?: string }) =>
+          normalized(p.page) === "hotel" &&
+          normalized(p.section) === "galeria" &&
+          p.imageUrl &&
+          typeof p.imageUrl === "string" &&
+          p.imageUrl.trim() !== ""
+      )
+      .sort((a: { order?: number }, b: { order?: number }) => (a.order ?? 999) - (b.order ?? 999))
+      .slice(0, 12);
+  }, [galleryPhotos]);
+
   const heroTitle = editor?.editMode
     ? <PageText page="hotel" section="hero" fieldKey="title" locale={locale} as="span" className="block" />
     : getPageContent("hotel", "hero", "title", locale, overrides) || t.hero.title;
@@ -247,29 +263,36 @@ function HotelPageContent() {
         backgroundColor="white"
       />
 
-      {/* Galeria de Fotos do Hotel - LAYOUT ASSIMÉTRICO FULLWIDTH */}
-      {editor?.editMode ? (
-        <section className="relative w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 container mx-auto">
-            {Array.from({ length: 9 }, (_, i) => hotelImages.galeria[i]).map((photo, i) => (
-              <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                <PageImage
-                  src={photo?.imageUrl ?? ""}
-                  path={`gallery:hotel:galeria:${i}`}
-                  aspectRatio="auto"
-                  className="w-full h-full"
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : (
-        <AsymmetricGallery
-          images={hotelGalleryImages.map(img => img.src).filter(src => src && src.trim() !== '')}
-          interval={4000}
-          imageQuality={100}
-        />
-      )}
+      {/* Galeria de Fotos do Hotel - Layout 1 esquerda + 2 direita */}
+      <section className="relative w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {editor?.editMode ? (
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = hotelGaleriaOneTwoRight[i];
+                const path = `gallery:hotel:galeria:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <GalleryOneLeftTwoRight
+              images={hotelGaleriaOneTwoRight
+                .map((p) => p.imageUrl)
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
+              interval={5000}
+            />
+          )}
+        </div>
+      </section>
 
       {/* Timeline - Nossa Jornada */}
       <section className="py-16 lg:py-24 bg-muted/30">

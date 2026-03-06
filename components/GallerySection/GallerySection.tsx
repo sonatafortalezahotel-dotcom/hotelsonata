@@ -34,8 +34,8 @@ export function GallerySection({
   };
 
   return (
-    <section className="mt-12 mb-12">
-      <h2 className="text-2xl font-bold mb-6">{title}</h2>
+    <section className="mt-12 mb-12 min-w-0">
+      <h2 className="text-2xl font-bold mb-6 min-w-0 break-words">{title}</h2>
       
       {/* Mobile: Carrossel Horizontal */}
       <div className="lg:hidden">

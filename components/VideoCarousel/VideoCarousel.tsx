@@ -127,9 +127,9 @@ export default function VideoCarousel({
   }, [videoInfo]);
 
   return (
-    <section className="relative w-full aspect-video lg:aspect-auto lg:h-screen overflow-hidden">
-      {/* Video/Image Background */}
-      <div className="absolute inset-0 w-full overflow-hidden">
+    <section className="relative w-full aspect-video lg:aspect-auto lg:h-screen overflow-hidden min-h-[280px]">
+      {/* Video/Image Background - container escala com zoom */}
+      <div className="absolute inset-0 w-full h-full min-w-full min-h-full overflow-hidden hero-bg-image">
         {currentItem.videoUrl && videoInfo ? (
           // YouTube ou Vimeo - usar iframe
           embedUrl ? (
@@ -138,8 +138,9 @@ export default function VideoCarousel({
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               style={{
                 width: '100vw',
-                height: '56.25vw', // Altura para manter proporção 16:9 (100vw * 9/16 = 56.25vw)
-                minHeight: '100%', // Garante que preenche pelo menos a altura do container (100vh)
+                height: '56.25vw',
+                minHeight: '100%',
+                minWidth: '177.78vh',
               }}
               allow="autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture"
               allowFullScreen
@@ -221,16 +222,16 @@ export default function VideoCarousel({
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/30 via-black/15 to-black/45" />
       </div>
 
-      {/* Content - sombras fortes para contraste em qualquer fundo (acessibilidade) */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8 pointer-events-none">
-        <div className="pointer-events-auto [text-shadow:0_1px_2px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6)]">
+      {/* Content - sombras fortes para contraste em qualquer fundo (acessibilidade); min-w-0 e break-words para título e texto sempre visíveis */}
+      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8 pointer-events-none min-w-0 w-full">
+        <div className="pointer-events-auto min-w-0 w-full max-w-4xl [text-shadow:0_1px_2px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6)]">
           {(currentItem.title || editor?.editMode) && (
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] min-w-0 break-words w-full">
               {getTitle(currentIndex)}
             </h1>
           )}
           {(currentItem.description || editor?.editMode) && (
-            <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mb-6 sm:mb-8 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+            <p className="text-lg sm:text-xl md:text-2xl max-w-3xl min-w-0 break-words w-full mb-6 sm:mb-8 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
               {getDescription(currentIndex)}
             </p>
           )}

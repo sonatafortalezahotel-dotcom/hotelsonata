@@ -34,7 +34,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <main 
         id="main-content" 
         className={cn(
-          "pb-24 lg:pb-16 min-h-screen relative z-10",
+          "pb-24 lg:pb-16 min-h-screen min-w-0 max-w-full relative z-10",
           isHomePage ? "pt-20 lg:pt-28" : "pt-20 lg:pt-36"
         )}
         tabIndex={-1}

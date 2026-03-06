@@ -95,7 +95,7 @@ export function EditorialSlide({
           {subtitle && (
             <p
               className={cn(
-                "text-white/90 text-sm md:text-base lg:text-lg font-light uppercase tracking-widest mb-2 md:mb-3 m-0 pl-0 pr-0 w-full min-w-0",
+                "text-white/90 text-sm md:text-base lg:text-lg font-light uppercase tracking-widest mb-2 md:mb-3 m-0 pl-0 pr-0 w-full min-w-0 break-words",
                 (textPosition === "bottom-left" || textPosition === "left") && "pl-[0.2em]",
                 (textPosition === "bottom-right" || textPosition === "right") && "pr-[0.1em]"
               )}
@@ -104,14 +104,14 @@ export function EditorialSlide({
             </p>
           )}
 
-          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-5 drop-shadow-2xl m-0 pl-0 pr-0 w-full min-w-0">
+          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-5 drop-shadow-2xl m-0 pl-0 pr-0 w-full min-w-0 break-words">
             {title}
           </h2>
 
           {description && (
             <p
               className={cn(
-                "text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed m-0 mt-2 md:mt-3 pl-0 pr-0 w-full min-w-0",
+                "text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed m-0 mt-2 md:mt-3 pl-0 pr-0 w-full min-w-0 break-words",
                 (textPosition === "bottom-left" || textPosition === "left") && "pl-[0.2em]",
                 (textPosition === "bottom-right" || textPosition === "right") && "pr-[0.1em]"
               )}

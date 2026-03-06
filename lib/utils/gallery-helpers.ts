@@ -18,6 +18,10 @@ export interface GalleryPhotoForPath {
  * Prioriza o registro da galeria com page/section/order correspondentes, para que
  * após salvar no editor e recarregar a página a imagem atualizada seja exibida.
  */
+function normalizePageSection(value: string | null | undefined): string {
+  return (value ?? "").toString().toLowerCase().trim();
+}
+
 export function getGalleryImageByPath(
   photos: GalleryPhotoForPath[] | undefined | null,
   path: string
@@ -27,8 +31,13 @@ export function getGalleryImageByPath(
   if (parts.length < 4) return null;
   const [, page, section, orderStr] = parts;
   const order = parseInt(orderStr ?? "0", 10) ?? 0;
+  const pageNorm = normalizePageSection(page);
+  const sectionNorm = normalizePageSection(section);
   const photo = photos.find(
-    (p) => (p.page ?? "") === page && (p.section ?? "") === section && (p.order ?? 0) === order
+    (p) =>
+      normalizePageSection(p.page) === pageNorm &&
+      normalizePageSection(p.section) === sectionNorm &&
+      (p.order ?? 0) === order
   );
   return photo?.imageUrl ?? null;
 }

@@ -43,22 +43,24 @@ export function FeatureImageSection({
   };
 
   return (
-    <section className={`py-16 lg:py-24 ${bgClasses[backgroundColor]}`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className={`py-16 lg:py-24 overflow-visible ${bgClasses[backgroundColor]}`}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
         <div className={`grid lg:grid-cols-2 gap-12 items-center ${imagePosition === "left" ? "lg:flex-row-reverse" : ""}`}>
-          {/* Conteúdo de Texto */}
-          <div className={`${imagePosition === "left" ? "lg:order-2" : "order-1"}`}>
-            {badge && (
-              <Badge className="mb-4 text-base px-4 py-2" variant="secondary">
-                {badge}
-              </Badge>
-            )}
+          {/* Conteúdo de Texto - overflow-visible para ícone/badge/título nunca serem cortados */}
+          <div className={`feature-section-text min-w-0 overflow-visible ${imagePosition === "left" ? "lg:order-2" : "order-1"}`}>
+            <div className="flex flex-wrap items-center gap-2 gap-y-3 mb-4 min-w-0">
+              {badge && (
+                <Badge className="text-sm lg:text-base px-3 py-1.5 lg:px-4 lg:py-2 flex-shrink-0 w-fit" variant="secondary">
+                  {badge}
+                </Badge>
+              )}
+            </div>
             
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6 min-w-0 break-words">
               {title}
             </h2>
             
-            <div className="text-lg text-muted-foreground leading-relaxed mb-6">
+            <div className="text-lg text-muted-foreground leading-relaxed mb-6 min-w-0 break-words">
               {description}
             </div>
 
@@ -80,9 +82,9 @@ export function FeatureImageSection({
             )}
           </div>
 
-          {/* Imagem */}
-          <div className={`relative ${imagePosition === "left" ? "lg:order-1" : "order-2"}`}>
-            <div className="relative aspect-[4/5] lg:aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl">
+          {/* Imagem - elemento decorativo contido para não cortar conteúdo da seção abaixo */}
+          <div className={`relative overflow-visible ${imagePosition === "left" ? "lg:order-1" : "order-2"}`}>
+            <div className="relative aspect-[4/5] lg:aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl min-w-0">
               {imageNode != null ? (
                 <div className="absolute inset-0 [&>img]:w-full [&>img]:h-full [&>img]:object-cover">
                   {imageNode}
@@ -103,8 +105,8 @@ export function FeatureImageSection({
               )}
             </div>
             
-            {/* Elemento Decorativo */}
-            <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-primary/10 rounded-2xl" />
+            {/* Elemento decorativo - contido para não sobrepor/cortar título da seção */}
+            <div className="absolute -z-10 -bottom-4 -right-4 left-4 top-4 bg-primary/10 rounded-2xl pointer-events-none" aria-hidden />
           </div>
         </div>
       </div>

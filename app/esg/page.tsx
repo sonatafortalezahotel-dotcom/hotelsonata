@@ -12,7 +12,7 @@ import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { MasonrySwap } from "@/components/HorizontalScroll";
+import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { useSustainability } from "@/lib/hooks/useSustainability";
 import { useGallery } from "@/lib/hooks/useGallery";
@@ -137,18 +137,27 @@ function ESGPageContent() {
           </div>
           
           {editor?.editMode ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }, (_, i) => esgImages.galeria[i]).map((photo, i) => (
-                <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                  <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:esg:galeria-praticas:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:esg:galeria-praticas:${i}`} aspectRatio="auto" className="w-full h-full" />
-                </div>
-              ))}
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = esgImages.galeria[i];
+                const path = `gallery:esg:galeria-praticas:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <MasonrySwap
+            <GalleryOneLeftTwoRight
               images={esgImages.galeria
-                .map(photo => photo.imageUrl)
-                .filter(img => img && img.trim() !== '')}
+                .map((p) => p.imageUrl)
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
               interval={5000}
             />
           )}

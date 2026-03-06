@@ -60,13 +60,13 @@ export function PhotoStory({
         <NordestinoPattern variant="sunset" opacity={0.04} />
       )}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Cabeçalho */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+        {/* Cabeçalho - título e texto sempre visíveis em qualquer resolução */}
+        <div className="text-center mb-12 lg:mb-16 min-w-0">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 min-w-0 break-words">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto min-w-0 break-words">
               {subtitle}
             </p>
           )}

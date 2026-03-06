@@ -137,13 +137,13 @@ export function ElegantCarousel({
 
   return (
     <div 
-      className={cn("relative", className)}
+      className={cn("relative min-w-0", className)}
     >
-      {/* Container com scroll */}
+      {/* Container com scroll - overflow contido para não expandir a página */}
       <div
         ref={scrollRef}
         className={cn(
-          "flex overflow-x-auto scrollbar-hide scroll-smooth",
+          "flex overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth min-w-0",
           `gap-${gap}`,
           centerMode && "snap-x snap-mandatory"
         )}

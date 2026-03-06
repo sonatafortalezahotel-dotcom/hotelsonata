@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Heart, Check, Building2, Lightbulb, Wind, ParkingCircle, Coffee, ChefHat, CheckCircle2 } from "lucide-react";
 import { RoomCapacityTable } from "@/components/RoomCapacityTable";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { MasonrySwap } from "@/components/HorizontalScroll";
+import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import Image from "next/image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
@@ -194,18 +194,27 @@ function EventosPageContent() {
           </div>
           
           {editor?.editMode ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 9 }, (_, i) => eventosImages.gallery[i]).map((photo, i) => (
-                <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                  <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:eventos:galeria:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:eventos:galeria:${i}`} aspectRatio="auto" className="w-full h-full" />
-                </div>
-              ))}
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = eventosImages.gallery[i];
+                const path = `gallery:eventos:galeria:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <MasonrySwap
+            <GalleryOneLeftTwoRight
               images={publicGalleryImages
                 .map(photo => photo.imageUrl)
-                .filter(img => img && typeof img === 'string' && img.trim() !== '')}
+                .filter((img): img is string => !!img && typeof img === "string" && img.trim() !== "")}
               interval={5000}
             />
           )}

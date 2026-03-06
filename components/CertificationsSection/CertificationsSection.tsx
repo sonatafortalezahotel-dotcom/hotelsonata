@@ -110,15 +110,15 @@ export default function CertificationsSection({
   return (
     <section className="py-16 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+        <div className="text-center mb-12 lg:mb-16 min-w-0">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 min-w-0 break-words">
             {editor?.editMode ? (
               <PageText page="home" section="certificationsSection" fieldKey="title" locale={locale as "pt" | "es" | "en"} as="span" />
             ) : (
               getPageContent("home", "certificationsSection", "title", locale as "pt" | "es" | "en", overrides) || "Certificações e Selos"
             )}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto min-w-0 break-words">
             {editor?.editMode ? (
               <PageText page="home" section="certificationsSection" fieldKey="subtitle" locale={locale as "pt" | "es" | "en"} as="span" />
             ) : (

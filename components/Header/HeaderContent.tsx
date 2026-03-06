@@ -128,22 +128,22 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
       role="banner"
       aria-label="Cabeçalho principal"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
-          {/* Logo */}
+      <div className="container mx-auto min-w-0 max-w-full px-4 sm:px-6 lg:px-8">
+        <div className="header-row flex items-center justify-between h-24 min-w-0">
+          {/* Logo - compacta em lg (1024px) para resoluções críticas; maior em xl */}
           <Link 
             href="/"
             className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg transition-transform hover:scale-105"
             aria-label="Página inicial"
           >
-            <div className="relative h-28 w-28 sm:h-44 sm:w-44 flex-shrink-0">
+            <div className="header-logo relative h-28 w-28 sm:h-44 sm:w-44 lg:h-24 lg:w-24 xl:h-44 xl:w-44 flex-shrink-0">
               <Image
                 src="/Logo/logo-soneto (1).png"
                 alt="Logo"
                 fill
                 className="object-contain"
                 priority
-                sizes="(max-width: 640px) 112px, 176px"
+                sizes="(max-width: 640px) 112px, (max-width: 1280px) 96px, 176px"
               />
             </div>
           </Link>
@@ -236,8 +236,8 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
             )}
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6" role="navigation" aria-label="Menu principal">
+          {/* Desktop Navigation - compacta em lg (1024px) para caber em resoluções críticas */}
+          <nav className="hidden lg:flex items-center gap-4 lg:gap-4 xl:gap-6" role="navigation" aria-label="Menu principal">
             {menuItems.map((item) => {
               const pathWithoutLocale = pathname?.replace(/^\/(en|es)(?=\/|$)/, "") || "";
               const isCurrent = pathWithoutLocale === item.href || (item.href !== "/" && pathWithoutLocale.startsWith(item.href + "/"));
@@ -246,7 +246,7 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative text-sm font-medium transition-colors group",
+                    "relative text-xs lg:text-xs xl:text-sm font-medium transition-colors group min-w-0",
                     textColor,
                     isCurrent && "underline underline-offset-4"
                   )}
@@ -270,12 +270,12 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
             />
 
             {/* Language Selector */}
-            <div className="relative group language-selector" ref={languageMenuRef}>
+            <div className="relative group language-selector min-w-0" ref={languageMenuRef}>
               <Button
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "gap-2",
+                  "gap-2 lg:gap-1.5 lg:px-2 xl:gap-2 xl:px-2",
                   textColor,
                   languageButtonHover,
                   isLanguageMenuOpen && "bg-primary-foreground/15"
@@ -286,10 +286,10 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                 aria-expanded={isLanguageMenuOpen}
                 aria-haspopup="true"
               >
-                <Globe className="h-4 w-4" />
-                <span className="text-sm">{currentLanguage.name}</span>
+                <Globe className="h-4 w-4 lg:h-3.5 lg:w-3.5 xl:h-4 xl:w-4 flex-shrink-0" />
+                <span className="text-sm lg:text-xs xl:text-sm">{currentLanguage.name}</span>
                 <ChevronDown className={cn(
-                  "h-3.5 w-3.5 transition-transform duration-200",
+                  "h-3.5 w-3.5 lg:h-3 lg:w-3 xl:h-3.5 xl:w-3.5 transition-transform duration-200 flex-shrink-0",
                   isLanguageMenuOpen && "rotate-180"
                 )} />
               </Button>

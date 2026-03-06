@@ -12,14 +12,12 @@ import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import { ContentSection } from "@/components/ui/ContentSection";
-import { FullWidthGallery } from "@/components/ui/FullWidthGallery";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
-import { EditorialCarousel, EditorialSlide, HorizontalScroll } from "@/components/HorizontalScroll";
+import { EditorialCarousel, EditorialSlide, HorizontalScroll, GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
 import { useLeisure } from "@/lib/hooks/useLeisure";
 import { useGallery } from "@/lib/hooks/useGallery";
-import { getGalleryImageTitle } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 function LazerPageContent() {
@@ -290,30 +288,33 @@ function LazerPageContent() {
           </div>
         </div>
 
-        {editor?.editMode ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 sm:px-6 lg:px-8 pb-8">
-            {Array.from({ length: 6 }, (_, i) => lazerImagesWithDistributed.piscina.galeria[i]).map((photo, i) => (
-              <div key={i} className="relative aspect-video rounded-lg overflow-hidden">
-                <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:lazer:galeria-piscina:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:lazer:galeria-piscina:${i}`} aspectRatio="auto" className="w-full h-full" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <FullWidthGallery
-            images={lazerImagesWithDistributed.piscina.galeria
-              .map((photo, index) => {
-                const title = getGalleryImageTitle(photo, index + 1);
-                return {
-                  src: photo.imageUrl,
-                  alt: title,
-                  title: title,
-                };
-              })
-              .filter((img) => img.src)}
-            height="h-[400px] md:h-[600px]"
-            showCaption={false}
-          />
-        )}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          {editor?.editMode ? (
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 ${GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT}`}>
+              {[0, 1, 2].map((i) => {
+                const photo = lazerImagesWithDistributed.piscina.galeria[i];
+                const path = `gallery:lazer:galeria-piscina:${i}`;
+                const src = (getGalleryImageByPath(galleryPhotos, path) || photo?.imageUrl) ?? "";
+                const isLeft = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={isLeft ? "relative rounded-lg overflow-hidden lg:row-span-2 min-h-[200px] lg:min-h-0" : "relative rounded-lg overflow-hidden"}
+                  >
+                    <PageImage src={src} path={path} aspectRatio="auto" className="w-full h-full object-cover" />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <GalleryOneLeftTwoRight
+              images={lazerImagesWithDistributed.piscina.galeria
+                .map((p) => p.imageUrl)
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
+              interval={5000}
+            />
+          )}
+        </div>
       </ContentSection>
 
       {/* 3. PhotoStory - Atividades do Dia - 4/4 */}

@@ -18,43 +18,43 @@ export function AccommodationsSection() {
   return (
     <section className="py-16 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+        <div className="text-center mb-12 lg:mb-16 min-w-0">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 min-w-0 break-words">
             {editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "title", locale, overrides) || t.title)}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto min-w-0 break-words">
             {editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "subtitle", locale, overrides) || t.subtitle)}
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           <Card className="text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50">
-            <CardContent className="pt-8 pb-6">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <CardContent className="pt-8 pb-6 min-w-0">
+              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 flex-shrink-0">
                 <Eye className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.seaView.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.seaView.title", locale, overrides) || t.cards.seaView.title)}</h3>
-              <p className="text-muted-foreground">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.seaView.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.seaView.description", locale, overrides) || t.cards.seaView.description)}</p>
+              <h3 className="text-xl font-bold text-foreground mb-3 min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.seaView.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.seaView.title", locale, overrides) || t.cards.seaView.title)}</h3>
+              <p className="text-muted-foreground min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.seaView.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.seaView.description", locale, overrides) || t.cards.seaView.description)}</p>
             </CardContent>
           </Card>
 
           <Card className="text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50">
-            <CardContent className="pt-8 pb-6">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <CardContent className="pt-8 pb-6 min-w-0">
+              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 flex-shrink-0">
                 <Home className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.comfort.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.comfort.title", locale, overrides) || t.cards.comfort.title)}</h3>
-              <p className="text-muted-foreground">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.comfort.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.comfort.description", locale, overrides) || t.cards.comfort.description)}</p>
+              <h3 className="text-xl font-bold text-foreground mb-3 min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.comfort.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.comfort.title", locale, overrides) || t.cards.comfort.title)}</h3>
+              <p className="text-muted-foreground min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.comfort.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.comfort.description", locale, overrides) || t.cards.comfort.description)}</p>
             </CardContent>
           </Card>
 
           <Card className="text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50">
-            <CardContent className="pt-8 pb-6">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <CardContent className="pt-8 pb-6 min-w-0">
+              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 flex-shrink-0">
                 <Dog className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.petFriendly.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.petFriendly.title", locale, overrides) || t.cards.petFriendly.title)}</h3>
-              <p className="text-muted-foreground">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.petFriendly.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.petFriendly.description", locale, overrides) || t.cards.petFriendly.description)}</p>
+              <h3 className="text-xl font-bold text-foreground mb-3 min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.petFriendly.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.petFriendly.title", locale, overrides) || t.cards.petFriendly.title)}</h3>
+              <p className="text-muted-foreground min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="cards.petFriendly.description" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "cards.petFriendly.description", locale, overrides) || t.cards.petFriendly.description)}</p>
             </CardContent>
           </Card>
         </div>
@@ -62,13 +62,13 @@ export function AccommodationsSection() {
         {/* Pet Friendly Details */}
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <CardContent className="p-8">
-            <div className="flex items-start gap-4 mb-6">
+            <div className="flex items-start gap-4 mb-6 min-w-0">
               <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                 <Dog className="h-6 w-6 text-primary" />
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="petFriendly.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "petFriendly.title", locale, overrides) || t.petFriendly.title)}</h3>
-                <p className="text-muted-foreground">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="petFriendly.subtitle" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "petFriendly.subtitle", locale, overrides) || t.petFriendly.subtitle)}</p>
+              <div className="min-w-0">
+                <h3 className="text-2xl font-bold text-foreground mb-2 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="petFriendly.title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "petFriendly.title", locale, overrides) || t.petFriendly.title)}</h3>
+                <p className="text-muted-foreground min-w-0 break-words">{editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="petFriendly.subtitle" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "petFriendly.subtitle", locale, overrides) || t.petFriendly.subtitle)}</p>
               </div>
             </div>
 

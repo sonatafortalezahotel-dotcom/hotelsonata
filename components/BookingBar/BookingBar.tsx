@@ -170,15 +170,15 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   return (
     <div 
       className={cn(
-        "transition-all duration-300 w-full left-0 right-0",
+        "transition-all duration-300 w-full min-w-0 left-0 right-0",
         isHomePage 
           ? "z-[50] sticky top-24 lg:top-24 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home: colado ao header (h-24 = 6rem)
           : "fixed bottom-0 lg:sticky lg:top-24 z-[40] bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Outras páginas: mobile fixo bottom, desktop sticky abaixo do header
       )}
     >
       {/* Container interno para o conteúdo */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-1 lg:py-1">
-        <div className="max-w-7xl mx-auto">
+      <div className="container mx-auto min-w-0 max-w-full px-4 sm:px-6 lg:px-8 py-1 lg:py-1">
+        <div className="max-w-7xl mx-auto min-w-0">
           {/* Barra com mesmo estilo do ReservationForm */}
           <div className="p-1.5 lg:p-2">
             {/* Versão compacta no mobile (sempre visível) */}

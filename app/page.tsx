@@ -9,15 +9,14 @@ import PackagesSection from "@/components/PackagesSection";
 import SocialMediaFeed from "@/components/SocialMediaFeed";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { PhotoStory } from "@/components/PhotoStory";
-import { ImageGalleryGrid } from "@/components/ImageGalleryGrid";
-import { HorizontalScroll, EditorialCarousel, EditorialSlide, MasonrySwap } from "@/components/HorizontalScroll";
+import { HorizontalScroll, EditorialCarousel, EditorialSlide, GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
 import { PageText, PageImage } from "@/components/PageEditor";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useEditor } from "@/lib/context/EditorContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { getPageContent } from "@/lib/utils/pageContent";
-import { getGalleryImageTitle } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 
 // Função para buscar quartos do banco de dados
@@ -421,7 +420,7 @@ export default function Home() {
       </div>
 
       {/* Experiências Visuais - CARROSSEL EDITORIAL FULLWIDTH */}
-      <section className="relative overflow-hidden group">
+      <section className="relative overflow-x-clip group">
         <EditorialCarousel
           autoplay={true}
           autoplayInterval={6000}
@@ -659,7 +658,7 @@ export default function Home() {
       </section>
 
       {/* PhotoStory - Um Dia no Hotel - GRID 1x4 FULLWIDTH */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-x-clip">
         {(() => {
           const photoStoryKeys = ["sunrise", "breakfast", "bike", "beachTennis"] as const;
           const getPhotoStoryItem = (index: number) => {
@@ -772,7 +771,7 @@ export default function Home() {
       </section>
 
       {/* Galeria - Momentos Inesquecíveis - MASONRY ANIMADO */}
-      <section className="py-16 lg:py-24 bg-background relative overflow-hidden">
+      <section className="py-16 lg:py-24 bg-background relative overflow-x-clip">
         {/* Padrão decorativo nordestino sutil */}
         <NordestinoPattern variant="sunset" opacity={0.03} />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -793,46 +792,38 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Grid Masonry - em edição: sempre 9 slots (page=home, section=galeria-momentos); fora: só fotos dessa seção */}
+          {/* Layout 1 esquerda + 2 direita (page=home, section=galeria-momentos). Em edição: 3 slots; fora: primeiras 3 fotos. */}
           {editor?.editMode ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 9 }, (_, index) => {
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:grid-rows-2 lg:h-[560px] xl:h-[680px] 2xl:h-[760px]">
+              {[0, 1, 2].map((index) => {
                 const path = `gallery:home:galeria-momentos:${index}`;
                 const photoByOrder = homeImages.galeriaMomentosPhotos.find((p: any) => (p.order ?? 0) === index);
                 const src = getGalleryImageByPath(galleryPhotos, path) || photoByOrder?.imageUrl || "";
+                const isLeft = index === 0;
                 return (
-                  <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                  <div
+                    key={index}
+                    className={cn(
+                      "relative rounded-lg overflow-hidden",
+                      isLeft ? "lg:row-span-2 min-h-[200px] lg:min-h-0" : ""
+                    )}
+                  >
                     <PageImage
                       src={src}
                       path={path}
                       aspectRatio="auto"
-                      className="w-full h-full"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 );
               })}
             </div>
-          ) : homeImages.galeriaMomentosPhotos.length >= 4 ? (
-            <MasonrySwap
+          ) : (
+            <GalleryOneLeftTwoRight
               images={homeImages.galeriaMomentosPhotos
                 .map(photo => photo.imageUrl)
-                .filter(url => url && url.trim() !== '')}
+                .filter((url): url is string => !!url && typeof url === "string" && url.trim() !== "")}
               interval={5000}
-            />
-          ) : (
-            <ImageGalleryGrid
-              images={homeImages.galeriaMomentosPhotos
-                .map((photo, index) => {
-                  const title = getGalleryImageTitle(photo, index + 1);
-                  return {
-                    src: photo.imageUrl,
-                    alt: title,
-                    title: title
-                  };
-                })
-                .filter(img => img.src)}
-              columns={3}
-              aspectRatio="landscape"
             />
           )}
         </div>

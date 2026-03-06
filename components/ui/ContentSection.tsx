@@ -53,7 +53,7 @@ export function ContentSection({
   return (
     <Component
       className={cn(
-        "relative overflow-hidden py-16 lg:py-24",
+        "relative overflow-x-clip py-16 lg:py-24",
         variantClasses[variant],
         widthClasses[width],
         className,
@@ -68,7 +68,7 @@ export function ContentSection({
         />
       )}
 
-      <div className="relative z-10">
+      <div className="relative z-10 min-w-0">
         {children}
       </div>
     </Component>

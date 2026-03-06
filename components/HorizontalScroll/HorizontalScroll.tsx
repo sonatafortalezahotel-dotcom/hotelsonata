@@ -40,7 +40,7 @@ export function HorizontalScroll({
       case "90":
         return "w-[90vw] md:w-[48vw]";
       case "auto":
-        return "w-auto min-w-[280px]";
+        return "w-auto min-w-0 max-w-full md:min-w-[280px] md:max-w-[320px]";
       default:
         return "w-[85vw] md:w-[45vw]";
     }
@@ -107,12 +107,12 @@ export function HorizontalScroll({
   };
 
   return (
-    <div className={cn("relative group", className)}>
-      {/* Container com scroll */}
+    <div className={cn("relative group min-w-0", className)}>
+      {/* Container com scroll - overflow-x contido para não expandir a página */}
       <div
         ref={scrollRef}
         className={cn(
-          "flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth",
+          "flex overflow-x-auto overflow-y-hidden scrollbar-hide snap-x snap-mandatory scroll-smooth min-w-0",
           `gap-${gap}`,
           enableDesktop ? "" : "lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible"
         )}

@@ -10,7 +10,15 @@ import { getPageTranslation } from "@/lib/translations/pages";
 import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
+import { useGallery } from "@/lib/hooks/useGallery";
+import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { useEffect, useState } from "react";
+
+/** Mesmas 2 logos do bloco "Prêmios de Excelência" da home (AwardsSection) */
+const EXCELLENCE_AWARDS_LOGOS = [
+  { src: "/Sobre Hotel/certificados/ORANGE_MEDIUM_TRAVEL_AWARDS.png", alt: "Travel Awards" },
+  { src: "/Sobre Hotel/certificados/LIGHT_MEDIUM_TRAVEL_AWARDS.png", alt: "Travel Awards" },
+];
 
 interface SiteSettings {
   email: string;
@@ -27,6 +35,7 @@ interface SiteSettings {
 export default function Footer() {
   const { locale } = useLanguage();
   const t = getPageTranslation(locale, "footer");
+  const { photos: galleryPhotos } = useGallery({ page: "global" });
   const [settings, setSettings] = useState<SiteSettings>({
     email: "contato@hotelsonata.com.br",
     phone: "(85) 3456-7890",
@@ -132,20 +141,20 @@ export default function Footer() {
           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6">
+        <div className="container mx-auto min-w-0 max-w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6 min-w-0">
             {/* Logo e Descrição */}
-            <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 min-w-0">
               <Link href="/" className="inline-block mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-lg">
                 <Image
                   src="/Logo/logo-soneto (1).png"
                   alt="Logo"
-                  width={120}
-                  height={120}
-                  className="object-contain h-24 w-24 sm:h-28 sm:w-28"
+                  width={180}
+                  height={180}
+                  className="object-contain h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40"
                 />
               </Link>
-              <p className="text-primary-foreground/80 mb-6 leading-relaxed text-sm">
+              <p className="text-primary-foreground/80 mb-6 leading-relaxed text-sm min-w-0 break-words">
                 {getFooterText("description", t.description)}
               </p>
               <div className="flex items-center gap-3">
@@ -175,7 +184,7 @@ export default function Footer() {
             </div>
 
             {/* Menu Rápido */}
-            <div className="col-span-1 md:col-span-1 lg:col-span-2">
+            <div className="col-span-1 md:col-span-1 lg:col-span-2 min-w-0">
               <h4 className="text-lg font-semibold mb-4">{getFooterText("quickMenu", t.quickMenu)}</h4>
               <ul className="space-y-3">
                 {menuItems.map((item) => (
@@ -192,29 +201,29 @@ export default function Footer() {
             </div>
 
             {/* Contato */}
-            <div className="col-span-1 md:col-span-1 lg:col-span-3">
+            <div className="col-span-1 md:col-span-1 lg:col-span-3 min-w-0">
               <h4 className="text-lg font-semibold mb-4">{getFooterText("contact", t.contact)}</h4>
               <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-3 text-primary-foreground/80">
+                <li className="flex items-start gap-3 text-primary-foreground/80 min-w-0">
                   <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <span>{fullAddress}</span>
+                  <span className="min-w-0 break-words">{fullAddress}</span>
                 </li>
-                <li className="flex items-center gap-3 text-primary-foreground/80">
+                <li className="flex items-center gap-3 text-primary-foreground/80 min-w-0">
                   <Phone className="h-5 w-5 flex-shrink-0" />
-                  <a href={`tel:${settings.phone.replace(/\D/g, "")}`} className="hover:underline">
+                  <a href={`tel:${settings.phone.replace(/\D/g, "")}`} className="hover:underline min-w-0 truncate">
                     {settings.phone}
                   </a>
                 </li>
-                <li className="flex items-center gap-3 text-primary-foreground/80">
+                <li className="flex items-center gap-3 text-primary-foreground/80 min-w-0">
                   <Mail className="h-5 w-5 flex-shrink-0" />
-                  <a href={`mailto:${settings.email}`} className="hover:underline">
+                  <a href={`mailto:${settings.email}`} className="hover:underline min-w-0 break-all">
                     {settings.email}
                   </a>
                 </li>
                 {settings.whatsapp && (
-                  <li className="flex items-center gap-3 text-primary-foreground/80">
+                  <li className="flex items-center gap-3 text-primary-foreground/80 min-w-0">
                     <MessageCircle className="h-5 w-5 flex-shrink-0" />
-                    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:underline min-w-0 truncate">
                       {settings.whatsapp}
                     </a>
                   </li>
@@ -223,7 +232,7 @@ export default function Footer() {
             </div>
 
             {/* Credibilidade e Certificações */}
-            <div className="col-span-1 md:col-span-2 lg:col-span-4">
+            <div className="col-span-1 md:col-span-2 lg:col-span-4 min-w-0">
               <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Award className="h-5 w-5" />
                 {getFooterText("credibility.title", t.credibility?.title || "Certificações")}
@@ -246,26 +255,19 @@ export default function Footer() {
                   </div>
                 </div>
 
-                {/* Travel Awards */}
+                {/* Prêmios de Excelência - mesmas logos do bloco da home */}
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="relative w-full h-12 bg-white/10 rounded p-2 flex items-center justify-center">
-                    <Image
-                      src="/Sobre Hotel/certificados/ORANGE_MEDIUM_TRAVEL_AWARDS.png"
-                      alt="Travel Awards"
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-contain p-1"
-                    />
-                  </div>
-                  <div className="relative w-full h-12 bg-white/10 rounded p-2 flex items-center justify-center">
-                    <Image
-                      src="/Sobre Hotel/certificados/LIGHT_MEDIUM_TRAVEL_AWARDS.png"
-                      alt="Travel Awards"
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-contain p-1"
-                    />
-                  </div>
+                  {EXCELLENCE_AWARDS_LOGOS.map((award, index) => (
+                    <div key={index} className="relative w-full h-12 bg-white/10 rounded p-2 flex items-center justify-center">
+                      <Image
+                        src={getGalleryImageByPath(galleryPhotos, `gallery:global:awards-excellence:${index}`) || award.src}
+                        alt={award.alt}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-contain p-1"
+                      />
+                    </div>
+                  ))}
                 </div>
 
                 {/* Selos de Qualidade */}
