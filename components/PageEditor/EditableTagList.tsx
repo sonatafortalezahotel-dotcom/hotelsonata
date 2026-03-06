@@ -16,6 +16,8 @@ interface EditableTagListProps {
   fieldKey: string;
   locale: Locale;
   className?: string;
+  /** Tags exibidas quando ainda não há nada salvo no editor (para o usuário poder editar as atuais). */
+  defaultTags?: string[];
 }
 
 export function EditableTagList({
@@ -24,10 +26,12 @@ export function EditableTagList({
   fieldKey,
   locale,
   className,
+  defaultTags = [],
 }: EditableTagListProps) {
   const editor = useEditor();
   const overrides = editor?.overrides ?? {};
-  const tags = getPageContentTags(page, section, fieldKey, locale, overrides);
+  const savedTags = getPageContentTags(page, section, fieldKey, locale, overrides);
+  const tags = savedTags.length > 0 ? savedTags : defaultTags;
   const [newTag, setNewTag] = useState("");
   const [saving, setSaving] = useState(false);
 

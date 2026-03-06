@@ -21,6 +21,7 @@ export async function GET(request: Request) {
         title: gastronomyTranslations.title,
         description: gastronomyTranslations.description,
         menu: gastronomyTranslations.menu,
+        tags: gastronomyTranslations.tags,
       })
       .from(gastronomy)
       .leftJoin(
@@ -50,7 +51,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { type, title, description, imageUrl, gallery, schedule, active, order, menu, locale = "pt" } = body;
+    const { type, title, description, imageUrl, gallery, schedule, active, order, menu, tags, locale = "pt" } = body;
 
     // Validação mais detalhada
     if (!type || typeof type !== "string" || !type.trim()) {
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
         title,
         description: description || "",
         menu: menu || null,
+        tags: Array.isArray(tags) ? tags : (typeof tags === "string" ? tags.split(",").map((s: string) => s.trim()).filter(Boolean) : null),
       });
     }
 

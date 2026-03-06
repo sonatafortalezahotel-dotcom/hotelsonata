@@ -37,6 +37,8 @@ interface GastronomyItem {
   title?: string | null;
   description?: string | null;
   imageUrl: string;
+  schedule?: string | null;
+  tags?: string[] | null;
   active: boolean;
   order: number;
 }
@@ -228,6 +230,8 @@ function GastronomyForm({
     type: item?.type || "restaurante",
     title: item?.title || "",
     description: item?.description || "",
+    schedule: item?.schedule ?? "",
+    tags: Array.isArray(item?.tags) ? item.tags.join("\n") : (item?.tags ? String(item.tags) : ""),
     imageUrl: item?.imageUrl || "",
     active: item?.active ?? true,
     order: item?.order || 0,
@@ -241,6 +245,8 @@ function GastronomyForm({
         type: item.type || "restaurante",
         title: item.title || "",
         description: item.description || "",
+        schedule: item.schedule ?? "",
+        tags: Array.isArray(item.tags) ? item.tags.join("\n") : (item.tags ? String(item.tags) : ""),
         imageUrl: item.imageUrl || "",
         active: item.active ?? true,
         order: item.order || 0,
@@ -250,6 +256,8 @@ function GastronomyForm({
         type: "restaurante",
         title: "",
         description: "",
+        schedule: "",
+        tags: "",
         imageUrl: "",
         active: true,
         order: 0,
@@ -289,6 +297,13 @@ function GastronomyForm({
         type: formData.type,
         title: formData.title.trim(),
         description: formData.description || "",
+        schedule: formData.schedule?.trim() || null,
+        tags: formData.tags
+          ? formData.tags
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
         imageUrl: formData.imageUrl,
         active: formData.active,
         order: formData.order,
@@ -391,6 +406,37 @@ function GastronomyForm({
             }
             rows={3}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="schedule">Horário</Label>
+          <Input
+            id="schedule"
+            value={formData.schedule}
+            onChange={(e) =>
+              setFormData({ ...formData, schedule: e.target.value })
+            }
+            placeholder="Ex: Segunda a Sexta: 6h30 às 10h / Sábados e Domingos: 7h às 10h30"
+          />
+          <p className="text-xs text-muted-foreground">
+            Exibido no card na página de Gastronomia. Deixe em branco para usar o texto padrão.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tags">Tags</Label>
+          <Textarea
+            id="tags"
+            value={formData.tags}
+            onChange={(e) =>
+              setFormData({ ...formData, tags: e.target.value })
+            }
+            placeholder={"Uma tag por linha\nEx: Tapiocas na Hora\nFrutas Frescas\nCafé Cearense"}
+            rows={4}
+          />
+          <p className="text-xs text-muted-foreground">
+            Uma tag por linha. Exibidas no card. Deixe em branco para usar as tags padrão.
+          </p>
         </div>
 
         <ImageUpload

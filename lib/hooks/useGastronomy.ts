@@ -8,6 +8,7 @@ export interface Gastronomy {
   imageUrl: string | null;
   gallery: string[] | null;
   schedule: string | null;
+  tags: string[] | null;
   active: boolean;
   order: number;
 }

@@ -130,8 +130,8 @@ export function AmenityCard({
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent" />
       </div>
 
-      {/* Conteúdo */}
-      <CardContent className="p-6">
+      {/* Conteúdo: sem max-height para não cortar texto; tags com flex-wrap e espaço */}
+      <CardContent className="p-6 overflow-visible min-h-0">
         <div className="flex items-start gap-3 mb-4">
           {Icon && (
             <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">

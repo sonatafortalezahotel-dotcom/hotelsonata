@@ -117,6 +117,7 @@ export const gastronomyTranslations = pgTable("gastronomy_translations", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   menu: jsonb("menu"), // Estrutura de menu traduzido
+  tags: jsonb("tags"), // Array de strings (tags exibidas no card)
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

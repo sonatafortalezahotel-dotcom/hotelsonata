@@ -6,9 +6,9 @@ import { Clock, Award, Coffee, UtensilsCrossed, ChefHat } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { useEditor } from "@/lib/context/EditorContext";
-import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
+import { getPageContent, getPageContentIcon, getPageContentTags } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
-import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
+import { PageText, PageImage, EditableIcon, EditableTagList } from "@/components/PageEditor";
 import Image from "next/image";
 import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
@@ -106,95 +106,136 @@ function GastronomiaPageContent() {
       <section className="py-16 lg:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {editor?.editMode ? (
-              <>
-                <div>
-                  <h3 className="text-xl font-bold mb-4">{t.breakfast.title}</h3>
-                  <div className="mb-4">
-                    <EditableIcon page="gastronomia" section="cards" fieldKey="breakfast.icon" locale={locale} defaultIconName="Coffee" defaultIcon={Coffee} iconClassName="h-16 w-16" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {Array.from({ length: 4 }, (_, i) => gastronomiaImages.cardCafeManha[i]).map((photo, i) => (
-                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
-                        <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:card-cafe-manha:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:gastronomia:card-cafe-manha:${i}`} aspectRatio="square" className="w-full h-full" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-4">{t.restaurant.title}</h3>
-                  <div className="mb-4">
-                    <EditableIcon page="gastronomia" section="cards" fieldKey="restaurant.icon" locale={locale} defaultIconName="UtensilsCrossed" defaultIcon={UtensilsCrossed} iconClassName="h-16 w-16" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {Array.from({ length: 5 }, (_, i) => gastronomiaImages.cardRestaurante[i]).map((photo, i) => (
-                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
-                        <PageImage src={(getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:card-restaurante:${i}`) || photo?.imageUrl) ?? ""} path={`gallery:gastronomia:card-restaurante:${i}`} aspectRatio="square" className="w-full h-full" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              (() => {
-                const overrides = editor?.overrides ?? {};
-                const breakfastIconName = getPageContentIcon("cards", "breakfast.icon", overrides, "Coffee");
-                const restaurantIconName = getPageContentIcon("cards", "restaurant.icon", overrides, "UtensilsCrossed");
-                const BreakfastIcon = getIcon(breakfastIconName) ?? Coffee;
-                const RestaurantIcon = getIcon(restaurantIconName) ?? UtensilsCrossed;
-                return (
-              <>
-                {/* Café da Manhã */}
-                <AmenityCard
-                  title={t.breakfast.title}
-                  description={t.breakfast.description}
-                  images={(() => {
-                    const cafe = gastronomy.find(g => g.type === "cafe" || g.type === "cafe-da-manha");
-                    if (cafe?.gallery && Array.isArray(cafe.gallery)) {
-                      return cafe.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "");
+            {(() => {
+              const overrides = editor?.overrides ?? {};
+              const breakfastIconName = getPageContentIcon("cards", "breakfast.icon", overrides, "Coffee");
+              const restaurantIconName = getPageContentIcon("cards", "restaurant.icon", overrides, "UtensilsCrossed");
+              const BreakfastIcon = getIcon(breakfastIconName) ?? Coffee;
+              const RestaurantIcon = getIcon(restaurantIconName) ?? UtensilsCrossed;
+              const cafe = gastronomy.find(g => g.type === "cafe" || g.type === "cafe-da-manha" || g.type === "cafe-manha");
+              const restaurante = gastronomy.find(g => g.type === "restaurante");
+              const cafeImages = (cafe?.gallery && Array.isArray(cafe.gallery))
+                ? cafe.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "")
+                : gastronomiaImages.cardCafeManha.map((p) => p.imageUrl).filter((url: any) => url && typeof url === "string" && url.trim() !== "");
+              const restauranteImages = (restaurante?.gallery && Array.isArray(restaurante.gallery))
+                ? restaurante.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "")
+                : gastronomiaImages.cardRestaurante.map((p) => p.imageUrl).filter((url: any) => url && typeof url === "string" && url.trim() !== "");
+              const defaultCafeSchedule = `${t.breakfast.scheduleWeekday} / ${t.breakfast.scheduleWeekend}`;
+              const defaultRestauranteSchedule = `${t.restaurant.lunch} / ${t.restaurant.dinner}`;
+              const cafeScheduleApi = cafe?.schedule != null && String(cafe.schedule).trim() !== "" ? String(cafe.schedule) : null;
+              const restauranteScheduleApi = restaurante?.schedule != null && String(restaurante.schedule).trim() !== "" ? String(restaurante.schedule) : null;
+              const cafeTagsFromEditor = getPageContentTags("gastronomia", "cards", "breakfast.tags", locale, overrides);
+              const restauranteTagsFromEditor = getPageContentTags("gastronomia", "cards", "restaurant.tags", locale, overrides);
+              const defaultCafeTags = [t.gallery.items.tapioca, t.gallery.items.fruits, t.gallery.items.breads, t.gallery.items.coffee, t.gallery.items.table];
+              const defaultRestauranteTags = [t.gallery.items.flavor, t.gallery.items.ocean, "Internacional"];
+              return (
+                <>
+                  {/* Café da Manhã */}
+                  <AmenityCard
+                    title={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="breakfast" fieldKey="title" locale={locale} as="span" placeholder={cafe?.title || t.breakfast.title} />
+                      ) : (
+                        getPageContent("gastronomia", "breakfast", "title", locale, overrides) || cafe?.title || t.breakfast.title
+                      )
                     }
-                    return gastronomiaImages.cardCafeManha
-                      .map((p) => p.imageUrl)
-                      .filter((url: any) => url && typeof url === "string" && url.trim() !== "");
-                  })()}
-                  icon={BreakfastIcon}
-                  schedule={gastronomy.find(g => g.type === "cafe")?.schedule || `${t.breakfast.scheduleWeekday} / ${t.breakfast.scheduleWeekend}`}
-                  badge={t.breakfast.badge}
-                  tags={[
-                    t.gallery.items.tapioca,
-                    t.gallery.items.fruits,
-                    t.gallery.items.breads,
-                    t.gallery.items.coffee,
-                    t.gallery.items.table
-                  ]}
-                />
+                    description={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="breakfast" fieldKey="description" locale={locale} as="span" placeholder={cafe?.description || t.breakfast.description} />
+                      ) : (
+                        getPageContent("gastronomia", "breakfast", "description", locale, overrides) || cafe?.description || t.breakfast.description
+                      )
+                    }
+                    images={
+                      editor?.editMode
+                        ? Array.from({ length: 4 }, (_, i) => (
+                            <PageImage
+                              key={i}
+                              src={getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:card-cafe-manha:${i}`) || cafeImages[i] || ""}
+                              path={`gallery:gastronomia:card-cafe-manha:${i}`}
+                              aspectRatio="square"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          ))
+                        : cafeImages
+                    }
+                    icon={editor?.editMode ? <EditableIcon page="gastronomia" section="cards" fieldKey="breakfast.icon" locale={locale} defaultIconName="Coffee" defaultIcon={Coffee} iconClassName="h-6 w-6 text-primary" /> : BreakfastIcon}
+                    schedule={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="breakfast" fieldKey="schedule" locale={locale} as="span" placeholder={cafeScheduleApi || defaultCafeSchedule} />
+                      ) : (
+                        getPageContent("gastronomia", "breakfast", "schedule", locale, overrides) || cafeScheduleApi || defaultCafeSchedule
+                      )
+                    }
+                    badge={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="breakfast" fieldKey="badge" locale={locale} as="span" placeholder={t.breakfast.badge} />
+                      ) : (
+                        getPageContent("gastronomia", "breakfast", "badge", locale, overrides) || t.breakfast.badge
+                      )
+                    }
+                    tagsSlot={editor?.editMode ? <EditableTagList page="gastronomia" section="cards" fieldKey="breakfast.tags" locale={locale} defaultTags={cafeTagsFromEditor.length > 0 ? cafeTagsFromEditor : Array.isArray(cafe?.tags) && cafe.tags.length > 0 ? cafe.tags : defaultCafeTags} /> : undefined}
+                    tags={
+                      editor?.editMode
+                        ? []
+                      : (cafeTagsFromEditor.length > 0 ? cafeTagsFromEditor : Array.isArray(cafe?.tags) && cafe.tags.length > 0 ? cafe.tags : defaultCafeTags)
+                    }
+                  />
 
-                {/* Restaurante */}
-                <AmenityCard
-                  title={t.restaurant.title}
-                  description={t.restaurant.description}
-                  images={(() => {
-                    const restaurante = gastronomy.find(g => g.type === "restaurante");
-                    if (restaurante?.gallery && Array.isArray(restaurante.gallery)) {
-                      return restaurante.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "");
+                  {/* Restaurante */}
+                  <AmenityCard
+                    title={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="restaurant" fieldKey="title" locale={locale} as="span" placeholder={restaurante?.title || t.restaurant.title} />
+                      ) : (
+                        getPageContent("gastronomia", "restaurant", "title", locale, overrides) || restaurante?.title || t.restaurant.title
+                      )
                     }
-                    return gastronomiaImages.cardRestaurante
-                      .map((p) => p.imageUrl)
-                      .filter((url: any) => url && typeof url === "string" && url.trim() !== "");
-                  })()}
-                  icon={RestaurantIcon}
-                  schedule={gastronomy.find(g => g.type === "restaurante")?.schedule || `${t.restaurant.lunch} / ${t.restaurant.dinner}`}
-                  badge={t.gallery.items.ocean}
-                  tags={[
-                    t.gallery.items.flavor,
-                    t.gallery.items.ocean,
-                    "Internacional"
-                  ]}
-                />
-              </>
-                );
-              })()
-            )}
+                    description={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="restaurant" fieldKey="description" locale={locale} as="span" placeholder={restaurante?.description || t.restaurant.description} />
+                      ) : (
+                        getPageContent("gastronomia", "restaurant", "description", locale, overrides) || restaurante?.description || t.restaurant.description
+                      )
+                    }
+                    images={
+                      editor?.editMode
+                        ? Array.from({ length: 5 }, (_, i) => (
+                            <PageImage
+                              key={i}
+                              src={getGalleryImageByPath(galleryPhotos, `gallery:gastronomia:card-restaurante:${i}`) || restauranteImages[i] || ""}
+                              path={`gallery:gastronomia:card-restaurante:${i}`}
+                              aspectRatio="square"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          ))
+                        : restauranteImages
+                    }
+                    icon={editor?.editMode ? <EditableIcon page="gastronomia" section="cards" fieldKey="restaurant.icon" locale={locale} defaultIconName="UtensilsCrossed" defaultIcon={UtensilsCrossed} iconClassName="h-6 w-6 text-primary" /> : RestaurantIcon}
+                    schedule={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="restaurant" fieldKey="schedule" locale={locale} as="span" placeholder={restauranteScheduleApi || defaultRestauranteSchedule} />
+                      ) : (
+                        getPageContent("gastronomia", "restaurant", "schedule", locale, overrides) || restauranteScheduleApi || defaultRestauranteSchedule
+                      )
+                    }
+                    badge={
+                      editor?.editMode ? (
+                        <PageText page="gastronomia" section="cards" fieldKey="restaurant.badge" locale={locale} as="span" placeholder={t.gallery.items.ocean} />
+                      ) : (
+                        getPageContent("gastronomia", "cards", "restaurant.badge", locale, overrides) || t.gallery.items.ocean
+                      )
+                    }
+                    tagsSlot={editor?.editMode ? <EditableTagList page="gastronomia" section="cards" fieldKey="restaurant.tags" locale={locale} defaultTags={restauranteTagsFromEditor.length > 0 ? restauranteTagsFromEditor : Array.isArray(restaurante?.tags) && restaurante.tags.length > 0 ? restaurante.tags : defaultRestauranteTags} /> : undefined}
+                    tags={
+                      editor?.editMode
+                        ? []
+                      : (restauranteTagsFromEditor.length > 0 ? restauranteTagsFromEditor : Array.isArray(restaurante?.tags) && restaurante.tags.length > 0 ? restaurante.tags : defaultRestauranteTags)
+                    }
+                  />
+                </>
+              );
+            })()}
           </div>
 
           {/* Destaques do Café da Manhã */}
@@ -352,7 +393,7 @@ function GastronomiaPageContent() {
             description: editor?.editMode ? <PageText page="gastronomia" section="photoStory" fieldKey="items.chef.description" locale={locale} as="span" /> : (getPageContent("gastronomia", "photoStory", "items.chef.description", locale, editor?.overrides ?? {}) || t.photoStory.items.chef.description),
           },
           {
-            image: editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:gastronomia:photo-story-gastronomia:3") || gastronomy.find(g => g.type === "cafe")?.imageUrl || gastronomiaImages.photoStory.cafe3 || ""} path="gallery:gastronomia:photo-story-gastronomia:3" aspectRatio="auto" className="absolute inset-0 w-full h-full" /> : (getGalleryImageByPath(galleryPhotos, "gallery:gastronomia:photo-story-gastronomia:3") || gastronomy.find(g => g.type === "cafe")?.imageUrl || gastronomiaImages.photoStory.cafe3 || null),
+            image: editor?.editMode ? <PageImage src={getGalleryImageByPath(galleryPhotos, "gallery:gastronomia:photo-story-gastronomia:3") || gastronomy.find(g => g.type === "cafe" || g.type === "cafe-manha" || g.type === "cafe-da-manha")?.imageUrl || gastronomiaImages.photoStory.cafe3 || ""} path="gallery:gastronomia:photo-story-gastronomia:3" aspectRatio="auto" className="absolute inset-0 w-full h-full" /> : (getGalleryImageByPath(galleryPhotos, "gallery:gastronomia:photo-story-gastronomia:3") || gastronomy.find(g => g.type === "cafe" || g.type === "cafe-manha" || g.type === "cafe-da-manha")?.imageUrl || gastronomiaImages.photoStory.cafe3 || null),
             title: editor?.editMode ? <PageText page="gastronomia" section="photoStory" fieldKey="items.breakfast.title" locale={locale} as="span" /> : (getPageContent("gastronomia", "photoStory", "items.breakfast.title", locale, editor?.overrides ?? {}) || t.photoStory.items.breakfast.title),
             description: editor?.editMode ? <PageText page="gastronomia" section="photoStory" fieldKey="items.breakfast.description" locale={locale} as="span" /> : (getPageContent("gastronomia", "photoStory", "items.breakfast.description", locale, editor?.overrides ?? {}) || t.photoStory.items.breakfast.description),
           },
@@ -398,14 +439,28 @@ function GastronomiaPageContent() {
       <section className="py-16 lg:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
-            {t.roomService.title}
+            {editor?.editMode ? (
+              <PageText page="gastronomia" section="roomService" fieldKey="title" locale={locale} as="span" placeholder={t.roomService.title} />
+            ) : (
+              getPageContent("gastronomia", "roomService", "title", locale, editor?.overrides ?? {}) || t.roomService.title
+            )}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t.roomService.description}
+            {editor?.editMode ? (
+              <PageText page="gastronomia" section="roomService" fieldKey="description" locale={locale} as="span" placeholder={t.roomService.description} />
+            ) : (
+              getPageContent("gastronomia", "roomService", "description", locale, editor?.overrides ?? {}) || t.roomService.description
+            )}
           </p>
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-lg">
             <Clock className="h-5 w-5 text-primary" />
-            <span className="font-semibold text-foreground">{t.roomService.available}</span>
+            <span className="font-semibold text-foreground">
+              {editor?.editMode ? (
+                <PageText page="gastronomia" section="roomService" fieldKey="available" locale={locale} as="span" placeholder={t.roomService.available} />
+              ) : (
+                getPageContent("gastronomia", "roomService", "available", locale, editor?.overrides ?? {}) || t.roomService.available
+              )}
+            </span>
           </div>
         </div>
       </section>
@@ -414,16 +469,28 @@ function GastronomiaPageContent() {
       <section className="py-16 lg:py-24 bg-gradient-to-br from-amber-600/90 to-amber-700 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            {t.cta.title}
+            {editor?.editMode ? (
+              <PageText page="gastronomia" section="cta" fieldKey="title" locale={locale} as="span" placeholder={t.cta.title} className="text-white" />
+            ) : (
+              getPageContent("gastronomia", "cta", "title", locale, editor?.overrides ?? {}) || t.cta.title
+            )}
           </h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto text-white/90">
-            {t.cta.subtitle}
+            {editor?.editMode ? (
+              <PageText page="gastronomia" section="cta" fieldKey="subtitle" locale={locale} as="span" placeholder={t.cta.subtitle} className="text-white/90" />
+            ) : (
+              getPageContent("gastronomia", "cta", "subtitle", locale, editor?.overrides ?? {}) || t.cta.subtitle
+            )}
           </p>
           <a 
             href="/"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-amber-700 hover:bg-white/90 h-11 px-8"
           >
-            {t.cta.bookNow}
+            {editor?.editMode ? (
+              <PageText page="gastronomia" section="cta" fieldKey="bookNow" locale={locale} as="span" placeholder={t.cta.bookNow} />
+            ) : (
+              getPageContent("gastronomia", "cta", "bookNow", locale, editor?.overrides ?? {}) || t.cta.bookNow
+            )}
           </a>
         </div>
       </section>

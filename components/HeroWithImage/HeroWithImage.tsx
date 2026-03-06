@@ -59,9 +59,10 @@ export function HeroWithImage({
   const hasImageNode = imageNode != null;
 
   // Margem negativa bem alta: foto sobe até o topo e cobre qualquer branco (layout/edit); padding-top mantém título abaixo do header
+  // overflow-hidden na section; conteúdo com padding-bottom para não cortar texto em viewports/zoom variados
   return (
     <section 
-      className={`relative ${heightClasses[height]} -mt-48 lg:-mt-56 pt-72 lg:pt-80 flex items-center justify-center overflow-hidden`}
+      className={`relative ${heightClasses[height]} min-h-[420px] -mt-48 lg:-mt-56 pt-72 lg:pt-80 flex items-center justify-center overflow-hidden`}
     >
       {/* Imagem de Fundo com Parallax */}
       {hasImageNode ? (
@@ -96,8 +97,8 @@ export function HeroWithImage({
         <div className={`absolute inset-0 z-0 bg-gradient-to-br from-primary/20 to-primary/40 ${overlayClasses[overlay]}`} />
       )}
 
-      {/* Conteúdo: -mt sobe o bloco (ícone, título, subtítulo) */}
-      <div className={`relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-white flex flex-col -mt-16 lg:-mt-24 ${alignmentClasses[alignment]}`}>
+      {/* Conteúdo: -mt sobe o bloco (ícone, título, subtítulo); pb evita corte do texto na base em vários computadores */}
+      <div className={`relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-white flex flex-col -mt-16 lg:-mt-24 pb-12 lg:pb-16 ${alignmentClasses[alignment]}`}>
         {icon && (
           <div className="mb-6 drop-shadow-2xl">
             {icon}

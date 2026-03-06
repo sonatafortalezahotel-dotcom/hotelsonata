@@ -17,7 +17,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { type, title, description, imageUrl, gallery, schedule, active, order, menu, locale = "pt" } = body;
+    const { type, title, description, imageUrl, gallery, schedule, active, order, menu, tags, locale = "pt" } = body;
 
     // Validação mais detalhada
     if (!type || typeof type !== "string" || !type.trim()) {
@@ -74,6 +74,7 @@ export async function PUT(
       )
       .limit(1);
 
+    const tagsValue = Array.isArray(tags) ? tags : (typeof tags === "string" ? tags.split(",").map((s: string) => s.trim()).filter(Boolean) : null);
     if (existingTranslation) {
       await db
         .update(gastronomyTranslations)
@@ -81,6 +82,7 @@ export async function PUT(
           title,
           description: description || "",
           menu: menu || null,
+          tags: tagsValue,
           updatedAt: new Date(),
         })
         .where(eq(gastronomyTranslations.id, existingTranslation.id));
@@ -91,6 +93,7 @@ export async function PUT(
         title,
         description: description || "",
         menu: menu || null,
+        tags: tagsValue,
       });
     }
 
