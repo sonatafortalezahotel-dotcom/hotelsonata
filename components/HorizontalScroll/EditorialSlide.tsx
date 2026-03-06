@@ -76,32 +76,59 @@ export function EditorialSlide({
       {/* Overlay Gradiente - pointer-events-none para permitir clicar na imagem no modo edição */}
       <div className={cn("absolute inset-0 pointer-events-none", overlayClasses[overlay])} />
 
-      {/* Texto Sobreposto - bloco único com mesma largura para título, subtítulo e descrição na mesma régua */}
+      {/* Texto Sobreposto - bloco com mesma borda esquerda para subtítulo, título e descrição */}
       <div className={cn(
         "absolute inset-0 flex flex-col z-10 pointer-events-none",
         textPositionClasses[textPosition]
       )}>
-        <div className={cn(
-          "pointer-events-auto max-w-2xl lg:max-w-3xl",
-          textAlignClasses[textPosition]
-        )}>
+        <div
+          className={cn(
+            "editorial-slide-text pointer-events-auto max-w-2xl lg:max-w-3xl w-full min-w-0 flex flex-col",
+            textPosition === "bottom-left" || textPosition === "left"
+              ? "items-start"
+              : textPosition === "bottom-right" || textPosition === "right"
+                ? "items-end"
+                : "items-center",
+            textAlignClasses[textPosition]
+          )}
+        >
           {subtitle && (
-            <p className="text-white/90 text-sm md:text-base lg:text-lg font-light uppercase tracking-widest mb-2 md:mb-3">
+            <p
+              className={cn(
+                "text-white/90 text-sm md:text-base lg:text-lg font-light uppercase tracking-widest mb-2 md:mb-3 m-0 pl-0 pr-0 w-full min-w-0",
+                (textPosition === "bottom-left" || textPosition === "left") && "pl-[0.2em]",
+                (textPosition === "bottom-right" || textPosition === "right") && "pr-[0.1em]"
+              )}
+            >
               {subtitle}
             </p>
           )}
 
-          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6 drop-shadow-2xl">
+          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6 drop-shadow-2xl m-0 pl-0 pr-0 w-full min-w-0">
             {title}
           </h2>
 
           {description && (
-            <p className="text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed">
+            <p
+              className={cn(
+                "text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed m-0 pl-0 pr-0 w-full min-w-0",
+                (textPosition === "bottom-left" || textPosition === "left") && "pl-[0.2em]",
+                (textPosition === "bottom-right" || textPosition === "right") && "pr-[0.1em]"
+              )}
+            >
               {description}
             </p>
           )}
         </div>
       </div>
+
+      {/* Reset local: anula margem do Preflight em p/h2; padding fica a cargo das classes Tailwind (ex.: pl-[0.1em] no subtítulo) */}
+      <style jsx>{`
+        .editorial-slide-text p,
+        .editorial-slide-text h2 {
+          margin: 0 !important;
+        }
+      `}</style>
     </div>
   );
 }
