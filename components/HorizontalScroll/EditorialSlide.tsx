@@ -104,14 +104,14 @@ export function EditorialSlide({
             </p>
           )}
 
-          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-6 drop-shadow-2xl m-0 pl-0 pr-0 w-full min-w-0">
+          <h2 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4 md:mb-5 drop-shadow-2xl m-0 pl-0 pr-0 w-full min-w-0">
             {title}
           </h2>
 
           {description && (
             <p
               className={cn(
-                "text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed m-0 pl-0 pr-0 w-full min-w-0",
+                "text-white/90 text-base md:text-lg lg:text-xl font-light leading-relaxed m-0 mt-2 md:mt-3 pl-0 pr-0 w-full min-w-0",
                 (textPosition === "bottom-left" || textPosition === "left") && "pl-[0.2em]",
                 (textPosition === "bottom-right" || textPosition === "right") && "pr-[0.1em]"
               )}
@@ -122,11 +122,12 @@ export function EditorialSlide({
         </div>
       </div>
 
-      {/* Reset local: anula margem do Preflight em p/h2; padding fica a cargo das classes Tailwind (ex.: pl-[0.1em] no subtítulo) */}
+      {/* Reset local: anula apenas margens laterais (Preflight); vertical fica com Tailwind para espaçamento título/descrição */}
       <style jsx>{`
         .editorial-slide-text p,
         .editorial-slide-text h2 {
-          margin: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
         }
       `}</style>
     </div>
