@@ -374,7 +374,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero/Carrossel - Mobile: 90px de respiro no topo; vídeo rola, formulário embaixo */}
+      {/* Hero/Carrossel com formulário posicionado na base do hero */}
       <div className="relative -mt-20 pt-[90px] lg:-mt-28 lg:pt-0">
         {highlights && highlights.length > 0 ? (
           <VideoCarousel highlights={highlights} locale={locale} galleryPhotos={galleryPhotos} />
@@ -383,15 +383,15 @@ export default function Home() {
             <Hero videoId="xptckGz4eH8" height="full" />
           </div>
         )}
-      </div>
 
-      {/* Formulário de reserva - Mobile: 50px de espaço do vídeo; Desktop: sobe e fica no meio entre hero e seção abaixo */}
-      <div className="relative z-10 mt-[50px] lg:mt-0 lg:-mt-72">
-        <ReservationForm />
+        {/* Formulário de reserva sempre colado na parte de baixo do hero */}
+        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2">
+          <ReservationForm />
+        </div>
       </div>
 
       {/* Seção de Quartos e Pacotes */}
-      <div className="pt-12 lg:pt-16">
+      <div className="pt-24 lg:pt-32">
         <PackagesSection
           rooms={roomsOrdered}
           packages={packages}
