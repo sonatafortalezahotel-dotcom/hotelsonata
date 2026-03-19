@@ -19,6 +19,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getPageContent } from "@/lib/utils/pageContent";
 
 interface HeaderContentProps {
@@ -171,56 +172,58 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[min(400px,100vw-2rem)] sm:w-[400px]">
+              <SheetContent side="right" className="w-[min(400px,100vw-2rem)] sm:w-[400px] p-0">
                 <SheetHeader>
                   <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
                 </SheetHeader>
-                <nav className="flex flex-col gap-1 mt-8" role="navigation" aria-label="Menu principal">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="min-h-[44px] flex items-center px-4 py-3 text-lg font-medium hover:text-primary hover:bg-accent/50 active:bg-accent transition-colors rounded-lg -mx-2"
-                    >
-                      {getNavLabel(item.fieldKey)}
-                    </Link>
-                  ))}
-                </nav>
-
-                {/* Mobile Language Selector */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <div className="flex items-center gap-2 mb-3 px-4">
-                    <Globe className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm font-semibold text-muted-foreground">
-                      Idioma
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-2 px-4">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          setLocale(lang.code);
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-                          locale === lang.code
-                            ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                            : "bg-accent text-foreground hover:bg-accent/80 hover:text-primary active:bg-accent/60"
-                        )}
-                        aria-selected={locale === lang.code}
+                <ScrollArea className="h-full w-full px-6 py-8">
+                  <nav className="flex flex-col gap-1" role="navigation" aria-label="Menu principal">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="min-h-[44px] flex items-center px-4 py-3 text-lg font-medium hover:text-primary hover:bg-accent/50 active:bg-accent transition-colors rounded-lg -mx-2"
                       >
-                        <span className="text-lg">{lang.flag}</span>
-                        <span className="flex-1">{lang.label}</span>
-                        {locale === lang.code && (
-                          <span className="text-xs opacity-70">✓</span>
-                        )}
-                      </button>
+                        {getNavLabel(item.fieldKey)}
+                      </Link>
                     ))}
+                  </nav>
+
+                  {/* Mobile Language Selector */}
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <div className="flex items-center gap-2 mb-3 px-4">
+                      <Globe className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-sm font-semibold text-muted-foreground">
+                        Idioma
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-2 px-4">
+                      {languages.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setLocale(lang.code);
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={cn(
+                            "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                            locale === lang.code
+                              ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                              : "bg-accent text-foreground hover:bg-accent/80 hover:text-primary active:bg-accent/60"
+                          )}
+                          aria-selected={locale === lang.code}
+                        >
+                          <span className="text-lg">{lang.flag}</span>
+                          <span className="flex-1">{lang.label}</span>
+                          {locale === lang.code && (
+                            <span className="text-xs opacity-70">✓</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </ScrollArea>
                 </SheetContent>
               </Sheet>
             ) : (

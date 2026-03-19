@@ -53,7 +53,7 @@ export function ContentSection({
   return (
     <Component
       className={cn(
-        "relative overflow-x-clip py-16 lg:py-24",
+        "relative overflow-x-clip py-10 lg:py-24",
         variantClasses[variant],
         widthClasses[width],
         className,

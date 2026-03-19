@@ -142,7 +142,7 @@ export default function CulturalIdentitySection({
   return (
     <section
       className={cn(
-        "relative py-16 lg:py-24 overflow-hidden",
+        "relative py-10 lg:py-24 overflow-hidden",
         "bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50",
         "dark:from-amber-950/20 dark:via-orange-950/20 dark:to-yellow-950/20",
         className
@@ -154,7 +154,7 @@ export default function CulturalIdentitySection({
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Cabeçalho */}
-        <div className="text-center mb-12 lg:mb-16">
+        <div className="text-center mb-8 lg:mb-16">
           <div className="inline-flex items-center gap-2 mb-4">
             <Sun className="h-6 w-6 text-yellow-500" />
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">

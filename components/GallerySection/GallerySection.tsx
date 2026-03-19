@@ -34,7 +34,7 @@ export function GallerySection({
   };
 
   return (
-    <section className="mt-12 mb-12 min-w-0">
+    <section className="mt-8 mb-8 lg:mt-12 lg:mb-12 min-w-0">
       <h2 className="text-2xl font-bold mb-6 min-w-0 break-words">{title}</h2>
       
       {/* Mobile: Carrossel Horizontal */}

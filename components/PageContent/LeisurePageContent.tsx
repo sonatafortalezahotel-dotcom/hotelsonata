@@ -32,11 +32,11 @@ export default function LeisurePageContent() {
   }, [locale]);
 
   if (loading) {
-    return <div className="text-center py-16">Carregando...</div>;
+    return <div className="text-center py-10">Carregando...</div>;
   }
 
   if (items.length === 0) {
-    return <div className="text-center py-16">Nenhum item disponível.</div>;
+    return <div className="text-center py-10">Nenhum item disponível.</div>;
   }
 
   return (

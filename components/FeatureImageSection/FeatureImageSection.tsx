@@ -43,7 +43,7 @@ export function FeatureImageSection({
   };
 
   return (
-    <section className={`py-16 lg:py-24 overflow-visible ${bgClasses[backgroundColor]}`}>
+    <section className={`py-10 lg:py-24 overflow-visible ${bgClasses[backgroundColor]}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
         <div className={`grid lg:grid-cols-2 gap-12 items-center ${imagePosition === "left" ? "lg:flex-row-reverse" : ""}`}>
           {/* Conteúdo de Texto - overflow-visible para ícone/badge/título nunca serem cortados */}

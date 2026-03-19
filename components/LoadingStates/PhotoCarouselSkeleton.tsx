@@ -5,10 +5,10 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export default function PhotoCarouselSkeleton() {
   return (
-    <section className="py-16 lg:py-24 bg-background">
+    <section className="py-10 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Título */}
-        <div className="text-center mb-12 lg:mb-16">
+        <div className="text-center mb-8 lg:mb-16">
           <Skeleton className="h-10 w-72 mx-auto mb-4" />
         </div>
 

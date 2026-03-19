@@ -507,7 +507,7 @@ export default async function LandingPage({ params }: PageProps) {
     return (
       <>
         <StructuredData data={breadcrumbData} />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
           <article className="max-w-4xl mx-auto">
             {/* Imagem Hero (prioridade: hero padrão > ogImage > primeira imagem da galeria) */}
             {(heroImages.length > 0 || page.ogImage || galleryImages.length > 0) && (

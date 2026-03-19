@@ -391,7 +391,7 @@ export default function Home() {
       </div>
 
       {/* Seção de Quartos e Pacotes */}
-      <div className="pt-24 lg:pt-32">
+      <div className="pt-44 lg:pt-32">
         <PackagesSection
           rooms={roomsOrdered}
           packages={packages}
@@ -771,11 +771,11 @@ export default function Home() {
       </section>
 
       {/* Galeria - Momentos Inesquecíveis - MASONRY ANIMADO */}
-      <section className="py-16 lg:py-24 bg-background relative overflow-x-clip">
+      <section className="py-10 lg:py-24 bg-background relative overflow-x-clip">
         {/* Padrão decorativo nordestino sutil */}
         <NordestinoPattern variant="sunset" opacity={0.03} />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12 lg:mb-16">
+          <div className="text-center mb-8 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               {editor?.editMode ? (
                 <PageText page="home" section="gallery" fieldKey="title" locale={locale} as="span" />

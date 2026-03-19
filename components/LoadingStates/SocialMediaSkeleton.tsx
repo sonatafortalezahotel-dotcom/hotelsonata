@@ -2,10 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SocialMediaSkeleton() {
   return (
-    <section className="py-16 lg:py-24 bg-muted/30">
+    <section className="py-10 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Skeleton */}
-        <div className="text-center mb-12 lg:mb-16">
+        <div className="text-center mb-8 lg:mb-16">
           <Skeleton className="h-10 w-80 mx-auto mb-4" />
           <Skeleton className="h-5 w-96 mx-auto" />
         </div>

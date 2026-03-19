@@ -49,7 +49,7 @@ export function AwardsSection() {
   return (
     <>
       <section 
-        className="py-16 lg:py-24 bg-background relative awards-section-no-gradient"
+        className="py-10 lg:py-24 bg-background relative awards-section-no-gradient"
         style={{
           background: 'hsl(var(--background))',
           backgroundImage: 'none !important',
@@ -62,7 +62,7 @@ export function AwardsSection() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Título Principal */}
-        <div className="text-center mb-12 lg:mb-16">
+        <div className="text-center mb-8 lg:mb-16">
           <Badge className="mb-4 text-base px-4 py-2" variant="outline">
             <Award className="h-4 w-4 mr-2" />
             {getAward("badge", t.badge)}

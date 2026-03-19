@@ -16,9 +16,9 @@ export function AccommodationsSection() {
   const overrides = editor?.overrides ?? {};
   const t = getPageTranslation(locale, "accommodations");
   return (
-    <section className="py-16 lg:py-24 bg-muted/30">
+    <section className="py-10 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16 min-w-0">
+        <div className="text-center mb-8 lg:mb-16 min-w-0">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 min-w-0 break-words">
             {editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="title" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "title", locale, overrides) || t.title)}
           </h2>
@@ -27,7 +27,7 @@ export function AccommodationsSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-8">
           <Card className="text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50">
             <CardContent className="pt-8 pb-6 min-w-0">
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 flex-shrink-0">
@@ -96,7 +96,7 @@ export function AccommodationsSection() {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-8">
           <a href="https://api.whatsapp.com/send?phone=558540061616&text=Ol%c3%a1,%20vi%20o%20site%20de%20voc%c3%aas%20e%20gostaria%20de%20mais%20informa%c3%a7%c3%b5es%20por%20favor." target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8">
             {editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="button" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "button", locale, overrides) || t.button)}
           </a>

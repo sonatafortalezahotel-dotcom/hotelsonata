@@ -54,14 +54,14 @@ export function PhotoStory({
   }, []);
 
   return (
-    <section className={`py-16 lg:py-24 ${bgClasses[backgroundColor]} relative overflow-hidden`}>
+    <section className={`py-10 lg:py-24 ${bgClasses[backgroundColor]} relative overflow-hidden`}>
       {/* Padrão decorativo nordestino sutil */}
       {backgroundColor === "muted" && (
         <NordestinoPattern variant="sunset" opacity={0.04} />
       )}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Cabeçalho - título e texto sempre visíveis em qualquer resolução */}
-        <div className="text-center mb-12 lg:mb-16 min-w-0">
+        <div className="text-center mb-8 lg:mb-16 min-w-0">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 min-w-0 break-words">
             {title}
           </h2>
