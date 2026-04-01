@@ -683,7 +683,8 @@ export default function Home() {
                         <PageText page="home" section="photoStory" fieldKey={`items.${key}.time`} locale={locale} as="span" />
                       )
                     : (
-                        getPageContent("home", "photoStory", `items.${key}.time`, locale, overrides) || (itemT?.time ?? "")
+                        getPageContent("home", "photoStory", `items.${key}.time`, locale, overrides) ||
+                        (itemT && "time" in itemT ? itemT.time : "")
                       ),
               titleStr: getPageContent("home", "photoStory", `items.${key}.title`, locale, overrides) || (itemT?.title ?? ""),
             };
