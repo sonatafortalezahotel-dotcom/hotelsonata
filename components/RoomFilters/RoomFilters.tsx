@@ -119,7 +119,7 @@ export default function RoomFilters({
   };
 
   return (
-    <Card className={cn("sticky top-24", className)}>
+    <Card className={cn("sticky top-28", className)}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{t.title}</CardTitle>

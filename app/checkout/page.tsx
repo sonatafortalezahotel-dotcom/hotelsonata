@@ -327,7 +327,7 @@ export default function CheckoutPage() {
 
           {/* Pagamento */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+            <Card className="sticky top-28">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />

@@ -40,8 +40,8 @@ async function getContactInfo() {
       
       return {
         email: settingsMap.email || 'contato@hotelsonata.com.br',
-        phone: settingsMap.phone || '(85) 3456-7890',
-        whatsapp: settingsMap.whatsapp || '(85) 99999-9999',
+        phone: settingsMap.phone || '(85) 4006-1600',
+        whatsapp: settingsMap.whatsapp || '(85) 4006-1616',
         address: settingsMap.address || 'Av. Beira Mar, 1000 - Praia de Iracema',
         city: settingsMap.city || 'Fortaleza',
         state: settingsMap.state || 'CE',
@@ -463,10 +463,10 @@ function ContatoPageContent() {
                   </CardHeader>
                   <CardContent>
                     <a 
-                      href={`tel:${contactInfo?.phone?.replace(/\D/g, '') || '8534567890'}`}
+                      href={`tel:${contactInfo?.phone?.replace(/\D/g, '') || '8540061600'}`}
                       className="text-primary hover:underline font-semibold"
                     >
-                      {contactInfo?.phone || '(85) 3456-7890'}
+                      {contactInfo?.phone || '(85) 4006-1600'}
                     </a>
                   </CardContent>
                 </Card>
@@ -483,12 +483,12 @@ function ContatoPageContent() {
                   </CardHeader>
                   <CardContent>
                     <a 
-                      href={`https://wa.me/${contactInfo?.whatsapp?.replace(/\D/g, '') || '85999999999'}`}
+                      href={`https://wa.me/${contactInfo?.whatsapp?.replace(/\D/g, '') || '558540061616'}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-600 hover:underline font-semibold"
                     >
-                      {contactInfo?.whatsapp || '(85) 99999-9999'}
+                      {contactInfo?.whatsapp || '(85) 4006-1616'}
                     </a>
                   </CardContent>
                 </Card>

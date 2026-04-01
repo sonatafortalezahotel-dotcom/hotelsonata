@@ -78,7 +78,7 @@ export default function ReservasPage() {
       email: "E-mail",
       emailPlaceholder: "seu@email.com",
       phone: "Telefone",
-      phonePlaceholder: "(85) 99999-9999",
+      phonePlaceholder: "(85) 4006-1616",
       document: "CPF/Passaporte",
       documentPlaceholder: "000.000.000-00",
       specialRequests: "Solicitações Especiais",
@@ -505,7 +505,7 @@ export default function ReservasPage() {
 
           {/* Resumo da Reserva */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+            <Card className="sticky top-28">
               <CardHeader>
                 <CardTitle>{t.reservationSummary}</CardTitle>
               </CardHeader>

@@ -57,8 +57,8 @@ export default function SettingsPage() {
 
         setContactData({
           email: settingsMap.email || "contato@hotelsonata.com.br",
-          phone: settingsMap.phone || "(85) 3456-7890",
-          whatsapp: settingsMap.whatsapp || "(85) 99999-9999",
+          phone: settingsMap.phone || "(85) 4006-1616",
+          whatsapp: settingsMap.whatsapp || "(85) 4006-1616",
           address: settingsMap.address || "Av. Beira Mar, 1000 - Praia de Iracema",
           city: settingsMap.city || "Fortaleza",
           state: settingsMap.state || "CE",

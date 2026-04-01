@@ -118,10 +118,6 @@ function GastronomiaPageContent() {
               const restauranteImages = (restaurante?.gallery && Array.isArray(restaurante.gallery))
                 ? restaurante.gallery.filter((url: any) => url && typeof url === "string" && url.trim() !== "")
                 : gastronomiaImages.cardRestaurante.map((p) => p.imageUrl).filter((url: any) => url && typeof url === "string" && url.trim() !== "");
-              const defaultCafeSchedule = `${t.breakfast.scheduleWeekday} / ${t.breakfast.scheduleWeekend}`;
-              const defaultRestauranteSchedule = `${t.restaurant.lunch} / ${t.restaurant.dinner}`;
-              const cafeScheduleApi = cafe?.schedule != null && String(cafe.schedule).trim() !== "" ? String(cafe.schedule) : null;
-              const restauranteScheduleApi = restaurante?.schedule != null && String(restaurante.schedule).trim() !== "" ? String(restaurante.schedule) : null;
               const cafeTagsFromEditor = getPageContentTags("gastronomia", "cards", "breakfast.tags", locale, overrides);
               const restauranteTagsFromEditor = getPageContentTags("gastronomia", "cards", "restaurant.tags", locale, overrides);
               const defaultCafeTags = [t.gallery.items.tapioca, t.gallery.items.fruits, t.gallery.items.breads, t.gallery.items.coffee, t.gallery.items.table];
@@ -158,13 +154,6 @@ function GastronomiaPageContent() {
                         : cafeImages
                     }
                     icon={editor?.editMode ? <EditableIcon page="gastronomia" section="cards" fieldKey="breakfast.icon" locale={locale} defaultIconName="Coffee" defaultIcon={Coffee} iconClassName="h-6 w-6 text-primary" /> : BreakfastIcon}
-                    schedule={
-                      editor?.editMode ? (
-                        <PageText page="gastronomia" section="breakfast" fieldKey="schedule" locale={locale} as="span" placeholder={cafeScheduleApi || defaultCafeSchedule} />
-                      ) : (
-                        getPageContent("gastronomia", "breakfast", "schedule", locale, overrides) || cafeScheduleApi || defaultCafeSchedule
-                      )
-                    }
                     badge={
                       editor?.editMode ? (
                         <PageText page="gastronomia" section="breakfast" fieldKey="badge" locale={locale} as="span" placeholder={t.breakfast.badge} />
@@ -210,13 +199,6 @@ function GastronomiaPageContent() {
                         : restauranteImages
                     }
                     icon={editor?.editMode ? <EditableIcon page="gastronomia" section="cards" fieldKey="restaurant.icon" locale={locale} defaultIconName="UtensilsCrossed" defaultIcon={UtensilsCrossed} iconClassName="h-6 w-6 text-primary" /> : RestaurantIcon}
-                    schedule={
-                      editor?.editMode ? (
-                        <PageText page="gastronomia" section="restaurant" fieldKey="schedule" locale={locale} as="span" placeholder={restauranteScheduleApi || defaultRestauranteSchedule} />
-                      ) : (
-                        getPageContent("gastronomia", "restaurant", "schedule", locale, overrides) || restauranteScheduleApi || defaultRestauranteSchedule
-                      )
-                    }
                     badge={
                       editor?.editMode ? (
                         <PageText page="gastronomia" section="cards" fieldKey="restaurant.badge" locale={locale} as="span" placeholder={t.gallery.items.ocean} />

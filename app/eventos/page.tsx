@@ -735,7 +735,7 @@ function EventosPageContent() {
             {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "title", locale, contentOverrides) || t.cta.title)}
           </h2>
           <a
-            href="https://wa.me/5585991454982"
+            href="https://wa.me/558540061616"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-12 px-8"

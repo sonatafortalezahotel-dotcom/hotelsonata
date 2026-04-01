@@ -26,8 +26,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <BookingBar isHomePage={isHomePage} />
       {/* 
         Espaçamento superior: 
-        - Home: pt para Header + BookingBar sticky
-        - Outras: pt para não ficar atrás do Header (fixo) + BookingBar (sticky) — header ~96px + barra ~48px
+        - Home: pt para Header (h-28) + BookingBar sticky quando visível
+        - Outras: Header ~112px + barra ~48px
         - Mobile: pb-24 (96px) = espaço para BookingBar fixo em mobile
         - Desktop: lg:pb-16 = espaço antes do footer
       */}
@@ -35,7 +35,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         id="main-content" 
         className={cn(
           "pb-16 lg:pb-16 min-h-screen min-w-0 max-w-full relative z-10",
-          isHomePage ? "pt-16 lg:pt-28" : "pt-16 lg:pt-36"
+          isHomePage ? "pt-28 lg:pt-28" : "pt-28 lg:pt-40"
         )}
         tabIndex={-1}
       >

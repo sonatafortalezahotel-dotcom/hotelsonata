@@ -1494,7 +1494,7 @@ async function seedReservations() {
       children: 0,
       guestName: "João Silva",
       guestEmail: "joao.silva@email.com",
-      guestPhone: "(85) 99999-9999",
+      guestPhone: "(85) 4006-1616",
       guestDocument: "123.456.789-00",
       basePrice: room.basePrice || 20000,
       totalNights: 4,

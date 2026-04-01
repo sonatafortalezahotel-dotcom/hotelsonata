@@ -375,7 +375,7 @@ export default function Home() {
   return (
     <>
       {/* Hero/Carrossel com formulário posicionado na base do hero */}
-      <div className="relative -mt-20 pt-[90px] lg:-mt-28 lg:pt-0">
+      <div className="relative -mt-20 pt-28 lg:-mt-28 lg:pt-0 max-lg:pb-[22rem] lg:pb-0">
         {highlights && highlights.length > 0 ? (
           <VideoCarousel highlights={highlights} locale={locale} galleryPhotos={galleryPhotos} />
         ) : (
@@ -384,14 +384,14 @@ export default function Home() {
           </div>
         )}
 
-        {/* Formulário de reserva sempre colado na parte de baixo do hero */}
-        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2">
+        {/* Mobile: formulário abaixo do vídeo (sem translate-y/2). Desktop: meio card sobre o hero. */}
+        <div className="absolute inset-x-0 bottom-0 z-10 max-lg:translate-y-0 lg:translate-y-1/2">
           <ReservationForm />
         </div>
       </div>
 
       {/* Seção de Quartos e Pacotes */}
-      <div className="pt-44 lg:pt-32">
+      <div className="max-lg:pt-6 pt-44 lg:pt-32">
         <PackagesSection
           rooms={roomsOrdered}
           packages={packages}
@@ -675,11 +675,16 @@ export default function Home() {
               ) : (
                 getPageContent("home", "photoStory", `items.${key}.description`, locale, overrides) || (itemT?.description ?? "")
               ),
-              time: editor?.editMode ? (
-                <PageText page="home" section="photoStory" fieldKey={`items.${key}.time`} locale={locale} as="span" />
-              ) : (
-                getPageContent("home", "photoStory", `items.${key}.time`, locale, overrides) || (itemT?.time ?? "")
-              ),
+              time:
+                key === "breakfast"
+                  ? null
+                  : editor?.editMode
+                    ? (
+                        <PageText page="home" section="photoStory" fieldKey={`items.${key}.time`} locale={locale} as="span" />
+                      )
+                    : (
+                        getPageContent("home", "photoStory", `items.${key}.time`, locale, overrides) || (itemT?.time ?? "")
+                      ),
               titleStr: getPageContent("home", "photoStory", `items.${key}.title`, locale, overrides) || (itemT?.title ?? ""),
             };
           };
@@ -715,7 +720,9 @@ export default function Home() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                           <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
                             <div className="pointer-events-auto">
-                              <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                              {item.time ? (
+                                <span className="text-white/80 text-sm font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                              ) : null}
                               <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
                               <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
                             </div>
@@ -755,7 +762,9 @@ export default function Home() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
                         <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none">
                           <div className="pointer-events-auto">
-                            <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                            {item.time ? (
+                              <span className="text-white/80 text-xs font-light uppercase tracking-wider mb-2 block">{item.time}</span>
+                            ) : null}
                             <h3 className="text-white text-xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
                             <p className="text-white/90 text-sm leading-relaxed line-clamp-3">{item.description}</p>
                           </div>

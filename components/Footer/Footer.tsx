@@ -38,8 +38,8 @@ export default function Footer() {
   const { photos: galleryPhotos } = useGallery({ page: "global" });
   const [settings, setSettings] = useState<SiteSettings>({
     email: "contato@hotelsonata.com.br",
-    phone: "(85) 3456-7890",
-    whatsapp: "(85) 99999-9999",
+    phone: "(85) 4006-1600",
+    whatsapp: "(85) 4006-1616",
     address: "Av. Beira Mar, 1000 - Praia de Iracema",
     city: "Fortaleza",
     state: "CE",
@@ -243,7 +243,7 @@ export default function Footer() {
                   <div className="relative w-12 h-12 flex-shrink-0">
                     <Image
                       src="/Sobre Hotel/certificados/tchotel_2022_LL (1).png"
-                      alt="TripAdvisor Travellers' Choice 2022"
+                      alt="TripAdvisor Travellers' Choice"
                       fill
                       sizes="48px"
                       className="object-contain"
@@ -251,7 +251,7 @@ export default function Footer() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-primary-foreground">TripAdvisor</p>
-                    <p className="text-xs text-primary-foreground/70">Travellers' Choice 2022</p>
+                    <p className="text-xs text-primary-foreground/70">{"Travellers' Choice"}</p>
                   </div>
                 </div>
 

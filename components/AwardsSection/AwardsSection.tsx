@@ -46,6 +46,14 @@ export function AwardsSection() {
     return getGalleryImageByPath(galleryPhotos, path) || fallback;
   };
 
+  const ratingStr =
+    !editor?.editMode
+      ? getPageContent("global", "awards", "tripadvisor.rating", locale, globalOverrides) ||
+        t.tripadvisor.rating
+      : t.tripadvisor.rating;
+  const starsRating = Number.parseFloat(String(ratingStr).replace(",", "."));
+  const ratingForStars = Number.isFinite(starsRating) ? starsRating : 4.6;
+
   return (
     <>
       <section 
@@ -105,13 +113,21 @@ export function AwardsSection() {
                     <p className="text-sm text-muted-foreground mb-2">{getAward("tripadvisor.excellent", t.tripadvisor.excellent)}</p>
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-4xl font-bold text-primary">{getAward("tripadvisor.rating", t.tripadvisor.rating)}</span>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
-                            key={star} 
-                            className={`h-5 w-5 ${star <= 4 ? 'fill-primary text-primary' : 'fill-primary/30 text-primary/30'}`}
-                          />
-                        ))}
+                      <div className="flex gap-1" aria-hidden>
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const fill = Math.min(1, Math.max(0, ratingForStars - (star - 1)));
+                          return (
+                            <span key={star} className="relative inline-flex h-5 w-5 shrink-0">
+                              <Star className="absolute inset-0 h-5 w-5 fill-primary/25 text-primary/25" />
+                              <span
+                                className="absolute inset-0 overflow-hidden"
+                                style={{ width: `${fill * 100}%` }}
+                              >
+                                <Star className="h-5 w-5 fill-primary text-primary" />
+                              </span>
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

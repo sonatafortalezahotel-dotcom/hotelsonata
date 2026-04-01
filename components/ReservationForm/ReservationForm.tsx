@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Users, Tag, Search, Loader2, ChevronDown } from "lucide-react";
-import { format } from "date-fns";
+import { format, startOfDay, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -28,6 +28,10 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
+import {
+  disableCheckInCalendarDate,
+  disableCheckOutCalendarDate,
+} from "@/lib/utils/bookingCalendar";
 
 interface ReservationFormProps {
   className?: string;
@@ -41,9 +45,12 @@ export default function ReservationForm({
   const [checkOut, setCheckOut] = useState<Date>();
   const [adults, setAdults] = useState("2");
   const [children, setChildren] = useState("0");
+  const [rooms, setRooms] = useState("1");
   const [promoCode, setPromoCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [checkInOpen, setCheckInOpen] = useState(false);
+  const [checkOutOpen, setCheckOutOpen] = useState(false);
 
   // Set mounted state to prevent hydration mismatch with Radix UI IDs
   useEffect(() => {
@@ -61,9 +68,9 @@ export default function ReservationForm({
   const getLabelStr = (fieldKey: string, fallback: string) =>
     getPageContent("global", "reservationForm", fieldKey, locale, globalOverrides) || fallback;
   const labels = {
-    pt: { checkIn: "Check-in", checkOut: "Check-out", dates: "Datas", guests: "Hóspedes", adults: "Adultos", children: "Crianças", promoCode: "CUPOM", promoCodePlaceholder: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
-    es: { checkIn: "Entrada", checkOut: "Salida", dates: "Fechas", guests: "Huéspedes", adults: "Adultos", children: "Niños", promoCode: "CUPÓN", promoCodePlaceholder: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
-    en: { checkIn: "Check-in", checkOut: "Check-out", dates: "Dates", guests: "Guests", adults: "Adults", children: "Children", promoCode: "COUPON", promoCodePlaceholder: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+    pt: { checkIn: "Check-in", checkOut: "Check-out", dates: "Datas", guests: "Hóspedes", adults: "Adultos", children: "Crianças", rooms: "Quartos", promoCode: "CUPOM", promoCodePlaceholder: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", dates: "Fechas", guests: "Huéspedes", adults: "Adultos", children: "Niños", rooms: "Habitaciones", promoCode: "CUPÓN", promoCodePlaceholder: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", dates: "Dates", guests: "Guests", adults: "Adults", children: "Children", rooms: "Rooms", promoCode: "COUPON", promoCodePlaceholder: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
   };
   const t = labels[locale as keyof typeof labels] || labels.pt;
 
@@ -80,8 +87,7 @@ export default function ReservationForm({
       return;
     }
 
-    // Validar se check-out é depois de check-in
-    if (checkOut <= checkIn) {
+    if (!isAfter(startOfDay(checkOut), startOfDay(checkIn))) {
       toast.error(
         locale === "en" 
           ? "Check-out must be after check-in" 
@@ -101,6 +107,7 @@ export default function ReservationForm({
         checkOut,
         adults,
         children,
+        rooms: parseInt(rooms, 10) || 1,
         promoCode: promoCode.trim() || undefined,
         locale: locale as "pt" | "es" | "en",
       });
@@ -136,11 +143,19 @@ export default function ReservationForm({
   // Formatar hóspedes
   const adultsCount = parseInt(adults);
   const childrenCount = parseInt(children);
-  const formattedGuests = locale === "pt" 
+  const roomsCount = parseInt(rooms, 10) || 1;
+  const roomsLabel =
+    locale === "pt"
+      ? `${roomsCount} ${roomsCount === 1 ? "QUARTO" : "QUARTOS"}`
+      : locale === "es"
+        ? `${roomsCount} ${roomsCount === 1 ? "HABITACIÓN" : "HABITACIONES"}`
+        : `${roomsCount} ${roomsCount === 1 ? "ROOM" : "ROOMS"}`;
+  const formattedGuests = locale === "pt"
     ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "CRIANÇA" : "CRIANÇAS"}`
     : locale === "es"
-    ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "NIÑO" : "NIÑOS"}`
-    : `${adultsCount} ${adultsCount === 1 ? "ADULT" : "ADULTS"}, ${childrenCount} ${childrenCount === 1 ? "CHILD" : "CHILDREN"}`;
+      ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "NIÑO" : "NIÑOS"}`
+      : `${adultsCount} ${adultsCount === 1 ? "ADULT" : "ADULTS"}, ${childrenCount} ${childrenCount === 1 ? "CHILD" : "CHILDREN"}`;
+  const formattedGuestsSummary = `${roomsLabel} · ${formattedGuests}`;
 
   return (
     <section
@@ -158,7 +173,13 @@ export default function ReservationForm({
               {/* Campo de Check-in */}
               <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
                 {isMounted ? (
-                  <Popover>
+                  <Popover
+                    open={checkInOpen}
+                    onOpenChange={(o) => {
+                      setCheckInOpen(o);
+                      if (o) setCheckOutOpen(false);
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -187,8 +208,17 @@ export default function ReservationForm({
                       <Calendar
                         mode="single"
                         selected={checkIn}
-                        onSelect={setCheckIn}
-                        disabled={(date) => date < new Date()}
+                        onSelect={(date) => {
+                          setCheckIn(date);
+                          setCheckInOpen(false);
+                          if (date && checkOut && !isAfter(startOfDay(checkOut), startOfDay(date))) {
+                            setCheckOut(undefined);
+                          }
+                          if (date) {
+                            requestAnimationFrame(() => setCheckOutOpen(true));
+                          }
+                        }}
+                        disabled={disableCheckInCalendarDate}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -223,7 +253,13 @@ export default function ReservationForm({
               {/* Campo de Check-out */}
               <div className="flex-1 border-r-0 lg:border-r border-primary-foreground/20 lg:border-slate-800/50 lg:dark:border-slate-700/60 pr-0 lg:pr-4 mb-3 lg:mb-0">
                 {isMounted ? (
-                  <Popover>
+                  <Popover
+                    open={checkOutOpen}
+                    onOpenChange={(o) => {
+                      setCheckOutOpen(o);
+                      if (o) setCheckInOpen(false);
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -252,11 +288,11 @@ export default function ReservationForm({
                       <Calendar
                         mode="single"
                         selected={checkOut}
-                        onSelect={setCheckOut}
-                        disabled={(date) => {
-                          if (!checkIn) return date < new Date();
-                          return date <= checkIn;
+                        onSelect={(date) => {
+                          setCheckOut(date);
+                          if (date) setCheckOutOpen(false);
                         }}
+                        disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -300,12 +336,12 @@ export default function ReservationForm({
                           "w-full justify-between text-left font-normal h-12 lg:h-14 min-h-[44px] bg-transparent hover:bg-black/20 dark:hover:bg-black/30 text-white border-0 p-3",
                           "text-sm lg:text-base"
                         )}
-                        aria-label={`${getLabelStr("guests", t.guests)}: ${formattedGuests}`}
+                        aria-label={`${getLabelStr("guests", t.guests)}: ${formattedGuestsSummary}`}
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" aria-hidden />
                           <span className="truncate text-xs lg:text-sm">
-                            {formattedGuests}
+                            {formattedGuestsSummary}
                           </span>
                         </div>
                         <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" aria-hidden />
@@ -313,6 +349,34 @@ export default function ReservationForm({
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-4" align="start">
                       <div className="space-y-4 min-w-[200px]">
+                        <div>
+                          <label id="reservation-rooms-label" className="text-sm font-medium mb-2 block">
+                            {editor?.editMode ? getLabel("rooms") : getLabelStr("rooms", t.rooms)}
+                          </label>
+                          <Select value={rooms} onValueChange={setRooms}>
+                            <SelectTrigger className="w-full" aria-labelledby="reservation-rooms-label">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                <SelectItem key={num} value={num.toString()}>
+                                  {num}{" "}
+                                  {locale === "en"
+                                    ? num === 1
+                                      ? "room"
+                                      : "rooms"
+                                    : locale === "es"
+                                      ? num === 1
+                                        ? "habitación"
+                                        : "habitaciones"
+                                      : num === 1
+                                        ? "quarto"
+                                        : "quartos"}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div>
                           <label id="reservation-adults-label" className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                           <Select value={adults} onValueChange={setAdults}>
@@ -364,7 +428,7 @@ export default function ReservationForm({
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                       <span className="truncate text-xs lg:text-sm">
-                        {formattedGuests}
+                        {formattedGuestsSummary}
                       </span>
                     </div>
                     <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />

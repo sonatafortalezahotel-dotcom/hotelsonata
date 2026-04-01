@@ -53,14 +53,6 @@ import { Lightbox } from "@/components/Lightbox";
 import { RoomHighlights } from "@/components/RoomHighlights";
 import { RoomAmenities } from "@/components/RoomAmenities";
 import { RoomRules } from "@/components/RoomRules";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { getPageTranslation } from "@/lib/translations/pages";
@@ -347,25 +339,6 @@ export default function RoomDetailPage() {
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <Breadcrumb className="mb-4">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/quartos">{locale === "en" ? "Rooms" : locale === "es" ? "Habitaciones" : "Quartos"}</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="max-w-[180px] sm:max-w-none truncate">{room.name || code}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
         <Button
           variant="ghost"
           onClick={() => router.back()}

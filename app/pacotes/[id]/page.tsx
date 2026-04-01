@@ -478,7 +478,7 @@ export default function PackageDetailPage() {
 
             {/* Sidebar - Reserva */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-24">
+              <Card className="sticky top-28">
                 <CardHeader>
                   <CardTitle>{t.reserve}</CardTitle>
                 </CardHeader>

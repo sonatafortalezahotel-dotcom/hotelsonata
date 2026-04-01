@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, startOfDay, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -30,6 +30,10 @@ import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
 import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
+import {
+  disableCheckInCalendarDate,
+  disableCheckOutCalendarDate,
+} from "@/lib/utils/bookingCalendar";
 import { toast } from "sonner";
 
 interface ReservationWidgetProps {
@@ -63,8 +67,11 @@ export default function ReservationWidget({
   const [checkOut, setCheckOut] = useState<Date | null>(initialCheckOut || null);
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
+  const [rooms, setRooms] = useState("1");
   const [promoCode, setPromoCode] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const [checkInOpen, setCheckInOpen] = useState(false);
+  const [checkOutOpen, setCheckOutOpen] = useState(false);
 
   // Set mounted state to prevent hydration mismatch with Radix UI IDs
   useEffect(() => {
@@ -78,6 +85,7 @@ export default function ReservationWidget({
       checkOut: "Check-out",
       adults: "Adultos",
       children: "Crianças",
+      rooms: "Quartos",
       checkAvailability: "Verificar Disponibilidade",
       checking: "Verificando...",
       available: "Disponível",
@@ -89,7 +97,7 @@ export default function ReservationWidget({
       email: "E-mail",
       emailPlaceholder: "seu@email.com",
       phone: "Telefone",
-      phonePlaceholder: "(85) 99999-9999",
+      phonePlaceholder: "(85) 4006-1616",
       document: "CPF/Passaporte",
       documentPlaceholder: "000.000.000-00",
       promoCode: "Código Promocional",
@@ -111,6 +119,7 @@ export default function ReservationWidget({
       checkOut: "Salida",
       adults: "Adultos",
       children: "Niños",
+      rooms: "Habitaciones",
       checkAvailability: "Verificar Disponibilidad",
       checking: "Verificando...",
       available: "Disponible",
@@ -122,7 +131,7 @@ export default function ReservationWidget({
       email: "Correo Electrónico",
       emailPlaceholder: "su@email.com",
       phone: "Teléfono",
-      phonePlaceholder: "+34 600 000 000",
+      phonePlaceholder: "(85) 4006-1616",
       document: "DNI/Pasaporte",
       documentPlaceholder: "00000000X",
       promoCode: "Código Promocional",
@@ -144,6 +153,7 @@ export default function ReservationWidget({
       checkOut: "Check-out",
       adults: "Adults",
       children: "Children",
+      rooms: "Rooms",
       checkAvailability: "Check Availability",
       checking: "Checking...",
       available: "Available",
@@ -155,7 +165,7 @@ export default function ReservationWidget({
       email: "Email",
       emailPlaceholder: "your@email.com",
       phone: "Phone",
-      phonePlaceholder: "+1 (555) 000-0000",
+      phonePlaceholder: "(85) 4006-1616",
       document: "ID/Passport",
       documentPlaceholder: "000-00-0000",
       promoCode: "Promotional Code",
@@ -189,7 +199,7 @@ export default function ReservationWidget({
       toast.error(t.selectDate);
       return;
     }
-    if (checkOut <= checkIn) {
+    if (!isAfter(startOfDay(checkOut), startOfDay(checkIn))) {
       toast.error(
         locale === "en"
           ? "Check-out must be after check-in"
@@ -217,6 +227,7 @@ export default function ReservationWidget({
         checkOut,
         adults,
         children,
+        rooms: parseInt(rooms, 10) || 1,
         promoCode: promoCode.trim() || undefined,
         locale: locale as "pt" | "es" | "en",
       });
@@ -243,7 +254,7 @@ export default function ReservationWidget({
   };
 
   return (
-    <Card className={cn("sticky top-24", className)}>
+    <Card className={cn("sticky top-28", className)}>
       <CardHeader>
         <CardTitle>{t.title}</CardTitle>
         <CardDescription>
@@ -256,7 +267,13 @@ export default function ReservationWidget({
           <div className="space-y-2">
             <Label>{t.checkIn}</Label>
             {isMounted ? (
-              <Popover>
+              <Popover
+                open={checkInOpen}
+                onOpenChange={(o) => {
+                  setCheckInOpen(o);
+                  if (o) setCheckOutOpen(false);
+                }}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -279,11 +296,19 @@ export default function ReservationWidget({
                     selected={checkIn || undefined}
                     onSelect={(date) => {
                       setCheckIn(date || null);
-                      if (date && checkOut && date >= checkOut) {
+                      setCheckInOpen(false);
+                      if (
+                        date &&
+                        checkOut &&
+                        !isAfter(startOfDay(checkOut), startOfDay(date))
+                      ) {
                         setCheckOut(null);
                       }
+                      if (date) {
+                        requestAnimationFrame(() => setCheckOutOpen(true));
+                      }
                     }}
-                    disabled={(date) => date < new Date()}
+                    disabled={disableCheckInCalendarDate}
                     initialFocus
                     locale={dateLocale}
                   />
@@ -311,7 +336,13 @@ export default function ReservationWidget({
           <div className="space-y-2">
             <Label>{t.checkOut}</Label>
             {isMounted ? (
-              <Popover>
+              <Popover
+                open={checkOutOpen}
+                onOpenChange={(o) => {
+                  setCheckOutOpen(o);
+                  if (o) setCheckInOpen(false);
+                }}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -332,11 +363,11 @@ export default function ReservationWidget({
                   <Calendar
                     mode="single"
                     selected={checkOut || undefined}
-                    onSelect={(date) => setCheckOut(date || null)}
-                    disabled={(date) => {
-                      if (!checkIn) return date < new Date();
-                      return date <= checkIn;
+                    onSelect={(date) => {
+                      setCheckOut(date || null);
+                      if (date) setCheckOutOpen(false);
                     }}
+                    disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
                     initialFocus
                     locale={dateLocale}
                   />
@@ -363,6 +394,34 @@ export default function ReservationWidget({
         </div>
 
         {/* Hóspedes */}
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label>{t.rooms}</Label>
+            <Select value={rooms} onValueChange={setRooms}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}{" "}
+                    {locale === "en"
+                      ? num === 1
+                        ? "room"
+                        : "rooms"
+                      : locale === "es"
+                        ? num === 1
+                          ? "habitación"
+                          : "habitaciones"
+                        : num === 1
+                          ? "quarto"
+                          : "quartos"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label>{t.adults}</Label>

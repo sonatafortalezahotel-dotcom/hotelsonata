@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Calendar as CalendarIcon, Users, Search, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
-import { format } from "date-fns";
+import { format, startOfDay, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -29,6 +29,10 @@ import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { toast } from "sonner";
 import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
+import {
+  disableCheckInCalendarDate,
+  disableCheckOutCalendarDate,
+} from "@/lib/utils/bookingCalendar";
 
 interface BookingBarProps {
   isHomePage?: boolean;
@@ -40,11 +44,15 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const [checkOut, setCheckOut] = useState<Date>();
   const [adults, setAdults] = useState("2");
   const [children, setChildren] = useState("0");
+  const [rooms, setRooms] = useState("1");
   const [promoCode, setPromoCode] = useState("");
   const [isVisible, setIsVisible] = useState(true); // Sempre visível inicialmente
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false); // Estado para expandir/colapsar no mobile
+  const [checkInOpen, setCheckInOpen] = useState(false);
+  const [checkOutOpen, setCheckOutOpen] = useState(false);
+  const [isLg, setIsLg] = useState(false);
   const pathname = usePathname();
   const urlLocale = pathname && /^\/(en|es)(?:\/|$)/.test(pathname) ? (pathname.split("/")[1] as "en" | "es") : "pt";
   const displayLocale = isMounted ? locale : urlLocale;
@@ -52,6 +60,14 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   // Set mounted state to prevent hydration mismatch with Radix UI IDs
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => setIsLg(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
   // Detectar scroll na home para mostrar/ocultar a barra
@@ -78,9 +94,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const editor = useEditor();
   const globalOverrides = editor?.globalOverrides ?? {};
   const labels = {
-    pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
-    es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
-    en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", guests: "Guests", promoCode: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+    pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", rooms: "Quartos", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", rooms: "Habitaciones", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", rooms: "Rooms", guests: "Guests", promoCode: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
   };
   const t = labels[locale as keyof typeof labels] || labels.pt;
   const getLabel = (fieldKey: string) => {
@@ -97,11 +113,35 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   // Formatar hóspedes igual ao ReservationForm
   const adultsCount = parseInt(adults);
   const childrenCount = parseInt(children);
-  const formattedGuests = locale === "pt" 
+  const roomsCount = parseInt(rooms, 10) || 1;
+  const roomsBit =
+    locale === "pt"
+      ? `${roomsCount} ${roomsCount === 1 ? "QUARTO" : "QUARTOS"}`
+      : locale === "es"
+        ? `${roomsCount} ${roomsCount === 1 ? "HABITACIÓN" : "HABITACIONES"}`
+        : `${roomsCount} ${roomsCount === 1 ? "ROOM" : "ROOMS"}`;
+  const formattedGuests = locale === "pt"
     ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "CRIANÇA" : "CRIANÇAS"}`
     : locale === "es"
-    ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "NIÑO" : "NIÑOS"}`
-    : `${adultsCount} ${adultsCount === 1 ? "ADULT" : "ADULTS"}, ${childrenCount} ${childrenCount === 1 ? "CHILD" : "CHILDREN"}`;
+      ? `${adultsCount} ${adultsCount === 1 ? "ADULTO" : "ADULTOS"}, ${childrenCount} ${childrenCount === 1 ? "NIÑO" : "NIÑOS"}`
+      : `${adultsCount} ${adultsCount === 1 ? "ADULT" : "ADULTS"}, ${childrenCount} ${childrenCount === 1 ? "CHILD" : "CHILDREN"}`;
+  const formattedGuestsSummary = `${roomsBit} · ${formattedGuests}`;
+
+  const onCheckInSelect = (date: Date | undefined) => {
+    setCheckIn(date);
+    setCheckInOpen(false);
+    if (date && checkOut && !isAfter(startOfDay(checkOut), startOfDay(date))) {
+      setCheckOut(undefined);
+    }
+    if (date) {
+      requestAnimationFrame(() => setCheckOutOpen(true));
+    }
+  };
+
+  const onCheckOutSelect = (date: Date | undefined) => {
+    setCheckOut(date);
+    if (date) setCheckOutOpen(false);
+  };
 
   const handleReserve = () => {
     if (!checkIn || !checkOut) {
@@ -115,7 +155,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       return;
     }
 
-    if (checkOut <= checkIn) {
+    if (!isAfter(startOfDay(checkOut), startOfDay(checkIn))) {
       toast.error(
         locale === "en"
           ? "Check-out must be after check-in"
@@ -135,6 +175,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
         checkOut,
         adults,
         children,
+        rooms: parseInt(rooms, 10) || 1,
         promoCode: promoCode.trim() || undefined,
         locale: locale as "pt" | "es" | "en",
       });
@@ -172,8 +213,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       className={cn(
         "transition-all duration-300 w-full min-w-0 left-0 right-0",
         isHomePage 
-          ? "z-[50] sticky top-24 lg:top-24 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Na home: colado ao header (h-24 = 6rem)
-          : "fixed bottom-0 lg:sticky lg:top-24 z-[40] bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Outras páginas: mobile fixo bottom, desktop sticky abaixo do header
+          ? "z-[50] sticky top-28 lg:top-28 bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Colado ao header (h-28 = 7rem)
+          : "fixed bottom-0 lg:sticky lg:top-28 z-[40] bg-black/40 dark:bg-black/60 backdrop-blur-md border-b border-slate-800/50 dark:border-slate-700/60" // Desktop sticky abaixo do header
       )}
     >
       {/* Container interno para o conteúdo */}
@@ -187,7 +228,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                 {/* Check-in compacto */}
                 <div className="flex-1 min-w-0">
                   {isMounted ? (
-                    <Popover>
+                    <Popover
+                      open={checkInOpen && !isLg}
+                      onOpenChange={(o) => {
+                        setCheckInOpen(o);
+                        if (o) setCheckOutOpen(false);
+                      }}
+                    >
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
@@ -214,8 +261,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <Calendar
                           mode="single"
                           selected={checkIn}
-                          onSelect={setCheckIn}
-                          disabled={(date) => date < new Date()}
+                          onSelect={onCheckInSelect}
+                          disabled={disableCheckInCalendarDate}
                           initialFocus
                           locale={dateLocale}
                         />
@@ -239,7 +286,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                 {/* Check-out compacto */}
                 <div className="flex-1 min-w-0">
                   {isMounted ? (
-                    <Popover>
+                    <Popover
+                      open={checkOutOpen && !isLg}
+                      onOpenChange={(o) => {
+                        setCheckOutOpen(o);
+                        if (o) setCheckInOpen(false);
+                      }}
+                    >
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
@@ -266,11 +319,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <Calendar
                           mode="single"
                           selected={checkOut}
-                          onSelect={setCheckOut}
-                          disabled={(date) => {
-                            if (!checkIn) return date < new Date();
-                            return date <= checkIn;
-                          }}
+                          onSelect={onCheckOutSelect}
+                          disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
                           initialFocus
                           locale={dateLocale}
                         />
@@ -334,12 +384,12 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               "w-full justify-between text-left font-normal min-h-[44px] bg-black/20 hover:bg-black/30 text-white border border-white/20 rounded-md p-2",
                               "text-xs"
                             )}
-                            aria-label={`${getLabelAria("guests")}: ${formattedGuests}`}
+                            aria-label={`${getLabelAria("guests")}: ${formattedGuestsSummary}`}
                           >
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                               <Users className="h-3.5 w-3.5 flex-shrink-0 text-white" aria-hidden />
                               <span className="truncate text-xs">
-                                {formattedGuests}
+                                {formattedGuestsSummary}
                               </span>
                             </div>
                             <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 text-white/70 ml-2" aria-hidden />
@@ -347,6 +397,34 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-4" align="start">
                           <div className="space-y-4 min-w-[200px]">
+                            <div>
+                              <label id="booking-bar-rooms-label-mobile" className="text-sm font-medium mb-2 block">
+                                {editor?.editMode ? getLabel("rooms") : (getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms)}
+                              </label>
+                              <Select value={rooms} onValueChange={setRooms}>
+                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-rooms-label-mobile">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                    <SelectItem key={num} value={num.toString()}>
+                                      {num}{" "}
+                                      {locale === "en"
+                                        ? num === 1
+                                          ? "room"
+                                          : "rooms"
+                                        : locale === "es"
+                                          ? num === 1
+                                            ? "habitación"
+                                            : "habitaciones"
+                                          : num === 1
+                                            ? "quarto"
+                                            : "quartos"}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <div>
                               <label id="booking-bar-adults-label" className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                               <Select value={adults} onValueChange={setAdults}>
@@ -395,7 +473,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <Users className="h-3.5 w-3.5 flex-shrink-0 text-white" />
                           <span className="truncate text-xs">
-                            {formattedGuests}
+                            {formattedGuestsSummary}
                           </span>
                         </div>
                       </Button>
@@ -428,7 +506,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               {/* Campo de Check-in */}
               <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
                 {isMounted ? (
-                  <Popover>
+                  <Popover
+                    open={checkInOpen && isLg}
+                    onOpenChange={(o) => {
+                      setCheckInOpen(o);
+                      if (o) setCheckOutOpen(false);
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -455,8 +539,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       <Calendar
                         mode="single"
                         selected={checkIn}
-                        onSelect={setCheckIn}
-                        disabled={(date) => date < new Date()}
+                        onSelect={onCheckInSelect}
+                        disabled={disableCheckInCalendarDate}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -490,7 +574,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
               {/* Campo de Check-out */}
               <div className="flex-1 flex flex-col items-center justify-center border-r border-white/10 dark:border-white/10 px-4 py-2">
                 {isMounted ? (
-                  <Popover>
+                  <Popover
+                    open={checkOutOpen && isLg}
+                    onOpenChange={(o) => {
+                      setCheckOutOpen(o);
+                      if (o) setCheckInOpen(false);
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -517,11 +607,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                       <Calendar
                         mode="single"
                         selected={checkOut}
-                        onSelect={setCheckOut}
-                        disabled={(date) => {
-                          if (!checkIn) return date < new Date();
-                          return date <= checkIn;
-                        }}
+                        onSelect={onCheckOutSelect}
+                        disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -567,7 +654,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <div className="flex items-center justify-center gap-2 flex-1 min-w-0 text-center">
                           <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                           <span className="truncate text-xs lg:text-sm">
-                            {formattedGuests}
+                            {formattedGuestsSummary}
                           </span>
                         </div>
                         <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
@@ -575,6 +662,34 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-4" align="start">
                       <div className="space-y-4 min-w-[200px]">
+                        <div>
+                          <label id="booking-bar-rooms-label-desktop" className="text-sm font-medium mb-2 block">
+                            {editor?.editMode ? getLabel("rooms") : (getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms)}
+                          </label>
+                          <Select value={rooms} onValueChange={setRooms}>
+                            <SelectTrigger className="w-full" aria-labelledby="booking-bar-rooms-label-desktop">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                <SelectItem key={num} value={num.toString()}>
+                                  {num}{" "}
+                                  {locale === "en"
+                                    ? num === 1
+                                      ? "room"
+                                      : "rooms"
+                                    : locale === "es"
+                                      ? num === 1
+                                        ? "habitación"
+                                        : "habitaciones"
+                                      : num === 1
+                                        ? "quarto"
+                                        : "quartos"}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div>
                           <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
                           <Select value={adults} onValueChange={setAdults}>
@@ -626,7 +741,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                     <div className="flex items-center justify-center gap-2 flex-1 min-w-0 text-center">
                       <Users className="h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0 text-white" />
                       <span className="truncate text-xs lg:text-sm">
-                        {formattedGuests}
+                        {formattedGuestsSummary}
                       </span>
                     </div>
                     <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />

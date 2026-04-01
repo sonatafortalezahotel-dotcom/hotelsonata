@@ -20,7 +20,7 @@ export const pageTranslations = {
         contact: "Fale Conosco"
       },
       highlights: {
-        comfort: { title: "Conforto Premium", description: "Camas confortáveis e roupas de cama de alta qualidade" },
+        comfort: { title: "Conforto e Qualidade", description: "Tudo projetado para receber você" },
         view: { title: "Vista para o Mar", description: "Quartos com vista privilegiada para a Praia de Iracema" },
         ac: { title: "Ar-Condicionado", description: "Climatização individual em todos os quartos" }
       },
@@ -173,7 +173,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "Para mais informações sobre nossos serviços, entre em contato com o setor de reservas ou recepção",
-        button: "Falar com a Recepção"
+        button: "Falar com Reservas"
       },
       activities: {
         pool: { title: "Área de Piscina", description: "Cadeiras de sol, chuveirão e vista para o mar. Você também pode contar com o atendimento do nosso restaurante nessa área.", schedule: "6:00 às 20:00 hrs", badge: "Vista Mar", tags: ["Restaurante", "Água de Coco", "Relaxamento"] },
@@ -414,7 +414,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atendimento Personalizado",
-        button: "Entre em contato com nossa equipe"
+        button: "Falar com Reservas"
       },
       access: {
         title: "Acesso e Localização",
@@ -560,7 +560,7 @@ export const pageTranslations = {
         rule2: "Evitar permanência na área do restaurante",
         fee: ""
       },
-      button: "Entre em contato com nossa equipe"
+      button: "Falar com Reservas"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -601,7 +601,7 @@ export const pageTranslations = {
       footer: {
         text: "Para mais informações sobre nossos serviços, entre em contato com o setor de reservas ou recepção",
         exploreButton: "Explorar Todas as Experiências",
-        contactButton: "Falar com a Recepção"
+        contactButton: "Falar com Reservas"
       }
     },
     // Seção de Prêmios
@@ -615,7 +615,7 @@ export const pageTranslations = {
         location: "Localização",
         walkable: "Ótimo para pedestres",
         score: "Nota: 99 de 100",
-        rating: "4,5",
+        rating: "4,6",
         locationScore: "99"
       },
       excellenceAwards: "Prêmios de Excelência",
@@ -649,7 +649,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Seu nome completo",
           email: "seu@email.com",
-          phone: "(85) 99999-9999",
+          phone: "(85) 4006-1616",
           position: "Selecione o cargo",
           message: "Conte-nos um pouco sobre você e sua experiência..."
         },
@@ -737,7 +737,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Seu nome",
           email: "seu@email.com",
-          phone: "(85) 9 9999-9999",
+          phone: "(85) 4006-1616",
           subject: "Sobre o que você quer falar?",
           message: "Escreva sua mensagem aqui..."
         },
@@ -834,8 +834,7 @@ export const pageTranslations = {
           },
           breakfast: {
             title: "Café da Manhã Regional",
-            description: "Buffet completo com tapiocas feitas na hora, frutas tropicais frescas, pães artesanais e o melhor café regional. Tudo com vista para o mar.",
-            time: "7:00 - 10:00"
+            description: "Buffet completo com tapiocas feitas na hora, frutas tropicais frescas, pães artesanais e o melhor café regional. Tudo com vista para o mar."
           },
           bike: {
             title: "Passeio de Bike pela Orla",
@@ -849,8 +848,7 @@ export const pageTranslations = {
           },
           lunch: {
             title: "Almoço com Frutos do Mar",
-            description: "Restaurante com especialidades em frutos do mar frescos e culinária cearense. Pratos que celebram os sabores locais.",
-            time: "12:00 - 15:00"
+            description: "Restaurante com especialidades em frutos do mar frescos e culinária cearense. Pratos que celebram os sabores locais."
           },
           spa: {
             title: "Relaxamento no Spa",
@@ -1017,7 +1015,7 @@ export const pageTranslations = {
           location: "Localização",
           walkable: "Ótimo para pedestres",
           score: "Nota: 99 de 100",
-          rating: "4,5",
+          rating: "4,6",
           locationScore: "99"
         },
         excellenceAwards: "Prêmios de Excelência",
@@ -1057,7 +1055,7 @@ export const pageTranslations = {
         contact: "Contáctanos"
       },
       highlights: {
-        comfort: { title: "Confort Premium", description: "Camas cómodas y ropa de cama de alta calidad" },
+        comfort: { title: "Confort y Calidad", description: "Todo diseñado para recibirte" },
         view: { title: "Vista al Mar", description: "Habitaciones con vista privilegiada a la Playa de Iracema" },
         ac: { title: "Aire Acondicionado", description: "Climatización individual en todas las habitaciones" }
       },
@@ -1210,7 +1208,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "Para más información sobre nuestros servicios, contacta con el departamento de reservas o recepción",
-        button: "Hablar con Recepción"
+        button: "Hablar con Reservas"
       },
       activities: {
         pool: { title: "Área de Piscina", description: "Sillas de sol, duchas y vista al mar. También servicio del restaurante.", schedule: "6:00 a 20:00", badge: "Vista Mar", tags: ["Restaurante", "Agua de Coco"] },
@@ -1451,7 +1449,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atención Personalizada",
-        button: "Contáctanos por WhatsApp"
+        button: "Hablar con Reservas"
       },
       access: {
         title: "Acceso y Ubicación",
@@ -1597,7 +1595,7 @@ export const pageTranslations = {
         rule2: "Evitar permanencia en el área del restaurante",
         fee: ""
       },
-      button: "Entre en contacto con nuestro equipo"
+      button: "Hablar con Reservas"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -1638,7 +1636,7 @@ export const pageTranslations = {
       footer: {
         text: "Para más información sobre nuestros servicios, contacta el sector de reservas o recepción",
         exploreButton: "Explorar Todas las Experiencias",
-        contactButton: "Hablar con la Recepción"
+        contactButton: "Hablar con Reservas"
       }
     },
     // Seção de Prêmios
@@ -1652,7 +1650,7 @@ export const pageTranslations = {
         location: "Ubicación",
         walkable: "Excelente para peatones",
         score: "Puntuación: 99 de 100",
-        rating: "4,5",
+        rating: "4,6",
         locationScore: "99"
       },
       excellenceAwards: "Premios de Excelencia",
@@ -1700,7 +1698,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Tu nombre",
           email: "tu@email.com",
-          phone: "(85) 9 9999-9999",
+          phone: "(85) 4006-1616",
           subject: "¿Sobre qué quieres hablar?",
           message: "Escribe tu mensaje aquí..."
         },
@@ -1797,8 +1795,7 @@ export const pageTranslations = {
           },
           breakfast: {
             title: "Desayuno Regional",
-            description: "Buffet completo con tapiocas hechas al momento, frutas tropicales frescas, panes artesanales y el mejor café regional. Todo con vista al mar.",
-            time: "7:00 - 10:00"
+            description: "Buffet completo con tapiocas hechas al momento, frutas tropicales frescas, panes artesanales y el mejor café regional. Todo con vista al mar."
           },
           bike: {
             title: "Paseo en Bici por la Orla",
@@ -1812,8 +1809,7 @@ export const pageTranslations = {
           },
           lunch: {
             title: "Almuerzo con Mariscos",
-            description: "Restaurante con especialidades en mariscos frescos y cocina cearense. Platos que celebran los sabores locales.",
-            time: "12:00 - 15:00"
+            description: "Restaurante con especialidades en mariscos frescos y cocina cearense. Platos que celebran los sabores locales."
           },
           spa: {
             title: "Relajación en el Spa",
@@ -1980,7 +1976,7 @@ export const pageTranslations = {
           location: "Ubicación",
           walkable: "Perfecto para peatones",
           score: "Nota: 99 de 100",
-          rating: "4,5",
+          rating: "4,6",
           locationScore: "99"
         },
         excellenceAwards: "Premios de Excelencia",
@@ -2028,7 +2024,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Tu nombre completo",
           email: "tu@email.com",
-          phone: "(85) 99999-9999",
+          phone: "(85) 4006-1616",
           position: "Selecciona el cargo",
           message: "Cuéntanos un poco sobre ti y tu experiencia..."
         },
@@ -2109,7 +2105,7 @@ export const pageTranslations = {
         contact: "Contact Us"
       },
       highlights: {
-        comfort: { title: "Premium Comfort", description: "Comfortable beds and high-quality linens" },
+        comfort: { title: "Comfort and Quality", description: "Everything designed to welcome you" },
         view: { title: "Sea View", description: "Rooms with privileged view of Iracema Beach" },
         ac: { title: "Air Conditioning", description: "Individual climate control in all rooms" }
       },
@@ -2262,7 +2258,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "For more information about our services, contact the reservations or reception department",
-        button: "Contact Reception"
+        button: "Contact Reservations"
       },
       activities: {
         pool: { title: "Pool Area", description: "Sun loungers, showers and sea view. Restaurant service available.", schedule: "6:00 to 20:00", badge: "Sea View", tags: ["Restaurant", "Coconut Water"] },
@@ -2503,7 +2499,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Personalized Service",
-        button: "Contact our team on WhatsApp"
+        button: "Contact Reservations"
       },
       access: {
         title: "Access and Location",
@@ -2649,7 +2645,7 @@ export const pageTranslations = {
         rule2: "Avoid staying in the restaurant area",
         fee: ""
       },
-      button: "Get in touch with our team"
+      button: "Contact Reservations"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -2690,7 +2686,7 @@ export const pageTranslations = {
       footer: {
         text: "For more information about our services, contact the reservations or reception department",
         exploreButton: "Explore All Experiences",
-        contactButton: "Contact Reception"
+        contactButton: "Contact Reservations"
       }
     },
     // Seção de Prêmios
@@ -2704,7 +2700,7 @@ export const pageTranslations = {
         location: "Location",
         walkable: "Great for pedestrians",
         score: "Score: 99 out of 100",
-        rating: "4,5",
+        rating: "4.6",
         locationScore: "99"
       },
       excellenceAwards: "Excellence Awards",
@@ -2752,7 +2748,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Your name",
           email: "your@email.com",
-          phone: "(85) 9 9999-9999",
+          phone: "(85) 4006-1616",
           subject: "What would you like to talk about?",
           message: "Write your message here..."
         },
@@ -2849,8 +2845,7 @@ export const pageTranslations = {
           },
           breakfast: {
             title: "Regional Breakfast",
-            description: "Complete buffet with freshly made tapiocas, fresh tropical fruits, artisan breads and the best regional coffee. All with sea view.",
-            time: "7:00 - 10:00"
+            description: "Complete buffet with freshly made tapiocas, fresh tropical fruits, artisan breads and the best regional coffee. All with sea view."
           },
           bike: {
             title: "Bike Ride along the Waterfront",
@@ -2864,8 +2859,7 @@ export const pageTranslations = {
           },
           lunch: {
             title: "Seafood Lunch",
-            description: "Restaurant specializing in fresh seafood and Ceará cuisine. Dishes that celebrate local flavors.",
-            time: "12:00 - 15:00"
+            description: "Restaurant specializing in fresh seafood and Ceará cuisine. Dishes that celebrate local flavors."
           },
           spa: {
             title: "Spa Relaxation",
@@ -3032,7 +3026,7 @@ export const pageTranslations = {
           location: "Location",
           walkable: "Great for pedestrians",
           score: "Score: 99 out of 100",
-          rating: "4,5",
+          rating: "4.6",
           locationScore: "99"
         },
         excellenceAwards: "Excellence Awards",
@@ -3080,7 +3074,7 @@ export const pageTranslations = {
         placeholders: {
           name: "Your full name",
           email: "your@email.com",
-          phone: "(85) 99999-9999",
+          phone: "(85) 4006-1616",
           position: "Select position",
           message: "Tell us a little about yourself and your experience..."
         },
