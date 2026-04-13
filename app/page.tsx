@@ -375,7 +375,7 @@ export default function Home() {
   return (
     <>
       {/* Hero/Carrossel com formulário posicionado na base do hero */}
-      <div className="relative -mt-20 pt-28 lg:-mt-28 lg:pt-0 max-lg:pb-[22rem] lg:pb-0">
+      <div className="relative -mt-20 pt-28 lg:-mt-28 lg:pt-0 max-lg:pb-[21rem] lg:pb-0">
         {highlights && highlights.length > 0 ? (
           <VideoCarousel highlights={highlights} locale={locale} galleryPhotos={galleryPhotos} />
         ) : (
@@ -384,14 +384,14 @@ export default function Home() {
           </div>
         )}
 
-        {/* Mobile: formulário abaixo do vídeo (sem translate-y/2). Desktop: meio card sobre o hero. */}
-        <div className="absolute inset-x-0 bottom-0 z-10 max-lg:translate-y-0 lg:translate-y-1/2">
+        {/* Mobile: um pouco acima da base. Desktop: menos translate-y que antes para subir o card no hero. */}
+        <div className="absolute inset-x-0 bottom-4 z-10 max-lg:translate-y-0 lg:bottom-10 lg:translate-y-[30%]">
           <ReservationForm />
         </div>
       </div>
 
       {/* Seção de Quartos e Pacotes */}
-      <div className="max-lg:pt-6 pt-44 lg:pt-32">
+      <div className="max-lg:pt-6 pt-40 lg:pt-28">
         <PackagesSection
           rooms={roomsOrdered}
           packages={packages}
