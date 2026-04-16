@@ -24,7 +24,7 @@ export default function blobAwareImageLoader({
   const q = quality ?? 75;
 
   if (src.startsWith("/")) {
-    return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
+    return src;
   }
 
   try {
