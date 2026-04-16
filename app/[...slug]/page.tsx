@@ -245,14 +245,8 @@ export default async function LandingPage({ params }: PageProps) {
     const capitalizedTitle = capitalizeKeywords(page.title, locale);
     const capitalizedDescription = capitalizeKeywords(page.description, locale);
 
-    // Atualizar contador de visualizações (async, não bloqueia renderização)
-    db.update(seoLandingPages)
-      .set({
-        viewCount: (page.viewCount || 0) + 1,
-        lastViewedAt: new Date(),
-      })
-      .where(eq(seoLandingPages.id, page.id))
-      .catch((err) => console.error("Erro ao atualizar view count:", err));
+    // Contador viewCount desligado: cada visita fazia UPDATE no DB (Neon) e pesava no serverless Vercel.
+    // Métricas de tráfego: use Meta Pixel / Search Console. Zerar contadores: POST /api/seo-landing-pages/reset-views
 
     // Structured Data
     // Se o locale não é pt, adicionar ao slug para o breadcrumb
