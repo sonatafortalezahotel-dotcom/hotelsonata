@@ -1,6 +1,6 @@
 'use client';
 
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import React, { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

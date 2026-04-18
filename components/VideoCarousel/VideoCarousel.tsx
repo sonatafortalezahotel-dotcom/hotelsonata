@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getVideoUrlType, extractYouTubeVideoId, extractVimeoVideoId } from "@/lib/utils";

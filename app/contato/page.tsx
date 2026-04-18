@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Clock, MessageCircle, Instagram, Facebook, CheckCircle2 } from "lucide-react";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { FullWidthGallery, AsymmetricGallery } from "@/components/HorizontalScroll";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { useEditor } from "@/lib/context/EditorContext";

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import Link from "next/link";
 import { format, differenceInDays, parse } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";

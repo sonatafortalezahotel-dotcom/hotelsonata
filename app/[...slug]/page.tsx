@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { db } from "@/lib/db";
 import { seoLandingPages } from "@/lib/db/schema";
 import { eq, and, asc, isNotNull } from "drizzle-orm";

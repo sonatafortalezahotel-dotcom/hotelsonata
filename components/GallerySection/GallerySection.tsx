@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { HorizontalScroll } from "@/components/HorizontalScroll";
 
 interface GalleryImage {

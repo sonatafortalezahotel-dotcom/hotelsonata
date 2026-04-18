@@ -8,7 +8,7 @@ import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
 import RoomsPageContent from "./RoomsPageContent";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { EditorialCarousel } from "@/components/HorizontalScroll";
 import { Bed, Eye, Sparkles, Waves, Wind } from "lucide-react";

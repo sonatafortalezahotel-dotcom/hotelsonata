@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { usePathname } from "next/navigation";
 import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,4 +1,5 @@
 import type { ImageLoaderProps } from "next/image";
+import { toClientBlobUrl } from "./blobUrl";
 
 function isVercelBlobHost(hostname: string): boolean {
   return (
@@ -30,7 +31,7 @@ export default function blobAwareImageLoader({
   try {
     const { hostname } = new URL(src);
     if (isVercelBlobHost(hostname)) {
-      return src;
+      return toClientBlobUrl(src);
     }
   } catch {
     return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import Hero from "@/components/Hero";
 import VideoCarousel from "@/components/VideoCarousel";
 import ReservationForm from "@/components/ReservationForm";

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { useEditor } from "@/lib/context/EditorContext";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageContent } from "@/lib/utils/pageContent";

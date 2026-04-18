@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";

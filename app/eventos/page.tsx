@@ -12,7 +12,7 @@ import { Briefcase, Heart, Check, Building2, Lightbulb, Wind, ParkingCircle, Cof
 import { RoomCapacityTable } from "@/components/RoomCapacityTable";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { useEditor } from "@/lib/context/EditorContext";

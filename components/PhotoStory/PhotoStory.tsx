@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { useEffect, useRef, useState, ReactNode } from "react";
 import { ElegantCarousel } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";

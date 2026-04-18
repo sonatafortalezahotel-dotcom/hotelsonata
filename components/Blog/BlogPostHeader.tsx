@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { cn } from "@/lib/utils";
 
 interface BlogPostHeaderProps {

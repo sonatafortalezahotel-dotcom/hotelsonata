@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { getRooms } from "@/lib/hooks/useRooms";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { Waves, Users as UsersIcon } from "lucide-react";
 
 interface Room {

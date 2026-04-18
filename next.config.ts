@@ -2,8 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    loader: "custom",
-    loaderFile: "./lib/blobAwareImageLoader.ts",
     remotePatterns: [
       {
         protocol: "https",

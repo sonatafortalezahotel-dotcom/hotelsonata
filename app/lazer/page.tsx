@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Waves, Bike, Dumbbell, Trophy, MapPin, Heart, Sparkles } from "lucide-react";

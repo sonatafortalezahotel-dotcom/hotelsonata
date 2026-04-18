@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { cn } from "@/lib/utils";
 import { HorizontalScroll } from "@/components/HorizontalScroll";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/lib/app-image";
 import { useEditor } from "@/lib/context/EditorContext";
 import { EditableImage } from "@/components/admin/EditableImage";
 import { ImageEditDialog } from "./ImageEditDialog";
