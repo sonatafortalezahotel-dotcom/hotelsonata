@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: false,
-    qualities: [75, 90, 100],
+    qualities: [75, 80, 90, 100],
   },
   // Otimizações de performance
   compress: true,

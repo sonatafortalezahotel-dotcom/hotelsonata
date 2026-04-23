@@ -430,7 +430,7 @@ function EventosPageContent() {
                     fill
                     className="object-contain p-4 md:p-8"
                     priority
-                    quality={100}
+                    quality={80}
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1536px"
                   />
                 )}

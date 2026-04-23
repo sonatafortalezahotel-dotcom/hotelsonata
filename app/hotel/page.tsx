@@ -230,7 +230,7 @@ function HotelPageContent() {
         badge={heroBadge}
         height="medium"
         overlay="medium"
-        imageQuality={100}
+        imageQuality={90}
       />
 
       {/* Nossa História */}
@@ -492,7 +492,7 @@ function HotelPageContent() {
                 ) : (() => {
                   const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:0") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[0] : hotelImages.localizacao) || galleryPhotos[3]?.imageUrl;
                   const valid = typeof base === "string" && base.trim() !== "";
-                  return valid ? <Image src={base} alt={t.explore.spots.beach.title} fill quality={100} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
+                  return valid ? <Image src={base} alt={t.explore.spots.beach.title} fill quality={80} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">
@@ -510,7 +510,7 @@ function HotelPageContent() {
                 ) : (() => {
                   const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:1") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[1] : undefined) || galleryPhotos[4]?.imageUrl;
                   const valid = typeof base === "string" && base.trim() !== "";
-                  return valid ? <Image src={base} alt={t.explore.spots.culture.title} fill quality={100} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
+                  return valid ? <Image src={base} alt={t.explore.spots.culture.title} fill quality={80} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">
@@ -528,7 +528,7 @@ function HotelPageContent() {
                 ) : (() => {
                   const base = getGalleryImageByPath(galleryPhotos, "gallery:hotel:localizacao:2") || (Array.isArray(hotelImages.localizacao) ? hotelImages.localizacao[2] : undefined) || galleryPhotos[5]?.imageUrl;
                   const valid = typeof base === "string" && base.trim() !== "";
-                  return valid ? <Image src={base} alt={t.explore.spots.market.title} fill quality={100} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
+                  return valid ? <Image src={base} alt={t.explore.spots.market.title} fill quality={80} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />;
                 })()}
               </div>
               <CardContent className="pt-6">

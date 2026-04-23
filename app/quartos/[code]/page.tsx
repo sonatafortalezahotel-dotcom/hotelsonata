@@ -335,7 +335,7 @@ export default function RoomDetailPage() {
         imageAlt={room.name || "Quarto Hotel Sonata"}
         height="large"
         overlay="medium"
-        imageQuality={100}
+        imageQuality={90}
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8">
@@ -477,7 +477,7 @@ export default function RoomDetailPage() {
           interval={4000}
           height="h-[450px] md:h-[600px] lg:h-[75vh] min-h-[500px]"
           mobileHeight="h-[55vh]"
-          imageQuality={100}
+          imageQuality={80}
           onImageClick={(index) => handleImageClick(galleryWithHero, index)}
         />
       )}
@@ -489,7 +489,7 @@ export default function RoomDetailPage() {
           interval={5000}
           desktopHeight="h-[85vh] min-h-[750px]"
           mobileHeight="h-[55vh]"
-          imageQuality={100}
+          imageQuality={80}
           onImageClick={(index) => handleImageClick(galleryWithHero, 4 + index)}
         />
       )}
@@ -501,7 +501,7 @@ export default function RoomDetailPage() {
           interval={4500}
           height="h-[450px] md:h-[600px] lg:h-[75vh] min-h-[500px]"
           mobileHeight="h-[55vh]"
-          imageQuality={100}
+          imageQuality={80}
           onImageClick={(index) => handleImageClick(galleryWithHero, 4 + index)}
         />
       )}

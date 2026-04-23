@@ -1,5 +1,4 @@
 import type { ImageLoaderProps } from "next/image";
-import { toClientBlobUrl } from "./blobUrl";
 
 function isVercelBlobHost(hostname: string): boolean {
   return (
@@ -8,10 +7,14 @@ function isVercelBlobHost(hostname: string): boolean {
   );
 }
 
+function optimizationUrl(src: string, width: number, q: number): string {
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
+}
+
 /**
- * Imagens já hospedadas no Vercel Blob são servidas direto do CDN (sem /_next/image).
- * Reduz data transfer e invocações de Image Optimization na Vercel.
- * Demais URLs continuam usando o pipeline padrão do Next.
+ * Rotear Blob e proxy privado por `/_next/image` para respeitar `w`/`quality` e
+ * reduzir banda (antes: URL direta = ficheiro completo no cliente).
+ * Caminhos estáticos em `/public` continuam sem passar pelo otimizador.
  */
 export default function blobAwareImageLoader({
   src,
@@ -24,6 +27,10 @@ export default function blobAwareImageLoader({
 
   const q = quality ?? 75;
 
+  if (src.startsWith("/api/blob-proxy/")) {
+    return optimizationUrl(src, width, q);
+  }
+
   if (src.startsWith("/")) {
     return src;
   }
@@ -31,11 +38,11 @@ export default function blobAwareImageLoader({
   try {
     const { hostname } = new URL(src);
     if (isVercelBlobHost(hostname)) {
-      return toClientBlobUrl(src);
+      return optimizationUrl(src, width, q);
     }
   } catch {
-    return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
+    return optimizationUrl(src, width, q);
   }
 
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
+  return optimizationUrl(src, width, q);
 }

@@ -34,7 +34,7 @@ export function FeatureImageSection({
   ctaText,
   ctaLink,
   backgroundColor = "white",
-  imageQuality = 100,
+  imageQuality = 80,
 }: FeatureImageSectionProps) {
   const bgClasses = {
     white: "bg-background",

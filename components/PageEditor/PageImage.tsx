@@ -64,7 +64,7 @@ export function PageImage({
           src={displaySrc}
           alt={alt}
           fill
-          quality={100}
+          quality={80}
           sizes="100vw"
           className="object-cover"
         />
