@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { PublicLayout } from "@/components/PublicLayout";
 import { StructuredData } from "@/components/SEO/StructuredData";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { generateHotelStructuredData } from "@/lib/utils/seo";
 
@@ -132,6 +133,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        <GoogleAnalytics />
         <MetaPixel />
         <StructuredData data={hotelStructuredData} />
         <Providers>
