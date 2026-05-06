@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import SkipToContent from "@/components/SkipToContent";
 import { AwardsSection } from "@/components/AwardsSection";
 import BookingBar from "@/components/BookingBar";
+import { WhatsAppFloatButton } from "@/components/WhatsAppFloatButton";
 import { EditorProvider } from "@/lib/context/EditorContext";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         }}
       />
       <Footer />
+      <WhatsAppFloatButton />
     </EditorProvider>
   );
 }

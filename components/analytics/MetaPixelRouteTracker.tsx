@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 declare global {
   interface Window {
@@ -12,11 +12,9 @@ declare global {
 export function MetaPixelRouteTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isFirst = useRef(true);
 
   useEffect(() => {
-    if (isFirst.current) {
-      isFirst.current = false;
+    if (!pathname || pathname.startsWith("/admin")) {
       return;
     }
     if (typeof window !== "undefined" && window.fbq) {

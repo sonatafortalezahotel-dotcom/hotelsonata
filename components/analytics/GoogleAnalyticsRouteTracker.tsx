@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 type GtagParams = Record<string, string | number | boolean | undefined>;
 
@@ -14,11 +14,9 @@ declare global {
 export function GoogleAnalyticsRouteTracker({ measurementId }: { measurementId: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isFirst = useRef(true);
 
   useEffect(() => {
-    if (isFirst.current) {
-      isFirst.current = false;
+    if (!pathname || pathname.startsWith("/admin")) {
       return;
     }
 
