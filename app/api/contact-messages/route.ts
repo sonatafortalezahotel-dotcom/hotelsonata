@@ -6,6 +6,7 @@ import { buildContactConfirmationEmail } from "@/lib/email/contactConfirmation";
 import {
   createMailTransporter,
   escapeHtml,
+  getContactCcEmails,
   getSmtpConfig,
   isSmtpConfigured,
   logMailResult,
@@ -60,7 +61,8 @@ export async function POST(request: Request) {
     if (isSmtpConfigured()) {
       try {
         const { fromEmail, fromName, contactEmail, host, user } = getSmtpConfig();
-        console.log("[contato] SMTP ativo", { host, user, contactEmail });
+        const contactCc = getContactCcEmails();
+        console.log("[contato] SMTP ativo", { host, user, contactEmail, cc: contactCc });
         const transporter = createMailTransporter();
         const html = `
           <h2 style="color: #1e40af; font-size: 24px; margin-bottom: 20px;">Nova mensagem de Contato - Hotel Sonata de Iracema</h2>
@@ -89,6 +91,7 @@ export async function POST(request: Request) {
         const internalMail = await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
           to: contactEmail,
+          cc: contactCc.length > 0 ? contactCc : undefined,
           replyTo: email,
           subject: internalSubject,
           text: internalText,

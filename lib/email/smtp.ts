@@ -10,6 +10,10 @@ export const SMTP_DEFAULTS = {
   rhEmail: "vagas@hotelsonata.com.br",
   eventosEmail: "reservas@sonatadeiracema.com.br",
   contactEmail: "reservas@sonatadeiracema.com.br",
+  contactCcEmails: [
+    "rafaelcsmarilia@gmail.com",
+    "kommucomunicacao@gmail.com",
+  ],
 } as const;
 
 function trimEnv(value: string | undefined): string {
@@ -40,6 +44,17 @@ export function getSmtpConfig() {
 export function isSmtpConfigured(): boolean {
   const { user, pass } = getSmtpConfig();
   return Boolean(user && pass);
+}
+
+/** Cópia (CC) nos alertas do formulário de contato. `CONTACT_CC_EMAILS` = emails separados por vírgula. */
+export function getContactCcEmails(): string[] {
+  const raw =
+    trimEnv(process.env.CONTACT_CC_EMAILS) ||
+    SMTP_DEFAULTS.contactCcEmails.join(",");
+  return raw
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
 }
 
 export function createMailTransporter() {
