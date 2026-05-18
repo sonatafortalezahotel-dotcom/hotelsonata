@@ -467,6 +467,12 @@ export default async function LandingPage({ params }: PageProps) {
       console.error("Erro ao buscar imagens da galeria:", err);
     }
 
+    const heroSrc = [
+      heroImages[0]?.imageUrl,
+      page.ogImage,
+      galleryImages[0]?.imageUrl,
+    ].find((url) => typeof url === "string" && url.trim().length > 0)?.trim();
+
     // Buscar quartos relacionados se houver
     let relatedRooms: any[] = [];
     if (page.relatedRoomIds) {
@@ -504,10 +510,10 @@ export default async function LandingPage({ params }: PageProps) {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
           <article className="max-w-4xl mx-auto">
             {/* Imagem Hero (prioridade: hero padrão > ogImage > primeira imagem da galeria) */}
-            {(heroImages.length > 0 || page.ogImage || galleryImages.length > 0) && (
+            {heroSrc && (
               <div className="mb-8 rounded-lg overflow-hidden shadow-lg relative aspect-video">
                 <Image
-                  src={heroImages[0]?.imageUrl || page.ogImage || galleryImages[0]?.imageUrl}
+                  src={heroSrc}
                   alt={capitalizedH1}
                   fill
                   className="object-cover"

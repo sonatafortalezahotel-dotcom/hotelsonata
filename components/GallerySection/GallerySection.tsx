@@ -23,7 +23,8 @@ export function GallerySection({
   altPrefix,
   columns = 3,
 }: GallerySectionProps) {
-  if (images.length === 0) {
+  const validImages = images.filter((img) => img.imageUrl?.trim());
+  if (validImages.length === 0) {
     return null;
   }
 
@@ -36,22 +37,21 @@ export function GallerySection({
   return (
     <section className="mt-8 mb-8 lg:mt-12 lg:mb-12 min-w-0">
       <h2 className="text-2xl font-bold mb-6 min-w-0 break-words">{title}</h2>
-      
-      {/* Mobile: Carrossel Horizontal */}
+
       <div className="lg:hidden">
-        <HorizontalScroll 
-          itemWidth="85" 
-          showArrows={false} 
+        <HorizontalScroll
+          itemWidth="85"
+          showArrows={false}
           showDots={true}
           gap={4}
         >
-          {images.map((img, index) => (
+          {validImages.map((img, index) => (
             <div
               key={`${img.id}-${index}-${img.imageUrl}`}
               className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
             >
               <Image
-                src={img.imageUrl}
+                src={img.imageUrl.trim()}
                 alt={img.title || img.description || `${altPrefix} ${index + 1}`}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -62,15 +62,14 @@ export function GallerySection({
         </HorizontalScroll>
       </div>
 
-      {/* Desktop: Grid */}
       <div className={`hidden lg:grid ${columnsClass[columns]} gap-4`}>
-        {images.map((img, index) => (
+        {validImages.map((img, index) => (
           <div
             key={`${img.id}-${index}-${img.imageUrl}`}
             className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
           >
             <Image
-              src={img.imageUrl}
+              src={img.imageUrl.trim()}
               alt={img.title || img.description || `${altPrefix} ${index + 1}`}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -82,3 +81,5 @@ export function GallerySection({
     </section>
   );
 }
+
+

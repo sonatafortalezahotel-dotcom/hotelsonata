@@ -12,9 +12,9 @@ function optimizationUrl(src: string, width: number, q: number): string {
 }
 
 /**
- * Rotear Blob e proxy privado por `/_next/image` para respeitar `w`/`quality` e
- * reduzir banda (antes: URL direta = ficheiro completo no cliente).
- * Caminhos estáticos em `/public` continuam sem passar pelo otimizador.
+ * Rotear Blob, proxy privado e `/public` por `/_next/image` para respeitar
+ * `w`/`quality`, reduzir banda e gerar `srcset` válido (URLs com espaços
+ * quebram o atributo se forem devolvidas sem encode).
  */
 export default function blobAwareImageLoader({
   src,
@@ -27,12 +27,8 @@ export default function blobAwareImageLoader({
 
   const q = quality ?? 75;
 
-  if (src.startsWith("/api/blob-proxy/")) {
-    return optimizationUrl(src, width, q);
-  }
-
   if (src.startsWith("/")) {
-    return src;
+    return optimizationUrl(src, width, q);
   }
 
   try {
