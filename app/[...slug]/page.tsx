@@ -261,33 +261,23 @@ export default async function LandingPage({ params }: PageProps) {
     let galleryImages: any[] = [];
     let galleryQuartos: any[] = [];
     let galleryGastronomia: any[] = [];
-    let galleryLazer: any[] = [];
     let galleryGeral: any[] = [];
     let galleryLocalizacao: any[] = [];
 
     const toGalleryItem = (imageUrl: string) => ({ id: 0, imageUrl, order: 0, active: true });
 
-    /** Garante que a galeria tem múltiplo de N itens (linhas completas sem faltar). */
-    const toMultipleOf = <T,>(arr: T[], n: number): T[] => {
-      if (arr.length === 0 || n < 1) return arr;
-      const len = arr.length;
-      const mod = len % n;
-      if (mod === 0) return arr;
-      const need = n - mod;
-      const out = [...arr];
-      for (let i = 0; i < need; i++) out.push(arr[i % len]);
-      return out;
-    };
+    /** Máximo de fotos por tópico nas landing pages SEO. */
+    const LANDING_GALLERY_PER_TOPIC = 4;
+    const capGallery = <T,>(arr: T[]) => arr.slice(0, LANDING_GALLERY_PER_TOPIC);
 
     try {
-      const { gallery, rooms, gastronomy, leisure } = await import("@/lib/db/schema");
+      const { gallery, rooms, gastronomy } = await import("@/lib/db/schema");
       const galleryTable = gallery;
       const keywords = page.keywords.split(",").map((k) => k.trim().toLowerCase());
       const contentType = page.contentType || "general";
 
       const hasQuartos = contentType === "rooms" || keywords.some((k) => /quarto|acomodação|suite|room|habitacion/.test(k));
       const hasGastronomia = contentType === "gastronomy" || keywords.some((k) => /gastronomia|restaurante|café|cafe|comida|food/.test(k));
-      const hasLazer = keywords.some((k) => /lazer|piscina|spa|academia|beach|fitness/.test(k));
       const hasLocalizacao = keywords.some((k) => /localização|localizacao|fortaleza|praia|iracema|location/.test(k));
 
       // 1) Quartos: galeria da página /quartos + mix de todos os quartos (imagem principal e galeria de cada um)
@@ -327,7 +317,6 @@ export default async function LandingPage({ params }: PageProps) {
         };
         addUnique(quartosGallery);
         addUnique(fromRooms);
-        galleryQuartos = galleryQuartos.slice(0, 4);
       }
 
       // 2) Gastronomia: mesma fonte da página /gastronomia (galeria page=gastronomia)
@@ -338,7 +327,7 @@ export default async function LandingPage({ params }: PageProps) {
           .where(and(eq(galleryTable.page, "gastronomia"), eq(galleryTable.active, true), isNotNull(galleryTable.imageUrl)))
           .orderBy(asc(galleryTable.order));
         if (gastronomiaGallery.length > 0) {
-          galleryGastronomia = gastronomiaGallery;
+          galleryGastronomia = capGallery(gastronomiaGallery);
         } else {
           const gastronomyRows = await db.select({ imageUrl: gastronomy.imageUrl, gallery: gastronomy.gallery }).from(gastronomy).where(eq(gastronomy.active, true)).limit(8);
           const fromGastronomy: any[] = [];
@@ -347,32 +336,11 @@ export default async function LandingPage({ params }: PageProps) {
             const urls = Array.isArray(g.gallery) ? (g.gallery as string[]) : [];
             urls.slice(0, 2).forEach((url) => typeof url === "string" && url && fromGastronomy.push(toGalleryItem(url)));
           }
-          galleryGastronomia = fromGastronomy;
+          galleryGastronomia = capGallery(fromGastronomy);
         }
       }
 
-      // 3) Lazer: mesma fonte da página /lazer (galeria page=lazer)
-      if (hasLazer) {
-        const lazerGallery = await db
-          .select()
-          .from(galleryTable)
-          .where(and(eq(galleryTable.page, "lazer"), eq(galleryTable.active, true), isNotNull(galleryTable.imageUrl)))
-          .orderBy(asc(galleryTable.order));
-        if (lazerGallery.length > 0) {
-          galleryLazer = lazerGallery;
-        } else {
-          const leisureRows = await db.select({ imageUrl: leisure.imageUrl, gallery: leisure.gallery }).from(leisure).where(eq(leisure.active, true)).limit(8);
-          const fromLeisure: any[] = [];
-          for (const l of leisureRows) {
-            if (l.imageUrl) fromLeisure.push(toGalleryItem(l.imageUrl));
-            const urls = Array.isArray(l.gallery) ? (l.gallery as string[]) : [];
-            urls.slice(0, 2).forEach((url) => typeof url === "string" && url && fromLeisure.push(toGalleryItem(url)));
-          }
-          galleryLazer = fromLeisure;
-        }
-      }
-
-      // 4) Localização: galeria lazer section localizacao ou home
+      // 3) Localização: galeria lazer section localizacao ou home
       if (hasLocalizacao) {
         const locGallery = await db
           .select()
@@ -386,10 +354,10 @@ export default async function LandingPage({ params }: PageProps) {
             )
           )
           .orderBy(asc(galleryTable.order));
-        if (locGallery.length > 0) galleryLocalizacao = locGallery;
+        if (locGallery.length > 0) galleryLocalizacao = capGallery(locGallery);
       }
 
-      // 5) Hero e galeria geral: página hotel ou home (fotos reais do site)
+      // 4) Hero e galeria geral: página hotel ou home (fotos reais do site)
       const heroFromHotel = await db
         .select()
         .from(galleryTable)
@@ -403,7 +371,7 @@ export default async function LandingPage({ params }: PageProps) {
       const forHero = heroFromHotel.length > 0 ? heroFromHotel : heroFromHome;
       if (forHero.length > 0) {
         heroImages = forHero.slice(0, 3);
-        if (galleryGeral.length === 0) galleryGeral = forHero.slice(3, 12);
+        if (galleryGeral.length === 0) galleryGeral = capGallery(forHero.slice(3));
       }
 
       if (galleryGeral.length === 0) {
@@ -412,16 +380,15 @@ export default async function LandingPage({ params }: PageProps) {
           .from(galleryTable)
           .where(and(eq(galleryTable.page, "home"), eq(galleryTable.active, true), isNotNull(galleryTable.imageUrl)))
           .orderBy(asc(galleryTable.order));
-        galleryGeral = geralGallery.slice(0, 9);
+        galleryGeral = capGallery(geralGallery);
       }
 
       // Fallback: seções específicas de SEO landing page (se existirem no admin)
-      if (heroImages.length === 0 || (galleryQuartos.length === 0 && galleryGastronomia.length === 0 && galleryLazer.length === 0)) {
+      if (heroImages.length === 0 || (galleryQuartos.length === 0 && galleryGastronomia.length === 0)) {
         const seoSections = [
           `seo-hero-padrao-${locale}`,
           hasQuartos ? `seo-galeria-quartos-${locale}` : null,
           hasGastronomia ? `seo-galeria-gastronomia-${locale}` : null,
-          hasLazer ? `seo-galeria-lazer-${locale}` : null,
           hasLocalizacao ? `seo-galeria-localizacao-${locale}` : null,
           `seo-galeria-geral-${locale}`,
         ].filter(Boolean) as string[];
@@ -438,31 +405,31 @@ export default async function LandingPage({ params }: PageProps) {
               )
             )
             .orderBy(asc(galleryTable.order));
-          if (section.includes("hero") && heroImages.length === 0) heroImages = rows;
-          else if (section.includes("quartos") && galleryQuartos.length === 0) galleryQuartos = rows;
-          else if (section.includes("gastronomia") && galleryGastronomia.length === 0) galleryGastronomia = rows;
-          else if (section.includes("lazer") && !section.includes("localizacao") && galleryLazer.length === 0) galleryLazer = rows;
-          else if (section.includes("localizacao") && galleryLocalizacao.length === 0) galleryLocalizacao = rows;
-          else if (section.includes("geral") && galleryGeral.length === 0) galleryGeral = rows;
+          if (section.includes("hero") && heroImages.length === 0) heroImages = rows.slice(0, 3);
+          else if (section.includes("quartos") && galleryQuartos.length === 0) galleryQuartos = capGallery(rows);
+          else if (section.includes("gastronomia") && galleryGastronomia.length === 0) galleryGastronomia = capGallery(rows);
+          else if (section.includes("localizacao") && galleryLocalizacao.length === 0) galleryLocalizacao = capGallery(rows);
+          else if (section.includes("geral") && galleryGeral.length === 0) galleryGeral = capGallery(rows);
         }
       }
 
-      galleryImages = [...galleryQuartos, ...galleryGastronomia, ...galleryLazer, ...galleryLocalizacao, ...galleryGeral].slice(0, 12);
+      galleryQuartos = capGallery(galleryQuartos);
+      galleryGastronomia = capGallery(galleryGastronomia);
+      galleryLocalizacao = capGallery(galleryLocalizacao);
+      galleryGeral = capGallery(galleryGeral);
+
+      galleryImages = [
+        ...galleryQuartos,
+        ...galleryGastronomia,
+        ...galleryLocalizacao,
+        ...galleryGeral,
+      ];
 
       if (heroImages.length === 0 && galleryImages.length === 0) {
         const anyActive = await db.select().from(galleryTable).where(and(eq(galleryTable.active, true), isNotNull(galleryTable.imageUrl))).orderBy(asc(galleryTable.order)).limit(10);
         heroImages = anyActive.slice(0, 1);
-        galleryImages = anyActive.slice(1, 7);
+        galleryImages = capGallery(anyActive.slice(1));
       }
-
-      // Galerias em linhas de 4 fotos → múltiplo de 4
-      galleryQuartos = toMultipleOf(galleryQuartos, 4);
-      galleryGastronomia = toMultipleOf(galleryGastronomia, 4);
-      galleryLazer = toMultipleOf(galleryLazer, 4);
-      galleryLocalizacao = toMultipleOf(galleryLocalizacao, 4);
-      // Hotel Gallery / Galeria do Hotel → linhas de 3
-      galleryGeral = toMultipleOf(galleryGeral, 3);
-      galleryImages = toMultipleOf(galleryImages, 4);
     } catch (err) {
       console.error("Erro ao buscar imagens da galeria:", err);
     }
@@ -560,7 +527,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Quartos e Acomodações"
               }
               altPrefix={`${page.h1 || page.title} - Quarto`}
-              columns={3}
+              columns={4}
             />
 
             <GallerySection
@@ -573,20 +540,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Gastronomia"
               }
               altPrefix={`${page.h1 || page.title} - Gastronomia`}
-              columns={3}
-            />
-
-            <GallerySection
-              images={galleryLazer}
-              title={
-                locale === "en"
-                  ? "Leisure & Activities"
-                  : locale === "es"
-                  ? "Ocio y Actividades"
-                  : "Lazer e Atividades"
-              }
-              altPrefix={`${page.h1 || page.title} - Lazer`}
-              columns={3}
+              columns={4}
             />
 
             <GallerySection
@@ -599,7 +553,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Localização e Arredores"
               }
               altPrefix={`${page.h1 || page.title} - Localização`}
-              columns={3}
+              columns={4}
             />
 
             {/* Galeria Geral (fallback ou complemento) */}
@@ -613,7 +567,7 @@ export default async function LandingPage({ params }: PageProps) {
                   : "Galeria do Hotel"
               }
               altPrefix={`${page.h1 || page.title} - Imagem`}
-              columns={3}
+              columns={4}
             />
 
             {/* Quartos Relacionados */}
