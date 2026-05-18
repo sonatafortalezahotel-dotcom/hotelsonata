@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type SentMessageInfo } from "nodemailer";
 
 /** Padrões do Hotel Sonata (Locaweb email-ssl). Sobrescreva via variáveis de ambiente. */
 export const SMTP_DEFAULTS = {
@@ -57,15 +57,7 @@ export function createMailTransporter() {
 }
 
 /** Loga resposta do nodemailer (accepted/rejected) para debug na Vercel. */
-export function logMailResult(
-  label: string,
-  result: {
-    messageId?: string;
-    accepted?: string[];
-    rejected?: string[];
-    response?: string;
-  }
-) {
+export function logMailResult(label: string, result: SentMessageInfo) {
   console.log(label, {
     messageId: result.messageId,
     accepted: result.accepted,
