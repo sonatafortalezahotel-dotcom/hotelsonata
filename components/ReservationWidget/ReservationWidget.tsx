@@ -29,10 +29,8 @@ import {
 import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   bookingChildrenOptions,
-  bookingRoomOptions,
   MAX_BOOKING_ADULTS,
   MAX_BOOKING_CHILDREN,
-  MAX_BOOKING_ROOMS,
 } from "@/lib/constants/booking";
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 import { useCurrency } from "@/lib/hooks/useCurrency";
@@ -75,7 +73,6 @@ export default function ReservationWidget({
   const [checkOut, setCheckOut] = useState<Date | null>(initialCheckOut || null);
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
-  const [rooms, setRooms] = useState("1");
   const [promoCode, setPromoCode] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [checkInOpen, setCheckInOpen] = useState(false);
@@ -85,13 +82,6 @@ export default function ReservationWidget({
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  useEffect(() => {
-    const count = parseInt(rooms, 10);
-    if (!Number.isNaN(count) && count > MAX_BOOKING_ROOMS) {
-      setRooms(String(MAX_BOOKING_ROOMS));
-    }
-  }, [rooms]);
 
   useEffect(() => {
     const count = parseInt(adults, 10);
@@ -114,7 +104,6 @@ export default function ReservationWidget({
       checkOut: "Check-out",
       adults: "Adultos",
       children: "Crianças",
-      rooms: "Quartos",
       checkAvailability: "Verificar Disponibilidade",
       checking: "Verificando...",
       available: "Disponível",
@@ -148,7 +137,6 @@ export default function ReservationWidget({
       checkOut: "Salida",
       adults: "Adultos",
       children: "Niños",
-      rooms: "Habitaciones",
       checkAvailability: "Verificar Disponibilidad",
       checking: "Verificando...",
       available: "Disponible",
@@ -182,7 +170,6 @@ export default function ReservationWidget({
       checkOut: "Check-out",
       adults: "Adults",
       children: "Children",
-      rooms: "Rooms",
       checkAvailability: "Check Availability",
       checking: "Checking...",
       available: "Available",
@@ -258,7 +245,7 @@ export default function ReservationWidget({
         checkOut,
         adults,
         children,
-        rooms: parseInt(rooms, 10) || 1,
+        rooms: 1,
         promoCode: promoCode.trim() || undefined,
         locale: locale as "pt" | "es" | "en",
       });
@@ -425,34 +412,6 @@ export default function ReservationWidget({
         </div>
 
         {/* Hóspedes */}
-        <div className="space-y-3">
-          <div className="space-y-2">
-            <Label>{t.rooms}</Label>
-            <Select value={rooms} onValueChange={setRooms}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {bookingRoomOptions().map((num) => (
-                  <SelectItem key={num} value={num.toString()}>
-                    {num}{" "}
-                    {locale === "en"
-                      ? num === 1
-                        ? "room"
-                        : "rooms"
-                      : locale === "es"
-                        ? num === 1
-                          ? "habitación"
-                          : "habitaciones"
-                        : num === 1
-                          ? "quarto"
-                          : "quartos"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label>{t.adults}</Label>
