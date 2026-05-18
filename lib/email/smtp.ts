@@ -9,6 +9,7 @@ export const SMTP_DEFAULTS = {
   fromName: "Hotel Sonata",
   rhEmail: "vagas@hotelsonata.com.br",
   eventosEmail: "reservas@sonatadeiracema.com.br",
+  contactEmail: "reservas@sonatadeiracema.com.br",
 } as const;
 
 function trimEnv(value: string | undefined): string {
@@ -31,6 +32,8 @@ export function getSmtpConfig() {
     rhEmail: trimEnv(process.env.RH_EMAIL) || SMTP_DEFAULTS.rhEmail,
     eventosEmail:
       trimEnv(process.env.EVENTOS_EMAIL) || SMTP_DEFAULTS.eventosEmail,
+    contactEmail:
+      trimEnv(process.env.CONTACT_EMAIL) || SMTP_DEFAULTS.contactEmail,
   };
 }
 
