@@ -1,36 +1,13 @@
 import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
-import nodemailer from "nodemailer";
 import { db } from "@/lib/db";
 import { eventLeads } from "@/lib/db/schema";
-
-const EVENTOS_EMAIL = process.env.EVENTOS_EMAIL || "eventos@sonatadeiracema.com.br";
-const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "dev@opendreams.com.br";
-const FROM_NAME = process.env.SMTP_FROM_NAME || "Hotel Sonata";
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtppro.zoho.com",
-    port: parseInt(process.env.SMTP_PORT || "465"),
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
-    },
-    tls: { rejectUnauthorized: false },
-  });
-}
-
-function escapeHtml(text: string) {
-  const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return String(text ?? "").replace(/[&<>"']/g, (m) => map[m]);
-}
+import {
+  createMailTransporter,
+  escapeHtml,
+  getSmtpConfig,
+  isSmtpConfigured,
+} from "@/lib/email/smtp";
 
 export async function GET() {
   try {
@@ -72,10 +49,10 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    // Enviar email para eventos@ (formulário de eventos)
-    if (process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+    if (isSmtpConfigured()) {
       try {
-        const transporter = createTransporter();
+        const { fromEmail, fromName, eventosEmail } = getSmtpConfig();
+        const transporter = createMailTransporter();
         const html = `
           <h2 style="color: #1e40af; font-size: 24px; margin-bottom: 20px;">Novo lead de Eventos - Hotel Sonata de Iracema</h2>
           <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px;">
@@ -93,8 +70,8 @@ export async function POST(request: Request) {
           <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">Enviado automaticamente pelo formulário de eventos do site.</p>
         `;
         await transporter.sendMail({
-          from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
-          to: EVENTOS_EMAIL,
+          from: `"${fromName}" <${fromEmail}>`,
+          to: eventosEmail,
           replyTo: email,
           subject: `Novo lead de Eventos: ${name}${company ? ` - ${company}` : ""}`,
           html,
@@ -113,4 +90,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
