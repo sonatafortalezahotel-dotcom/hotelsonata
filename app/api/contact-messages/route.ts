@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contactMessages } from "@/lib/db/schema";
+import { buildContactConfirmationEmail } from "@/lib/email/contactConfirmation";
 import {
   createMailTransporter,
   escapeHtml,
@@ -28,7 +29,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, subject, message } = body;
+    const { name, email, phone, subject, message, locale } = body;
 
     if (!name || !email) {
       return NextResponse.json(
@@ -74,6 +75,24 @@ export async function POST(request: Request) {
           subject: `Contato do site: ${subject?.trim() || name}`,
           html,
         });
+
+        try {
+          const confirmation = buildContactConfirmationEmail({
+            name,
+            subject,
+            message,
+            phone,
+            locale,
+          });
+          await transporter.sendMail({
+            from: `"${fromName}" <${fromEmail}>`,
+            to: email,
+            subject: confirmation.subject,
+            html: confirmation.html,
+          });
+        } catch (confirmErr) {
+          console.error("Erro ao enviar email de confirmação ao visitante:", confirmErr);
+        }
       } catch (err) {
         console.error("Erro ao enviar email de contato:", err);
       }

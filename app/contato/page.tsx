@@ -154,6 +154,7 @@ function ContatoPageContent() {
           phone: formData.phone || undefined,
           subject: formData.subject || undefined,
           message: formData.message || undefined,
+          locale,
         }),
       });
       const data = await response.json().catch(() => ({}));
