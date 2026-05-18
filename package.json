@@ -19,7 +19,8 @@
     "migrate:blob-copy": "tsx scripts/migrate-vercel-blob-copy.ts",
     "migrate:blob-urls-db": "tsx scripts/replace-blob-urls-in-db.ts",
     "migrate:blob-origins": "tsx scripts/print-blob-origins.ts",
-    "migrate:neon-dump": "tsx scripts/migrate-neon-pg-dump.ts"
+    "migrate:neon-dump": "tsx scripts/migrate-neon-pg-dump.ts",
+    "test:smtp": "tsx scripts/test-smtp.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
