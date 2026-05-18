@@ -38,6 +38,7 @@ import {
   bookingChildrenOptions,
   bookingRoomOptions,
   MAX_BOOKING_ADULTS,
+  MAX_BOOKING_CHILDREN,
   MAX_BOOKING_ROOMS,
 } from "@/lib/constants/booking";
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
@@ -83,6 +84,13 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       setAdults(String(MAX_BOOKING_ADULTS));
     }
   }, [adults]);
+
+  useEffect(() => {
+    const count = parseInt(children, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_CHILDREN) {
+      setChildren(String(MAX_BOOKING_CHILDREN));
+    }
+  }, [children]);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");

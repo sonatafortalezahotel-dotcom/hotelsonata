@@ -27,7 +27,13 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
-import { bookingRoomOptions, MAX_BOOKING_ROOMS } from "@/lib/constants/booking";
+import {
+  bookingChildrenOptions,
+  bookingRoomOptions,
+  MAX_BOOKING_ADULTS,
+  MAX_BOOKING_CHILDREN,
+  MAX_BOOKING_ROOMS,
+} from "@/lib/constants/booking";
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
@@ -86,6 +92,20 @@ export default function ReservationWidget({
       setRooms(String(MAX_BOOKING_ROOMS));
     }
   }, [rooms]);
+
+  useEffect(() => {
+    const count = parseInt(adults, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ADULTS) {
+      setAdults(String(MAX_BOOKING_ADULTS));
+    }
+  }, [adults]);
+
+  useEffect(() => {
+    const count = parseInt(children, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_CHILDREN) {
+      setChildren(String(MAX_BOOKING_CHILDREN));
+    }
+  }, [children]);
 
   const labels = {
     pt: {
@@ -444,7 +464,10 @@ export default function ReservationWidget({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+                {Array.from(
+                  { length: Math.min(maxGuests, MAX_BOOKING_ADULTS) },
+                  (_, i) => i + 1
+                ).map((num) => (
                   <SelectItem key={num} value={num.toString()}>
                     {num}
                   </SelectItem>
@@ -462,7 +485,7 @@ export default function ReservationWidget({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[0, 1, 2, 3, 4].map((num) => (
+                {bookingChildrenOptions().map((num) => (
                   <SelectItem key={num} value={num.toString()}>
                     {num}
                   </SelectItem>
