@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Calendar as CalendarIcon, Users, Search, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
-import { format, startOfDay, isAfter } from "date-fns";
+import { format, startOfDay, startOfMonth, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -33,6 +33,14 @@ import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
 } from "@/lib/utils/bookingCalendar";
+import {
+  bookingAdultsOptions,
+  bookingChildrenOptions,
+  bookingRoomOptions,
+  MAX_BOOKING_ADULTS,
+  MAX_BOOKING_ROOMS,
+} from "@/lib/constants/booking";
+import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 
 interface BookingBarProps {
   isHomePage?: boolean;
@@ -61,6 +69,20 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    const count = parseInt(rooms, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ROOMS) {
+      setRooms(String(MAX_BOOKING_ROOMS));
+    }
+  }, [rooms]);
+
+  useEffect(() => {
+    const count = parseInt(adults, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ADULTS) {
+      setAdults(String(MAX_BOOKING_ADULTS));
+    }
+  }, [adults]);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -109,6 +131,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const getLabelAria = (fieldKey: string): string =>
     getPageContent("global", "bookingBar", fieldKey, displayLocale, globalOverrides) || (t as Record<string, string>)[fieldKey] || "";
   const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
+  const { checkInMonth, setCheckInMonth, checkOutMonth, setCheckOutMonth } =
+    useBookingCalendarMonths(checkIn, checkOut, checkOutOpen);
 
   // Formatar hóspedes igual ao ReservationForm
   const adultsCount = parseInt(adults);
@@ -130,10 +154,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const onCheckInSelect = (date: Date | undefined) => {
     setCheckIn(date);
     setCheckInOpen(false);
-    if (date && checkOut && !isAfter(startOfDay(checkOut), startOfDay(date))) {
-      setCheckOut(undefined);
-    }
+    setCheckOut(undefined);
     if (date) {
+      setCheckOutMonth(startOfMonth(date));
       requestAnimationFrame(() => setCheckOutOpen(true));
     }
   };
@@ -263,6 +286,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           selected={checkIn}
                           onSelect={onCheckInSelect}
                           disabled={disableCheckInCalendarDate}
+                          month={checkInMonth}
+                          onMonthChange={setCheckInMonth}
                           initialFocus
                           locale={dateLocale}
                         />
@@ -321,6 +346,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                           selected={checkOut}
                           onSelect={onCheckOutSelect}
                           disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
+                          month={checkOutMonth}
+                          onMonthChange={setCheckOutMonth}
+                          startMonth={checkIn ? startOfMonth(checkIn) : undefined}
                           initialFocus
                           locale={dateLocale}
                         />
@@ -406,7 +434,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                  {bookingRoomOptions().map((num) => (
                                     <SelectItem key={num} value={num.toString()}>
                                       {num}{" "}
                                       {locale === "en"
@@ -432,7 +460,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                  {bookingAdultsOptions().map((num) => (
                                     <SelectItem key={num} value={num.toString()}>
                                       {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
                                     </SelectItem>
@@ -447,7 +475,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                                  {bookingChildrenOptions().map((num) => (
                                     <SelectItem key={num} value={num.toString()}>
                                       {num === 0 
                                         ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
@@ -541,6 +569,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         selected={checkIn}
                         onSelect={onCheckInSelect}
                         disabled={disableCheckInCalendarDate}
+                        month={checkInMonth}
+                        onMonthChange={setCheckInMonth}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -609,6 +639,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         selected={checkOut}
                         onSelect={onCheckOutSelect}
                         disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
+                        month={checkOutMonth}
+                        onMonthChange={setCheckOutMonth}
+                        startMonth={checkIn ? startOfMonth(checkIn) : undefined}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -671,7 +704,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                              {bookingRoomOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num}{" "}
                                   {locale === "en"
@@ -697,7 +730,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                              {bookingAdultsOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
                                 </SelectItem>
@@ -712,7 +745,7 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                              {bookingChildrenOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num === 0 
                                     ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")

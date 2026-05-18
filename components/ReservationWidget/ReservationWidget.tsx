@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, differenceInDays, startOfDay, isAfter } from "date-fns";
+import { format, differenceInDays, startOfDay, startOfMonth, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -27,6 +27,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { bookingRoomOptions, MAX_BOOKING_ROOMS } from "@/lib/constants/booking";
+import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
 import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
@@ -77,6 +79,13 @@ export default function ReservationWidget({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    const count = parseInt(rooms, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ROOMS) {
+      setRooms(String(MAX_BOOKING_ROOMS));
+    }
+  }, [rooms]);
 
   const labels = {
     pt: {
@@ -185,6 +194,8 @@ export default function ReservationWidget({
 
   const t = labels[locale as keyof typeof labels] || labels.pt;
   const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
+  const { checkInMonth, setCheckInMonth, checkOutMonth, setCheckOutMonth } =
+    useBookingCalendarMonths(checkIn, checkOut, checkOutOpen);
 
   const nights = checkIn && checkOut ? differenceInDays(checkOut, checkIn) : 0;
   const totalPrice = nights > 0 && basePrice > 0 ? nights * basePrice : 0;
@@ -297,18 +308,15 @@ export default function ReservationWidget({
                     onSelect={(date) => {
                       setCheckIn(date || null);
                       setCheckInOpen(false);
-                      if (
-                        date &&
-                        checkOut &&
-                        !isAfter(startOfDay(checkOut), startOfDay(date))
-                      ) {
-                        setCheckOut(null);
-                      }
+                      setCheckOut(null);
                       if (date) {
+                        setCheckOutMonth(startOfMonth(date));
                         requestAnimationFrame(() => setCheckOutOpen(true));
                       }
                     }}
                     disabled={disableCheckInCalendarDate}
+                    month={checkInMonth}
+                    onMonthChange={setCheckInMonth}
                     initialFocus
                     locale={dateLocale}
                   />
@@ -368,6 +376,9 @@ export default function ReservationWidget({
                       if (date) setCheckOutOpen(false);
                     }}
                     disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
+                    month={checkOutMonth}
+                    onMonthChange={setCheckOutMonth}
+                    startMonth={checkIn ? startOfMonth(checkIn) : undefined}
                     initialFocus
                     locale={dateLocale}
                   />
@@ -402,7 +413,7 @@ export default function ReservationWidget({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                {bookingRoomOptions().map((num) => (
                   <SelectItem key={num} value={num.toString()}>
                     {num}{" "}
                     {locale === "en"
@@ -433,7 +444,7 @@ export default function ReservationWidget({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: Math.min(maxGuests, 8) }, (_, i) => i + 1).map((num) => (
+                {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
                   <SelectItem key={num} value={num.toString()}>
                     {num}
                   </SelectItem>

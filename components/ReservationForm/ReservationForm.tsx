@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Users, Tag, Search, Loader2, ChevronDown } from "lucide-react";
-import { format, startOfDay, isAfter } from "date-fns";
+import { format, startOfDay, startOfMonth, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
@@ -32,6 +32,14 @@ import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
 } from "@/lib/utils/bookingCalendar";
+import {
+  bookingAdultsOptions,
+  bookingChildrenOptions,
+  bookingRoomOptions,
+  MAX_BOOKING_ADULTS,
+  MAX_BOOKING_ROOMS,
+} from "@/lib/constants/booking";
+import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 
 interface ReservationFormProps {
   className?: string;
@@ -56,6 +64,20 @@ export default function ReservationForm({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    const count = parseInt(rooms, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ROOMS) {
+      setRooms(String(MAX_BOOKING_ROOMS));
+    }
+  }, [rooms]);
+
+  useEffect(() => {
+    const count = parseInt(adults, 10);
+    if (!Number.isNaN(count) && count > MAX_BOOKING_ADULTS) {
+      setAdults(String(MAX_BOOKING_ADULTS));
+    }
+  }, [adults]);
 
   const editor = useEditor();
   const globalOverrides = editor?.globalOverrides ?? {};
@@ -139,6 +161,8 @@ export default function ReservationForm({
 
   // Locale para formatação de datas e calendário
   const dateLocale = locale === "pt" ? ptBR : locale === "es" ? es : enUS;
+  const { checkInMonth, setCheckInMonth, checkOutMonth, setCheckOutMonth } =
+    useBookingCalendarMonths(checkIn, checkOut, checkOutOpen);
 
   // Formatar hóspedes
   const adultsCount = parseInt(adults);
@@ -211,14 +235,15 @@ export default function ReservationForm({
                         onSelect={(date) => {
                           setCheckIn(date);
                           setCheckInOpen(false);
-                          if (date && checkOut && !isAfter(startOfDay(checkOut), startOfDay(date))) {
-                            setCheckOut(undefined);
-                          }
+                          setCheckOut(undefined);
                           if (date) {
+                            setCheckOutMonth(startOfMonth(date));
                             requestAnimationFrame(() => setCheckOutOpen(true));
                           }
                         }}
                         disabled={disableCheckInCalendarDate}
+                        month={checkInMonth}
+                        onMonthChange={setCheckInMonth}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -293,6 +318,9 @@ export default function ReservationForm({
                           if (date) setCheckOutOpen(false);
                         }}
                         disabled={(date) => disableCheckOutCalendarDate(date, checkIn)}
+                        month={checkOutMonth}
+                        onMonthChange={setCheckOutMonth}
+                        startMonth={checkIn ? startOfMonth(checkIn) : undefined}
                         initialFocus
                         locale={dateLocale}
                       />
@@ -358,7 +386,7 @@ export default function ReservationForm({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                              {bookingRoomOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num}{" "}
                                   {locale === "en"
@@ -384,7 +412,7 @@ export default function ReservationForm({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                              {bookingAdultsOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
                                 </SelectItem>
@@ -399,7 +427,7 @@ export default function ReservationForm({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                              {bookingChildrenOptions().map((num) => (
                                 <SelectItem key={num} value={num.toString()}>
                                   {num === 0 
                                     ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
