@@ -50,6 +50,9 @@ export async function POST(request: Request) {
       })
       .returning();
 
+    const messageId = newMessage[0]?.id;
+    console.log("[contato] Mensagem salva no banco", { id: messageId, locale: locale || "pt" });
+
     if (isSmtpConfigured()) {
       try {
         const { fromEmail, fromName, contactEmail } = getSmtpConfig();
@@ -68,12 +71,17 @@ export async function POST(request: Request) {
           <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">Enviado automaticamente pelo formulário de contato do site.</p>
         `;
 
-        await transporter.sendMail({
+        const internalMail = await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
           to: contactEmail,
           replyTo: email,
           subject: `Contato do site: ${subject?.trim() || name}`,
           html,
+        });
+        console.log("[contato] Email interno enviado", {
+          id: messageId,
+          to: contactEmail,
+          smtpMessageId: internalMail.messageId,
         });
 
         try {
@@ -84,24 +92,30 @@ export async function POST(request: Request) {
             phone,
             locale,
           });
-          await transporter.sendMail({
+          const confirmMail = await transporter.sendMail({
             from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: confirmation.subject,
             html: confirmation.html,
           });
+          console.log("[contato] Email de confirmação enviado", {
+            id: messageId,
+            smtpMessageId: confirmMail.messageId,
+          });
         } catch (confirmErr) {
-          console.error("Erro ao enviar email de confirmação ao visitante:", confirmErr);
+          console.error("[contato] Erro ao enviar email de confirmação ao visitante:", confirmErr);
         }
       } catch (err) {
-        console.error("Erro ao enviar email de contato:", err);
+        console.error("[contato] Erro ao enviar email interno:", err);
       }
     } else {
       console.warn(
-        "SMTP não configurado: mensagem de contato salva no banco, email não enviado."
+        "[contato] SMTP não configurado: mensagem salva no banco, emails não enviados.",
+        { id: messageId }
       );
     }
 
+    console.log("[contato] POST concluído com sucesso", { id: messageId });
     return NextResponse.json(newMessage[0], { status: 201 });
   } catch (error) {
     console.error("Erro ao criar mensagem de contato:", error);
