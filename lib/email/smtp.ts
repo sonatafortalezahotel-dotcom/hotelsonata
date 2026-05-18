@@ -50,7 +50,31 @@ export function createMailTransporter() {
     secure: port === 465,
     auth: { user, pass },
     tls: { rejectUnauthorized: false },
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 30_000,
   });
+}
+
+/** Loga resposta do nodemailer (accepted/rejected) para debug na Vercel. */
+export function logMailResult(
+  label: string,
+  result: {
+    messageId?: string;
+    accepted?: string[];
+    rejected?: string[];
+    response?: string;
+  }
+) {
+  console.log(label, {
+    messageId: result.messageId,
+    accepted: result.accepted,
+    rejected: result.rejected,
+    response: result.response,
+  });
+  if (result.rejected?.length) {
+    console.error(`${label} — destinatários rejeitados pelo SMTP:`, result.rejected);
+  }
 }
 
 export function escapeHtml(text: string) {

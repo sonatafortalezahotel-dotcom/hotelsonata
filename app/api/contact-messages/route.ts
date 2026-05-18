@@ -8,6 +8,7 @@ import {
   escapeHtml,
   getSmtpConfig,
   isSmtpConfigured,
+  logMailResult,
 } from "@/lib/email/smtp";
 
 export async function GET() {
@@ -53,9 +54,13 @@ export async function POST(request: Request) {
     const messageId = newMessage[0]?.id;
     console.log("[contato] Mensagem salva no banco", { id: messageId, locale: locale || "pt" });
 
+    let internalEmailOk = false;
+    let confirmationEmailOk = false;
+
     if (isSmtpConfigured()) {
       try {
-        const { fromEmail, fromName, contactEmail } = getSmtpConfig();
+        const { fromEmail, fromName, contactEmail, host, user } = getSmtpConfig();
+        console.log("[contato] SMTP ativo", { host, user, contactEmail });
         const transporter = createMailTransporter();
         const html = `
           <h2 style="color: #1e40af; font-size: 24px; margin-bottom: 20px;">Nova mensagem de Contato - Hotel Sonata de Iracema</h2>
@@ -71,18 +76,28 @@ export async function POST(request: Request) {
           <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">Enviado automaticamente pelo formulário de contato do site.</p>
         `;
 
+        const internalSubject = `Contato do site: ${subject?.trim() || name}`;
+        const internalText = [
+          "Nova mensagem de contato - Hotel Sonata de Iracema",
+          `Nome: ${name}`,
+          `Email: ${email}`,
+          `Telefone: ${phone || "-"}`,
+          `Assunto: ${subject || "-"}`,
+          `Mensagem: ${message || "-"}`,
+        ].join("\n");
+
         const internalMail = await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
           to: contactEmail,
           replyTo: email,
-          subject: `Contato do site: ${subject?.trim() || name}`,
+          subject: internalSubject,
+          text: internalText,
           html,
         });
-        console.log("[contato] Email interno enviado", {
-          id: messageId,
-          to: contactEmail,
-          smtpMessageId: internalMail.messageId,
-        });
+        logMailResult("[contato] Email interno (reservas)", internalMail);
+        internalEmailOk =
+          Boolean(internalMail.messageId) &&
+          (!internalMail.rejected || internalMail.rejected.length === 0);
 
         try {
           const confirmation = buildContactConfirmationEmail({
@@ -96,12 +111,13 @@ export async function POST(request: Request) {
             from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: confirmation.subject,
+            text: `Recebemos sua mensagem. Responderemos em até 24 horas úteis.\n\nAssunto: ${subject || "-"}\n\nHotel Sonata de Iracema`,
             html: confirmation.html,
           });
-          console.log("[contato] Email de confirmação enviado", {
-            id: messageId,
-            smtpMessageId: confirmMail.messageId,
-          });
+          logMailResult("[contato] Email de confirmação (visitante)", confirmMail);
+          confirmationEmailOk =
+            Boolean(confirmMail.messageId) &&
+            (!confirmMail.rejected || confirmMail.rejected.length === 0);
         } catch (confirmErr) {
           console.error("[contato] Erro ao enviar email de confirmação ao visitante:", confirmErr);
         }
@@ -115,7 +131,12 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[contato] POST concluído com sucesso", { id: messageId });
+    console.log("[contato] Resumo do envio", {
+      id: messageId,
+      smtpConfigurado: isSmtpConfigured(),
+      emailInterno: internalEmailOk,
+      emailConfirmacao: confirmationEmailOk,
+    });
     return NextResponse.json(newMessage[0], { status: 201 });
   } catch (error) {
     console.error("Erro ao criar mensagem de contato:", error);
