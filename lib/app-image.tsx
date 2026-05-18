@@ -1,10 +1,12 @@
+"use client";
+
 import NextImage, { type ImageProps } from "next/image";
 import blobAwareImageLoader from "@/lib/blobAwareImageLoader";
 import { toClientBlobUrl } from "@/lib/blobUrl";
 
 /**
- * `next.config` usa `images.loader: "custom"`; no Next 16+ é necessário passar
- * a prop `loader` em cada <Image>. Este wrapper aplica o loader padrão do app.
+ * Client Component: o loader customizado não pode ser passado de Server Components.
+ * Use este wrapper em vez de `next/image` direto (Blob privado + paths com espaços).
  */
 export type AppImageProps = ImageProps;
 
