@@ -35,6 +35,10 @@ import {
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
+import {
+  distributeGuests,
+  getGuestDistributionErrorMessage,
+} from "@/lib/utils/guestDistribution";
 import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
@@ -227,14 +231,25 @@ export default function ReservationWidget({
       );
       return;
     }
-    const totalGuests = parseInt(adults) + parseInt(children);
-    if (totalGuests > maxGuests) {
+    const adultsCount = parseInt(adults, 10);
+    const childrenCount = parseInt(children, 10);
+    const distribution = distributeGuests(adultsCount, childrenCount);
+    if (!distribution.ok) {
+      toast.error(
+        getGuestDistributionErrorMessage(distribution.errorCode, locale as "pt" | "es" | "en")
+      );
+      return;
+    }
+    if (
+      distribution.rooms.length === 1 &&
+      adultsCount + childrenCount > maxGuests
+    ) {
       toast.error(
         locale === "en"
           ? `This room accommodates up to ${maxGuests} guests`
           : locale === "es"
-          ? `Esta habitación acomoda hasta ${maxGuests} huéspedes`
-          : `Este quarto acomoda até ${maxGuests} hóspedes`
+            ? `Esta habitación acomoda hasta ${maxGuests} huéspedes`
+            : `Este quarto acomoda até ${maxGuests} hóspedes`
       );
       return;
     }
@@ -245,7 +260,6 @@ export default function ReservationWidget({
         checkOut,
         adults,
         children,
-        rooms: 1,
         promoCode: promoCode.trim() || undefined,
         locale: locale as "pt" | "es" | "en",
       });

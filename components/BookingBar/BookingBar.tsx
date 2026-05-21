@@ -9,13 +9,6 @@ import { es } from "date-fns/locale/es";
 import { enUS } from "date-fns/locale/en-US";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -34,14 +27,16 @@ import {
   disableCheckOutCalendarDate,
 } from "@/lib/utils/bookingCalendar";
 import {
-  bookingAdultsOptions,
-  bookingChildrenOptions,
-  bookingRoomOptions,
   MAX_BOOKING_ADULTS,
   MAX_BOOKING_CHILDREN,
   MAX_BOOKING_ROOMS,
 } from "@/lib/constants/booking";
+import {
+  BookingGuestsFields,
+  BookingGuestsPopoverContent,
+} from "@/components/BookingGuestsPopover";
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
+import { useSyncBookingRooms } from "@/lib/hooks/useSyncBookingRooms";
 
 interface BookingBarProps {
   isHomePage?: boolean;
@@ -91,6 +86,8 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
       setChildren(String(MAX_BOOKING_CHILDREN));
     }
   }, [children]);
+
+  useSyncBookingRooms(adults, children, rooms, setRooms);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -436,74 +433,25 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                             <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 text-white/70 ml-2" aria-hidden />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-4" align="start">
-                          <div className="space-y-4 min-w-[200px]">
-                            <div>
-                              <label id="booking-bar-rooms-label-mobile" className="text-sm font-medium mb-2 block">
-                                {editor?.editMode ? getLabel("rooms") : (getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms)}
-                              </label>
-                              <Select value={rooms} onValueChange={setRooms}>
-                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-rooms-label-mobile">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {bookingRoomOptions().map((num) => (
-                                    <SelectItem key={num} value={num.toString()}>
-                                      {num}{" "}
-                                      {locale === "en"
-                                        ? num === 1
-                                          ? "room"
-                                          : "rooms"
-                                        : locale === "es"
-                                          ? num === 1
-                                            ? "habitación"
-                                            : "habitaciones"
-                                          : num === 1
-                                            ? "quarto"
-                                            : "quartos"}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div>
-                              <label id="booking-bar-adults-label" className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
-                              <Select value={adults} onValueChange={setAdults}>
-                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-adults-label">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {bookingAdultsOptions().map((num) => (
-                                    <SelectItem key={num} value={num.toString()}>
-                                      {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div>
-                              <label id="booking-bar-children-label" className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
-                              <Select value={children} onValueChange={setChildren}>
-                                <SelectTrigger className="w-full" aria-labelledby="booking-bar-children-label">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {bookingChildrenOptions().map((num) => (
-                                    <SelectItem key={num} value={num.toString()}>
-                                      {num === 0 
-                                        ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
-                                        : `${num} ${num === 1 
-                                          ? (locale === "en" ? "child" : locale === "es" ? "niño" : "criança")
-                                          : (locale === "en" ? "children" : locale === "es" ? "niños" : "crianças")
-                                        }`
-                                      }
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </PopoverContent>
+                        <BookingGuestsPopoverContent>
+                          <BookingGuestsFields
+                            locale={locale as "pt" | "es" | "en"}
+                            rooms={rooms}
+                            onRoomsChange={setRooms}
+                            adults={adults}
+                            onAdultsChange={setAdults}
+                            children={children}
+                            onChildrenChange={setChildren}
+                            roomsLabel={
+                              editor?.editMode
+                                ? getLabel("rooms")
+                                : getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms
+                            }
+                            adultsLabel={getLabel("adults")}
+                            childrenLabel={getLabel("children")}
+                            idPrefix="booking-bar-mobile"
+                          />
+                        </BookingGuestsPopoverContent>
                       </Popover>
                     ) : (
                       <Button
@@ -706,74 +654,25 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                         <ChevronDown className="h-4 w-4 flex-shrink-0 text-white/70 ml-2" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-4" align="start">
-                      <div className="space-y-4 min-w-[200px]">
-                        <div>
-                          <label id="booking-bar-rooms-label-desktop" className="text-sm font-medium mb-2 block">
-                            {editor?.editMode ? getLabel("rooms") : (getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms)}
-                          </label>
-                          <Select value={rooms} onValueChange={setRooms}>
-                            <SelectTrigger className="w-full" aria-labelledby="booking-bar-rooms-label-desktop">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {bookingRoomOptions().map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num}{" "}
-                                  {locale === "en"
-                                    ? num === 1
-                                      ? "room"
-                                      : "rooms"
-                                    : locale === "es"
-                                      ? num === 1
-                                        ? "habitación"
-                                        : "habitaciones"
-                                      : num === 1
-                                        ? "quarto"
-                                        : "quartos"}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">{getLabel("adults")}</label>
-                          <Select value={adults} onValueChange={setAdults}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {bookingAdultsOptions().map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num} {num === 1 ? (locale === "en" ? "adult" : locale === "es" ? "adulto" : "adulto") : (locale === "en" ? "adults" : locale === "es" ? "adultos" : "adultos")}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">{getLabel("children")}</label>
-                          <Select value={children} onValueChange={setChildren}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {bookingChildrenOptions().map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num === 0 
-                                    ? (locale === "en" ? "No children" : locale === "es" ? "Sin niños" : "Sem crianças")
-                                    : `${num} ${num === 1 
-                                      ? (locale === "en" ? "child" : locale === "es" ? "niño" : "criança")
-                                      : (locale === "en" ? "children" : locale === "es" ? "niños" : "crianças")
-                                    }`
-                                  }
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </PopoverContent>
+                    <BookingGuestsPopoverContent>
+                      <BookingGuestsFields
+                        locale={locale as "pt" | "es" | "en"}
+                        rooms={rooms}
+                        onRoomsChange={setRooms}
+                        adults={adults}
+                        onAdultsChange={setAdults}
+                        children={children}
+                        onChildrenChange={setChildren}
+                        roomsLabel={
+                          editor?.editMode
+                            ? getLabel("rooms")
+                            : getPageContent("global", "bookingBar", "rooms", displayLocale, globalOverrides) || t.rooms
+                        }
+                        adultsLabel={getLabel("adults")}
+                        childrenLabel={getLabel("children")}
+                        idPrefix="booking-bar-desktop"
+                      />
+                    </BookingGuestsPopoverContent>
                   </Popover>
                 ) : (
                   <Button
