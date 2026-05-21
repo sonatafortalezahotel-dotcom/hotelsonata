@@ -35,7 +35,7 @@ import {
 import { useBookingCalendarMonths } from "@/lib/hooks/useBookingCalendarMonths";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
-import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
+import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
@@ -259,14 +259,19 @@ export default function ReservationWidget({
       setTimeout(() => {
         window.location.href = omnibeesUrl;
       }, 500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao redirecionar:", error);
+      const distributionMessage = getOmnibeesDistributionErrorMessage(
+        error,
+        locale as "pt" | "es" | "en"
+      );
       toast.error(
-        locale === "en"
-          ? "An error occurred. Please try again."
-          : locale === "es"
-          ? "Ocurrió un error. Por favor intente nuevamente."
-          : "Ocorreu um erro. Por favor, tente novamente."
+        distributionMessage ??
+          (locale === "en"
+            ? "An error occurred. Please try again."
+            : locale === "es"
+              ? "Ocurrió un error. Por favor intente nuevamente."
+              : "Ocorreu um erro. Por favor, tente novamente.")
       );
     }
   };

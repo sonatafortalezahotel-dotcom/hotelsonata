@@ -27,7 +27,7 @@ import { useLanguage } from "@/lib/context/LanguageContext";
 import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
-import { buildOmnibeesUrl } from "@/lib/utils/omnibees";
+import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
@@ -157,12 +157,17 @@ export default function ReservationForm({
       }, 500);
     } catch (error) {
       setIsLoading(false);
+      const distributionMessage = getOmnibeesDistributionErrorMessage(
+        error,
+        locale as "pt" | "es" | "en"
+      );
       toast.error(
-        locale === "en" 
-          ? "An error occurred. Please try again." 
-          : locale === "es" 
-          ? "Ocurrió un error. Por favor intente nuevamente."
-          : "Ocorreu um erro. Por favor, tente novamente."
+        distributionMessage ??
+          (locale === "en"
+            ? "An error occurred. Please try again."
+            : locale === "es"
+              ? "Ocurrió un error. Por favor intente nuevamente."
+              : "Ocorreu um erro. Por favor, tente novamente.")
       );
     }
   };
