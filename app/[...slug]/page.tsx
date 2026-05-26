@@ -9,11 +9,11 @@ import { StructuredData } from "@/components/SEO/StructuredData";
 import { generateBreadcrumbStructuredData } from "@/lib/utils/seo";
 import { capitalizeKeywords } from "@/lib/utils/slug";
 import { GallerySection } from "@/components/GallerySection/GallerySection";
+import { getLandingPageBySlug, parseLandingSlug } from "@/lib/seo-landing-page";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 
-// Sempre renderizar no servidor e consultar o banco (funciona em localhost e produção)
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -22,56 +22,17 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const slugArray = resolvedParams.slug;
-  
-  // Detectar locale do primeiro segmento do slug
-  // O middleware não faz rewrite para rotas catch-all, então o locale está no slug
-  const locales = ["en", "es", "pt"];
-  const firstSegment = slugArray[0];
-  const isLocale = locales.includes(firstSegment);
-  const locale = isLocale ? firstSegment : "pt";
-  
-  // Se o locale estava no slug, removê-lo para obter o slug real
-  const actualSlug = isLocale ? slugArray.slice(1).join("/") : slugArray.join("/");
+  const { locale, actualSlug, fullSlug } = parseLandingSlug(slugArray);
 
   try {
-    // Primeiro, tentar buscar no locale específico
-    let landingPage = await db
-      .select()
-      .from(seoLandingPages)
-      .where(
-        and(
-          eq(seoLandingPages.slug, actualSlug),
-          eq(seoLandingPages.locale, locale),
-          eq(seoLandingPages.active, true)
-        )
-      )
-      .limit(1);
+    const page = await getLandingPageBySlug(actualSlug, locale);
 
-    // Se não encontrou no locale específico e não é PT, tentar buscar em PT como fallback
-    if (landingPage.length === 0 && locale !== "pt") {
-      landingPage = await db
-        .select()
-        .from(seoLandingPages)
-        .where(
-          and(
-            eq(seoLandingPages.slug, actualSlug),
-            eq(seoLandingPages.locale, "pt"),
-            eq(seoLandingPages.active, true)
-          )
-        )
-        .limit(1);
-    }
-
-    if (landingPage.length === 0) {
+    if (!page) {
       return {
         title: "Página não encontrada",
         description: "A página solicitada não foi encontrada.",
       };
     }
-
-    const page = landingPage[0];
-    // Se o locale não é pt, adicionar ao slug para o canonical
-    const fullSlug = locale !== "pt" ? `${locale}/${actualSlug}` : actualSlug;
     const canonical = page.canonicalUrl || `${SITE_URL}/${fullSlug}`;
 
     // Capitalizar título e descrição para metadados (Google)
@@ -133,110 +94,24 @@ export default async function LandingPage({ params }: PageProps) {
   const resolvedParams = await params;
   const slugArray = resolvedParams.slug;
   
-  // Verificar se o array de slug está vazio
   if (!slugArray || slugArray.length === 0) {
     notFound();
   }
-  
-  // Detectar locale do primeiro segmento do slug
-  // O middleware não faz rewrite para rotas catch-all, então o locale está no slug
-  const locales = ["en", "es", "pt"];
-  const firstSegment = slugArray[0];
-  const isLocale = locales.includes(firstSegment);
-  const locale = isLocale ? firstSegment : "pt";
-  
-  // Se o locale estava no slug, removê-lo para obter o slug real
-  const actualSlug = isLocale ? slugArray.slice(1).join("/") : slugArray.join("/");
-  
-  if (process.env.NODE_ENV === "development") {
-    console.log(`[LandingPage] slugArray:`, slugArray);
-    console.log(`[LandingPage] Locale detectado: ${locale}, actualSlug: ${actualSlug}`);
-  }
 
-  // Verificar se o slug está vazio após remover o locale
+  const { locale, actualSlug, fullSlug } = parseLandingSlug(slugArray);
+
   if (!actualSlug || actualSlug.trim().length === 0) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn(`[LandingPage] Slug vazio após processamento`);
-    }
     notFound();
   }
 
   try {
-    // Primeiro, tentar buscar no locale específico
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[LandingPage] Buscando: slug="${actualSlug}", locale="${locale}"`);
-    }
-    
-    let landingPage = await db
-      .select()
-      .from(seoLandingPages)
-      .where(
-        and(
-          eq(seoLandingPages.slug, actualSlug),
-          eq(seoLandingPages.locale, locale),
-          eq(seoLandingPages.active, true)
-        )
-      )
-      .limit(1);
+    const pageRow = await getLandingPageBySlug(actualSlug, locale);
 
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[LandingPage] Resultado da busca no locale ${locale}: ${landingPage.length} página(s) encontrada(s)`);
-    }
-
-    // Se não encontrou no locale específico e não é PT, tentar buscar em PT como fallback
-    if (landingPage.length === 0 && locale !== "pt") {
-      if (process.env.NODE_ENV === "development") {
-        console.log(`[LandingPage] Tentando fallback para PT: slug="${actualSlug}"`);
-      }
-      landingPage = await db
-        .select()
-        .from(seoLandingPages)
-        .where(
-          and(
-            eq(seoLandingPages.slug, actualSlug),
-            eq(seoLandingPages.locale, "pt"),
-            eq(seoLandingPages.active, true)
-          )
-        )
-        .limit(1);
-      
-      if (process.env.NODE_ENV === "development") {
-        console.log(`[LandingPage] Resultado do fallback PT: ${landingPage.length} página(s) encontrada(s)`);
-      }
-    }
-
-    // Se ainda não encontrou, tentar buscar sem filtro de active (para debug)
-    if (landingPage.length === 0) {
-      const debugPage = await db
-        .select()
-        .from(seoLandingPages)
-        .where(
-          and(
-            eq(seoLandingPages.slug, actualSlug),
-            eq(seoLandingPages.locale, locale)
-          )
-        )
-        .limit(1);
-      
-      if (debugPage.length > 0) {
-        // Página existe mas está inativa
-        console.warn(`[LandingPage] Página encontrada mas inativa: slug=${actualSlug}, locale=${locale}`);
-      } else {
-        // Verificar se existe com slug similar
-        const similarPages = await db
-          .select({ slug: seoLandingPages.slug, locale: seoLandingPages.locale })
-          .from(seoLandingPages)
-          .where(eq(seoLandingPages.locale, locale))
-          .limit(10);
-        
-        console.warn(`[LandingPage] Página não encontrada: slug=${actualSlug}, locale=${locale}`);
-        console.warn(`[LandingPage] Páginas disponíveis no locale ${locale}:`, similarPages.map(p => p.slug));
-      }
-      
+    if (!pageRow) {
       notFound();
     }
 
-    const page = landingPage[0];
+    const page = pageRow;
 
     // Capitalizar conteúdo para exibição na landing page
     const capitalizedH1 = page.h1 
@@ -248,9 +123,6 @@ export default async function LandingPage({ params }: PageProps) {
     // Contador viewCount desligado: cada visita fazia UPDATE no DB (Neon) e pesava no serverless Vercel.
     // Métricas de tráfego: use Meta Pixel / Search Console. Zerar contadores: POST /api/seo-landing-pages/reset-views
 
-    // Structured Data
-    // Se o locale não é pt, adicionar ao slug para o breadcrumb
-    const fullSlug = locale !== "pt" ? `${locale}/${actualSlug}` : actualSlug;
     const breadcrumbData = generateBreadcrumbStructuredData([
       { name: "Home", url: SITE_URL },
       { name: capitalizedH1, url: `${SITE_URL}/${fullSlug}` },

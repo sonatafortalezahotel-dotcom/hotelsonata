@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_CACHE_60 } from "@/lib/api-cache";
 import { db } from "@/lib/db";
 import { gallery } from "@/lib/db/schema";
 import { eq, asc, desc, and, or, isNull } from "drizzle-orm";
@@ -89,7 +90,7 @@ export async function GET(request: Request) {
 
     const photos = await query;
 
-    return NextResponse.json(photos);
+    return NextResponse.json(photos, { headers: PUBLIC_CACHE_60 });
   } catch (error: unknown) {
     console.error("Erro ao buscar galeria:", error);
     const message = error instanceof Error ? error.message : "";

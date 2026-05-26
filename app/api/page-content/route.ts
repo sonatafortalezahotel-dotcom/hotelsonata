@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_CACHE_60 } from "@/lib/api-cache";
 import { db } from "@/lib/db";
 import { pageContent } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
       const key = `${row.section}.${row.fieldKey}`;
       map[key] = row.value;
     }
-    return NextResponse.json(map);
+    return NextResponse.json(map, { headers: PUBLIC_CACHE_60 });
   } catch (error) {
     console.error("Erro ao buscar page content:", error);
     return NextResponse.json(

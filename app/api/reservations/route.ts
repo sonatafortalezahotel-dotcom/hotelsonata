@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reservations, rooms } from "@/lib/db/schema";
-import { eq, and, or, gte, lte, sql, lt, gt, desc } from "drizzle-orm";
+import { eq, and, or, gte, lte, sql, lt, gt, desc, inArray } from "drizzle-orm";
 
 /**
  * Gera um número de confirmação único
@@ -17,75 +17,70 @@ function generateConfirmationNumber(): string {
   return `${prefix}-${year}${month}${day}-${random}`;
 }
 
+/** Condição de sobreposição de datas (check-in/check-out em YYYY-MM-DD). */
+function reservationOverlapCondition(checkIn: string, checkOut: string) {
+  return or(
+    and(lte(reservations.checkIn, checkIn), gt(reservations.checkOut, checkIn)),
+    and(lt(reservations.checkIn, checkOut), gte(reservations.checkOut, checkOut)),
+    and(gte(reservations.checkIn, checkIn), lte(reservations.checkOut, checkOut))
+  );
+}
+
 /**
- * Verifica se um quarto está disponível no período especificado
+ * IDs de quartos com reserva confirmada conflitante no período (1 query).
  */
+async function getBusyRoomIds(
+  checkIn: string,
+  checkOut: string,
+  roomIds?: number[],
+  excludeReservationId?: number
+): Promise<Set<number>> {
+  try {
+    const conditions = [
+      eq(reservations.status, "confirmed"),
+      reservationOverlapCondition(checkIn, checkOut),
+    ];
+    if (roomIds && roomIds.length > 0) {
+      conditions.push(inArray(reservations.roomId, roomIds));
+    }
+    if (excludeReservationId) {
+      conditions.push(sql`${reservations.id} != ${excludeReservationId}`);
+    }
+
+    const rows = await db
+      .selectDistinct({ roomId: reservations.roomId })
+      .from(reservations)
+      .where(and(...conditions));
+
+    return new Set(rows.map((r) => r.roomId));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "";
+    if (
+      message.includes("does not exist") ||
+      message.includes("relation") ||
+      message.includes("table")
+    ) {
+      console.warn("Tabela de reservas não encontrada. Retornando sem conflitos.");
+      return new Set();
+    }
+    console.error("Erro ao verificar disponibilidade:", error);
+    return new Set();
+  }
+}
+
 async function checkRoomAvailability(
   roomId: number,
   checkIn: string,
   checkOut: string,
   excludeReservationId?: number
 ): Promise<boolean> {
-  try {
-    // As datas já vêm como strings no formato YYYY-MM-DD
-    // Não precisamos converter para Date, apenas usar diretamente no SQL
-    
-    // Busca reservas que conflitam com o período
-    // Lógica: duas reservas conflitam se:
-    // - O check-in da nova está entre check-in e check-out de uma existente, OU
-    // - O check-out da nova está entre check-in e check-out de uma existente, OU
-    // - A nova reserva engloba completamente uma existente
-    
-    // Usar operadores do Drizzle diretamente com strings de data
-    // As strings já vêm no formato YYYY-MM-DD que o PostgreSQL aceita
-    const conflictingReservations = await db
-      .select()
-      .from(reservations)
-      .where(
-        and(
-          eq(reservations.roomId, roomId),
-          eq(reservations.status, "confirmed"), // Apenas reservas confirmadas bloqueiam
-          or(
-            // Caso 1: Check-in da nova reserva está dentro de uma reserva existente
-            // checkIn >= existing.checkIn AND checkIn < existing.checkOut
-            and(
-              lte(reservations.checkIn, checkIn),
-              gt(reservations.checkOut, checkIn)
-            ),
-            // Caso 2: Check-out da nova reserva está dentro de uma reserva existente
-            // checkOut > existing.checkIn AND checkOut <= existing.checkOut
-            and(
-              lt(reservations.checkIn, checkOut),
-              gte(reservations.checkOut, checkOut)
-            ),
-            // Caso 3: A nova reserva engloba uma reserva existente
-            // checkIn <= existing.checkIn AND checkOut >= existing.checkOut
-            and(
-              gte(reservations.checkIn, checkIn),
-              lte(reservations.checkOut, checkOut)
-            )
-          ),
-          excludeReservationId
-            ? sql`${reservations.id} != ${excludeReservationId}`
-            : undefined
-        )
-      );
-
-    return conflictingReservations.length === 0;
-  } catch (error: any) {
-    // Se a tabela não existir ainda, retorna true (disponível)
-    // Isso permite que o sistema funcione mesmo sem a migration aplicada
-    if (error?.message?.includes("does not exist") || 
-        error?.message?.includes("relation") ||
-        error?.message?.includes("table")) {
-      console.warn("Tabela de reservas não encontrada. Retornando disponível por padrão.");
-      return true;
-    }
-    
-    // Para outros erros, loga e retorna true (assumindo disponível em caso de erro)
-    console.error("Erro ao verificar disponibilidade:", error);
-    return true;
-  }
+  const busy = await getBusyRoomIds(
+    checkIn,
+    checkOut,
+    [roomId],
+    excludeReservationId
+  );
+  return !busy.has(roomId);
 }
 
 /**
@@ -189,20 +184,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Verificar disponibilidade de cada quarto
-    const roomsWithAvailability = await Promise.all(
-      availableRooms.map(async (room) => {
-        const isAvailable = await checkRoomAvailability(
-          room.id,
-          checkIn,
-          checkOut
-        );
-        return {
-          ...room,
-          available: isAvailable,
-        };
-      })
-    );
+    const roomIds = availableRooms.map((room) => room.id);
+    const busyRoomIds = await getBusyRoomIds(checkIn, checkOut, roomIds);
+    const roomsWithAvailability = availableRooms.map((room) => ({
+      ...room,
+      available: !busyRoomIds.has(room.id),
+    }));
 
     // Calcular noites
     const nights = Math.ceil(

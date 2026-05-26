@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean, varchar, integer, date, jsonb, decimal, uniqueIndex, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, boolean, varchar, integer, date, jsonb, decimal, uniqueIndex, primaryKey, index } from "drizzle-orm/pg-core";
 
 // Tabela de usuários (para admin)
 export const users = pgTable("users", {
@@ -381,7 +381,14 @@ export const reservations = pgTable("reservations", {
   notes: text("notes"), // Notas internas do hotel
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  availabilityIdx: index("reservations_availability_idx").on(
+    table.roomId,
+    table.status,
+    table.checkIn,
+    table.checkOut
+  ),
+}));
 
 // Tabela de landing pages dinâmicas para SEO
 export const seoLandingPages = pgTable("seo_landing_pages", {

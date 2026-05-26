@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_CACHE_60 } from "@/lib/api-cache";
 import { db } from "@/lib/db";
 import { socialMediaPosts } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -12,7 +13,7 @@ export async function GET() {
       .orderBy(desc(socialMediaPosts.order))
       .limit(6);
 
-    return NextResponse.json(posts);
+    return NextResponse.json(posts, { headers: PUBLIC_CACHE_60 });
   } catch (error) {
     console.error("Erro ao buscar posts das redes sociais:", error);
     return NextResponse.json(

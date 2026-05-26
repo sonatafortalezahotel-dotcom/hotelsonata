@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_CACHE_60 } from "@/lib/api-cache";
 import { db } from "@/lib/db";
 import { highlights } from "@/lib/db/schema";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -19,7 +20,7 @@ export async function GET() {
       )
       .orderBy(desc(highlights.order));
 
-    return NextResponse.json(activeHighlights);
+    return NextResponse.json(activeHighlights, { headers: PUBLIC_CACHE_60 });
   } catch (error) {
     console.error("Erro ao buscar destaques:", error);
     return NextResponse.json(

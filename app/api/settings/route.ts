@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_CACHE_300 } from "@/lib/api-cache";
 import { db } from "@/lib/db";
 import { siteSettings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -19,11 +20,11 @@ export async function GET(request: Request) {
         return NextResponse.json(null);
       }
 
-      return NextResponse.json(setting[0]);
+      return NextResponse.json(setting[0], { headers: PUBLIC_CACHE_300 });
     }
 
     const allSettings = await db.select().from(siteSettings);
-    return NextResponse.json(allSettings);
+    return NextResponse.json(allSettings, { headers: PUBLIC_CACHE_300 });
   } catch (error) {
     console.error("Erro ao buscar configurações:", error);
     return NextResponse.json(
