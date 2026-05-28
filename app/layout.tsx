@@ -131,6 +131,9 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
+        {/* ASKSUITE CODE START */}
+        <script id="script-infochat" src="https://cdn.asksuite.com/infochat.js?dataConfig=https://control.asksuite.com/api/companies/hotel-sonata-de-iracema" async />
+        {/* ASKSUITE CODE END */}
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <GoogleAnalytics />

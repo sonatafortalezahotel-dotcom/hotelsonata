@@ -10,7 +10,7 @@ export const pageTranslations = {
       },
       section: {
         title: "Escolha Sua Acomodação",
-        subtitle: "Conforto, sofisticação e a vista mais bonita de Fortaleza"
+        subtitle: "Dispomos de apartamentos adaptados para cadeirantes nas configurações individual e dupla. Estamos à disposição para ajudar!"
       },
       empty: "Nenhum quarto disponível no momento.",
       cta: {

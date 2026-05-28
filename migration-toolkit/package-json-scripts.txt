@@ -1,0 +1,11 @@
+"scripts": {
+  ( ... merge com os teus existentes: )
+
+  "migrate:neon-dump": "tsx scripts/migrate-neon-pg-dump.ts",
+  "migrate:blob-copy": "tsx scripts/migrate-vercel-blob-copy.ts",
+  "migrate:blob-origins": "tsx scripts/print-blob-origins.ts",
+  "migrate:blob-urls-db": "tsx scripts/replace-blob-urls-in-db.ts"
+}
+
+Dependências: dotenv, tsx, @vercel/blob, pg, @types/pg (dev)
+Next.js: ver integração em migration-toolkit/nextjs-blob-private/ se usares Blob private

@@ -7,7 +7,8 @@
  *   npm run test:smtp -- --send --to voce@gmail.com
  */
 import { config } from "dotenv";
-config({ path: ".env.local" });
+// override: true — senão variáveis SMTP antigas no shell/IDE mascaram o .env.local
+config({ path: ".env.local", override: true });
 
 import {
   createMailTransporter,
