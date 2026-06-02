@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { optimizeImageForUpload } from "@/lib/imageOptimizer";
+import { toClientBlobUrl } from "@/lib/blobUrl";
 import { YouTube } from "@/lib/tiptap/YouTubeExtension";
 import { ImageGallery } from "@/lib/tiptap/ImageGalleryExtension";
 import { YouTubeDialog } from "./YouTubeDialog";
@@ -32,7 +33,7 @@ import { GalleryDialog } from "./GalleryDialog";
 
 const UPLOAD_FOLDER = "blog";
 
-// Extensão Image com atributo data-size (sem NodeView - usa renderHTML padrão)
+// Extensão Image com atributo data-size e preview via proxy para Blob private
 const ImageWithSize = Image.extend({
   addAttributes() {
     const parentAttrs = this.parent?.() ?? {};
@@ -44,6 +45,38 @@ const ImageWithSize = Image.extend({
         renderHTML: (attrs: Record<string, unknown>) =>
           attrs["data-size"] ? { "data-size": attrs["data-size"] } : {},
       },
+    };
+  },
+  addNodeView() {
+    return ({ node }) => {
+      const img = document.createElement("img");
+      img.className = "rounded-lg max-w-full h-auto block";
+      img.alt = "";
+      img.referrerPolicy = "no-referrer";
+      img.decoding = "async";
+      img.src = toClientBlobUrl(node.attrs.src as string);
+
+      const size = node.attrs["data-size"] as string | null;
+      if (size) {
+        img.setAttribute("data-size", size);
+      }
+
+      return {
+        dom: img,
+        update: (updatedNode) => {
+          if (updatedNode.type.name !== this.name) {
+            return false;
+          }
+          img.src = toClientBlobUrl(updatedNode.attrs.src as string);
+          const nextSize = updatedNode.attrs["data-size"] as string | null;
+          if (nextSize) {
+            img.setAttribute("data-size", nextSize);
+          } else {
+            img.removeAttribute("data-size");
+          }
+          return true;
+        },
+      };
     };
   },
 });
@@ -230,14 +263,15 @@ export function BlogRichTextEditor({
       return false;
     }
     if (url.startsWith("http")) {
+      const displayUrl = toClientBlobUrl(url);
       const tester = new window.Image();
       tester.onload = () => {
-        console.log("[BlogEditor] Preflight OK:", url);
+        console.log("[BlogEditor] Preflight OK:", displayUrl);
       };
       tester.onerror = () => {
-        console.error("[BlogEditor] Preflight FALHOU:", url);
+        console.error("[BlogEditor] Preflight FALHOU:", displayUrl);
       };
-      tester.src = url;
+      tester.src = displayUrl;
     }
     const success = ed.chain().focus().setImage({ src: url }).run();
     if (success) {

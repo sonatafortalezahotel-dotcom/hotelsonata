@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { toClientBlobUrl } from "@/lib/blobUrl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,12 @@ export function ImageUpload({
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!uploading) {
+      setPreview(value || null);
+    }
+  }, [value, uploading]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,7 +132,7 @@ export function ImageUpload({
       {preview && (
         <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border bg-muted max-w-full">
           <img
-            src={preview}
+            src={toClientBlobUrl(preview)}
             alt="Preview"
             className="w-full h-full object-cover"
           />

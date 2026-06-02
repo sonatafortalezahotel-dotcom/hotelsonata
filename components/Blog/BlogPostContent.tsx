@@ -2,6 +2,7 @@
 
 import { useMemo, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { rewriteBlobUrlsInHtml } from "@/lib/blobUrl";
 import { CarouselGallery } from "./CarouselGallery";
 
 // Sanitize HTML: remove tags perigosas mas preserva iframes do YouTube e estruturas de galeria
@@ -44,7 +45,10 @@ interface BlogPostContentProps {
 }
 
 export function BlogPostContent({ content, className }: BlogPostContentProps) {
-  const sanitized = useMemo(() => sanitizeHtml(content), [content]);
+  const sanitized = useMemo(
+    () => rewriteBlobUrlsInHtml(sanitizeHtml(content)),
+    [content]
+  );
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Hidratar carousels após renderização

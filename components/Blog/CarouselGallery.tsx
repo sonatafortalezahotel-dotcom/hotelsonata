@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toClientBlobUrl } from "@/lib/blobUrl";
 
 interface CarouselGalleryProps {
   images: string[];
@@ -31,12 +32,14 @@ export function CarouselGallery({ images }: CarouselGalleryProps) {
 
   if (images.length === 0) return null;
 
+  const displayImages = images.map((url) => toClientBlobUrl(url));
+
   return (
     <div className="relative w-full group">
       {/* Imagem atual */}
       <div className="relative w-full overflow-hidden rounded-lg bg-muted">
         <img
-          src={images[currentIndex]}
+          src={displayImages[currentIndex]}
           alt={`Imagem ${currentIndex + 1}`}
           className="w-full h-[400px] object-cover"
           loading="lazy"

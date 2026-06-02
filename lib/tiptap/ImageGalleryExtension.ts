@@ -1,4 +1,5 @@
 import { Node } from "@tiptap/core";
+import { toClientBlobUrl } from "@/lib/blobUrl";
 
 export interface ImageGalleryOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -216,7 +217,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         // Renderizar carousel
         images.forEach((src: string, index: number) => {
           const img = document.createElement("img");
-          img.src = src;
+          img.src = toClientBlobUrl(src);
           img.alt = "";
           img.className = "gallery-image";
           img.setAttribute("loading", "lazy");
@@ -263,7 +264,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
         // Renderizar grid
         images.forEach((src: string) => {
           const img = document.createElement("img");
-          img.src = src;
+          img.src = toClientBlobUrl(src);
           img.alt = "";
           img.className = "gallery-image";
           img.setAttribute("loading", "lazy");
@@ -350,7 +351,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           if (newLayout === "carousel") {
             newImages.forEach((src: string, index: number) => {
               const img = document.createElement("img");
-              img.src = src;
+              img.src = toClientBlobUrl(src);
               img.alt = "";
               img.className = "gallery-image";
               img.setAttribute("loading", "lazy");
@@ -366,7 +367,7 @@ export const ImageGallery = Node.create<ImageGalleryOptions>({
           } else {
             newImages.forEach((src: string) => {
               const img = document.createElement("img");
-              img.src = src;
+              img.src = toClientBlobUrl(src);
               img.alt = "";
               img.className = "gallery-image";
               img.setAttribute("loading", "lazy");
