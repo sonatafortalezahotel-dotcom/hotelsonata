@@ -573,3 +573,16 @@ body > section:last-of-type + div {
 ol[data-sonner-toaster] {
   z-index: 99999 !important;
 }
+
+/* Asksuite: apenas desktop; no celular fica só o botão do WhatsApp */
+@media (max-width: 1023px) {
+  #infochat_float,
+  #chatbot,
+  #chatbotmobile,
+  #chatbotmobile > div,
+  iframe[src*="asksuite"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
