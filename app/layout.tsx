@@ -7,6 +7,7 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { StructuredData } from "@/components/SEO/StructuredData";
 import { AsksuiteLoader } from "@/components/AsksuiteLoader";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { generateHotelStructuredData } from "@/lib/utils/seo";
 
@@ -134,6 +135,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        <GoogleTagManager />
         <GoogleAnalytics />
         <MetaPixel />
         <AsksuiteLoader />
