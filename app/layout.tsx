@@ -5,7 +5,6 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { PublicLayout } from "@/components/PublicLayout";
 import { StructuredData } from "@/components/SEO/StructuredData";
-import { AsksuiteLoader } from "@/components/AsksuiteLoader";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
@@ -138,7 +137,6 @@ export default function RootLayout({
         <GoogleTagManager />
         <GoogleAnalytics />
         <MetaPixel />
-        <AsksuiteLoader />
         <StructuredData data={hotelStructuredData} />
         <Providers>
           <Suspense fallback={null}>
