@@ -133,11 +133,11 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
+        <GoogleAds />
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <GoogleTagManager />
         <GoogleAnalytics />
-        <GoogleAds />
         <MetaPixel />
         <StructuredData data={hotelStructuredData} />
         <Providers>
