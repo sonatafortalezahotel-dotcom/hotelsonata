@@ -1,5 +1,4 @@
-import { GoogleAdsConversion } from "@/components/analytics/GoogleAdsConversion";
-import { GOOGLE_ADS_CONVERSIONS } from "@/components/analytics/google-ads-config";
+import { GoogleAdsHomeConversion } from "@/components/analytics/GoogleAdsHomeConversion";
 import { getHomeInitialData } from "@/lib/home-data";
 import HomeClient from "./HomeClient";
 
@@ -9,7 +8,7 @@ export default async function HomePage() {
   const initialData = await getHomeInitialData("pt");
   return (
     <>
-      <GoogleAdsConversion sendTo={GOOGLE_ADS_CONVERSIONS.homePageView.sendTo} />
+      <GoogleAdsHomeConversion />
       <HomeClient initialData={initialData} />
     </>
   );

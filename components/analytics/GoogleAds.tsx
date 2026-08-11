@@ -1,11 +1,12 @@
-import { GOOGLE_ADS_ID } from "./google-ads-config";
+import { GOOGLE_ADS_CONVERSIONS, GOOGLE_ADS_ID } from "./google-ads-config";
 
 /**
- * Snippet oficial do Google Ads (gtag.js).
- * Deve ser renderizado dentro de <head> no layout raiz
- * para o verificador do Google detectar no HTML inicial.
+ * Snippet oficial do Google Ads (gtag.js) no <head>.
+ * A conversão de visualização da home dispara só quando o path é "/".
  */
 export function GoogleAds() {
+  const homeConversion = GOOGLE_ADS_CONVERSIONS.homePageView.sendTo;
+
   return (
     <>
       <script
@@ -19,6 +20,17 @@ export function GoogleAds() {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${GOOGLE_ADS_ID}');
+            (function () {
+              var path = location.pathname || '/';
+              if ((path === '/' || path === '') && !window.__awHomeConversionFired) {
+                window.__awHomeConversionFired = true;
+                gtag('event', 'conversion', {
+                  send_to: '${homeConversion}',
+                  value: 1.0,
+                  currency: 'BRL'
+                });
+              }
+            })();
           `,
         }}
       />
