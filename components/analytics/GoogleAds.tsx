@@ -1,4 +1,4 @@
-export const GOOGLE_ADS_ID = "AW-11258285844";
+import { GOOGLE_ADS_ID } from "./google-ads-config";
 
 /**
  * Snippet oficial do Google Ads (gtag.js).
@@ -25,3 +25,5 @@ export function GoogleAds() {
     </>
   );
 }
+
+export { GOOGLE_ADS_ID, GOOGLE_ADS_CONVERSIONS } from "./google-ads-config";
