@@ -6,8 +6,6 @@ import { GOOGLE_ADS_CONVERSIONS } from "./google-ads-config";
 
 declare global {
   interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
     __awHomeConversionFired?: boolean;
   }
 }
