@@ -12,6 +12,6 @@ Todo botão de ação no site público (home, hotel, restaurante/gastronomia, la
 - Destino: `https://book.omnibees.com/hotel/2712`
 - Ícone: `CalendarCheck`
 
-Depois de cada bloco de conteúdo das páginas públicas, no vão (`py-16 lg:py-24`), usar `SectionReserveCta` — um único **Reserve Agora** após o bloco, não um botão em cada card/slide interno.
+Depois de cada bloco de conteúdo das páginas públicas, no vão (`py-16 lg:py-24`), usar `SectionReserveCta` — um único **Reserve Agora** após o bloco, não um botão em cada card/slide interno. Não inserir CTA entre dois blocos de imagem fullwidth que se encostam (carrossel editorial + grid de fotos).
 
 Não criar CTAs com "Ver cardápio", "Saiba mais", "Fazer reserva" ou link para `/reservas`. Exceções: envio de formulário (contato/orçamento de evento), navegação do menu e "Ver detalhes" de quarto.

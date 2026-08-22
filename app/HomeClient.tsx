@@ -531,7 +531,6 @@ export default function HomeClient({
           )}
         </EditorialCarousel>
       </section>
-      <SectionReserveCta />
 
       {/* PhotoStory - Um Dia no Hotel - GRID 1x4 FULLWIDTH */}
       <section className="relative overflow-x-clip">

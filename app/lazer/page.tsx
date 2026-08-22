@@ -384,7 +384,6 @@ function LazerPageContent() {
           );
         })}
       </EditorialCarousel>
-      <SectionReserveCta />
 
       {/* 5. Galeria - Spa & Relaxamento - GRID 1x4 */}
       <section className="relative overflow-hidden">
