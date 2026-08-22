@@ -2,7 +2,6 @@
 
 import Image from "@/lib/app-image";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -22,8 +21,6 @@ export function ExperienceCard({
   images,
   icon: Icon,
   badge,
-  ctaText,
-  ctaLink
 }: ExperienceCardProps) {
   // Filtrar imagens válidas
   const validImages = Array.isArray(images) ? images.filter(img => img && img.trim() !== "") : [];
@@ -87,53 +84,20 @@ export function ExperienceCard({
             {description}
           </p>
 
-          {/* CTA e Indicadores - Aparecem juntos no hover */}
-          {ctaText && ctaLink && (
-            <div className={`transition-all duration-300 flex flex-col items-center gap-3 ${
+          {validImages.length > 1 && (
+            <div className={`transition-all duration-300 flex justify-center gap-2 ${
               isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
-              {/* Indicadores de Imagem - Na mesma altura do botão */}
-              {validImages.length > 1 && (
-                <div className="flex justify-center gap-2">
-                  {validImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentImageIndex(index);
-                      }}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        index === currentImageIndex 
-                          ? "bg-white w-8" 
-                          : "bg-white/50 w-1.5 hover:bg-white/75"
-                      }`}
-                      aria-label={`Ver foto ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-              
-              <Button 
-                asChild 
-                variant="secondary" 
-                size="sm"
-                className="shadow-lg"
-              >
-                <a href={ctaLink}>{ctaText}</a>
-              </Button>
-            </div>
-          )}
-          
-          {/* Indicadores quando não tem CTA */}
-          {(!ctaText || !ctaLink) && validImages.length > 1 && (
-            <div className="flex justify-center gap-2 mt-2">
               {validImages.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentImageIndex(index)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentImageIndex(index);
+                  }}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    index === currentImageIndex 
-                      ? "bg-white w-8" 
+                    index === currentImageIndex
+                      ? "bg-white w-8"
                       : "bg-white/50 w-1.5 hover:bg-white/75"
                   }`}
                   aria-label={`Ver foto ${index + 1}`}

@@ -19,6 +19,7 @@ import { PhotoStory } from "@/components/PhotoStory";
 import { useLeisure } from "@/lib/hooks/useLeisure";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import OmnibeesReserveButton, { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 function LazerPageContent() {
   const { locale } = useLanguage();
@@ -315,6 +316,7 @@ function LazerPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </ContentSection>
 
       {/* 3. PhotoStory - Atividades do Dia - 4/4 */}
@@ -382,6 +384,7 @@ function LazerPageContent() {
           );
         })}
       </EditorialCarousel>
+      <SectionReserveCta />
 
       {/* 5. Galeria - Spa & Relaxamento - GRID 1x4 */}
       <section className="relative overflow-hidden">
@@ -443,6 +446,7 @@ function LazerPageContent() {
             </div>
           </>
         )}
+        <SectionReserveCta />
       </section>
 
       {/* 6. Atividades - Resumo com Cards - 15/15 (5 cards com carrosséis) */}
@@ -513,15 +517,8 @@ function LazerPageContent() {
             <p className="text-muted-foreground mb-4">
               {editor?.editMode ? <PageText page="lazer" section="contactReception" fieldKey="text" locale={locale} as="span" /> : (getPageContent("lazer", "contactReception", "text", locale, editor?.overrides ?? {}) || tServices.footer.text)}
             </p>
-            <a
-              href="https://api.whatsapp.com/send?phone=558540061616&text=Ol%c3%a1,%20vi%20o%20site%20de%20voc%c3%aas%20e%20gostaria%20de%20mais%20informa%c3%a7%c3%b5es%20por%20favor."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
-            >
-              {editor?.editMode ? <PageText page="lazer" section="contactReception" fieldKey="button" locale={locale} as="span" /> : (getPageContent("lazer", "contactReception", "button", locale, editor?.overrides ?? {}) || t.contactReception.button)}
-            </a>
           </div>
+          <SectionReserveCta />
         </div>
       </ContentSection>
 
@@ -589,6 +586,7 @@ function LazerPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* CTA Section */}
@@ -600,12 +598,7 @@ function LazerPageContent() {
           <p className="text-lg mb-8 max-w-2xl mx-auto text-muted-foreground">
             {editor?.editMode ? <PageText page="lazer" section="cta" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("lazer", "cta", "subtitle", locale, editor?.overrides ?? {}) || t.cta.subtitle)}
           </p>
-          <a 
-            href="/"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
-          >
-            {editor?.editMode ? <PageText page="lazer" section="cta" fieldKey="bookNow" locale={locale} as="span" /> : (getPageContent("lazer", "cta", "bookNow", locale, editor?.overrides ?? {}) || t.cta.bookNow)}
-          </a>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

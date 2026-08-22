@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, Users, Tag, Search, Loader2, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon, Users, Tag, CalendarCheck, Loader2, ChevronDown } from "lucide-react";
 import { format, startOfDay, startOfMonth, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
@@ -20,7 +20,7 @@ import { useLanguage } from "@/lib/context/LanguageContext";
 import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
-import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
+import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage, OMNIBEES_HOTEL_URL, getReserveNowLabel } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
@@ -95,22 +95,16 @@ export default function ReservationForm({
   const getLabelStr = (fieldKey: string, fallback: string) =>
     getPageContent("global", "reservationForm", fieldKey, locale, globalOverrides) || fallback;
   const labels = {
-    pt: { checkIn: "Check-in", checkOut: "Check-out", dates: "Datas", guests: "Hóspedes", adults: "Adultos", children: "Crianças", rooms: "Quartos", promoCode: "CUPOM", promoCodePlaceholder: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
-    es: { checkIn: "Entrada", checkOut: "Salida", dates: "Fechas", guests: "Huéspedes", adults: "Adultos", children: "Niños", rooms: "Habitaciones", promoCode: "CUPÓN", promoCodePlaceholder: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
-    en: { checkIn: "Check-in", checkOut: "Check-out", dates: "Dates", guests: "Guests", adults: "Adults", children: "Children", rooms: "Rooms", promoCode: "COUPON", promoCodePlaceholder: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+    pt: { checkIn: "Check-in", checkOut: "Check-out", dates: "Datas", guests: "Hóspedes", adults: "Adultos", children: "Crianças", rooms: "Quartos", promoCode: "CUPOM", promoCodePlaceholder: "CUPOM", reserve: "Reserve Agora", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", dates: "Fechas", guests: "Huéspedes", adults: "Adultos", children: "Niños", rooms: "Habitaciones", promoCode: "CUPÓN", promoCodePlaceholder: "CUPÓN", reserve: "Reserve ahora", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", dates: "Dates", guests: "Guests", adults: "Adults", children: "Children", rooms: "Rooms", promoCode: "COUPON", promoCodePlaceholder: "COUPON", reserve: "Book Now", selectDate: "Select date" },
   };
   const t = labels[locale as keyof typeof labels] || labels.pt;
+  const reserveNowLabel = getReserveNowLabel(locale as "pt" | "es" | "en");
 
   const handleReserve = () => {
-    // Validação com feedback visual
     if (!checkIn || !checkOut) {
-      toast.error(
-        locale === "en" 
-          ? "Please select check-in and check-out dates" 
-          : locale === "es" 
-          ? "Por favor seleccione las fechas de entrada y salida"
-          : "Por favor, selecione as datas de check-in e check-out"
-      );
+      window.open(OMNIBEES_HOTEL_URL, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -439,23 +433,23 @@ export default function ReservationForm({
                 </div>
               </div>
 
-              {/* Botão de Pesquisa */}
+              {/* Botão Reserve Agora */}
               <div className="flex-shrink-0">
                 <Button
                   onClick={handleReserve}
                   className="w-full lg:w-auto h-12 lg:h-14 min-h-[44px] px-6 lg:px-8 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   disabled={isLoading}
-                  aria-label={locale === "en" ? "Search availability" : locale === "es" ? "Buscar disponibilidad" : "Pesquisar disponibilidade"}
+                  aria-label={reserveNowLabel}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin text-white" />
-                      <span className="text-sm lg:text-base">{locale === "en" ? "Searching..." : locale === "es" ? "Buscando..." : "Buscando..."}</span>
+                      <span className="text-sm lg:text-base">{reserveNowLabel}</span>
                     </>
                   ) : (
                     <>
-                      <Search className="mr-2 h-5 w-5 text-white" />
-                      <span className="text-sm lg:text-base">{t.reserve}</span>
+                      <CalendarCheck className="mr-2 h-5 w-5 text-white" />
+                      <span className="text-sm lg:text-base">{reserveNowLabel}</span>
                     </>
                   )}
                 </Button>

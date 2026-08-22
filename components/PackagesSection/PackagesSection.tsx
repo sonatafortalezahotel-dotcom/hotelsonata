@@ -3,15 +3,9 @@
 import Image from "@/lib/app-image";
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import NordestinoPattern from "@/components/NordestinoPattern";
-import { EditorialCarousel, EditorialSlide } from "@/components/HorizontalScroll";
 import { useLanguage } from "@/lib/context/LanguageContext";
-import { useEditor } from "@/lib/context/EditorContext";
-import { PageText } from "@/components/PageEditor";
-import { getPageContent } from "@/lib/utils/pageContent";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 interface Room {
   id: number;
@@ -53,23 +47,8 @@ export default function PackagesSection({
   title,
   subtitle,
   empty,
-  cta,
-  packagesCta,
 }: PackagesSectionProps) {
   const { locale } = useLanguage();
-  const editor = useEditor();
-  const overrides = editor?.overrides ?? {};
-  const ctaContent = cta ?? (editor?.editMode ? (
-    <PageText page="home" section="packagesSection" fieldKey="cta" locale={locale as "pt" | "es" | "en"} as="span" />
-  ) : (
-    getPageContent("home", "packagesSection", "cta", locale as "pt" | "es" | "en", overrides) || defaultCta
-  ));
-  
-  const packagesCtaContent = packagesCta ?? (editor?.editMode ? (
-    <PageText page="home" section="packagesSection" fieldKey="packagesCta" locale={locale as "pt" | "es" | "en"} as="span" />
-  ) : (
-    getPageContent("home", "packagesSection", "packagesCta", locale as "pt" | "es" | "en", overrides) || defaultPackagesCta
-  ));
   
   // Exibir todos os quartos e pacotes cadastrados na ordem definida pelo cliente
   const sortedRooms = rooms;
@@ -141,17 +120,10 @@ export default function PackagesSection({
                           })()}
                         </h3>
                         {(room.shortDescription || room.description) && (
-                          <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed mb-4">
+                          <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed">
                             {room.shortDescription || room.description}
                           </p>
                         )}
-                        
-                        {/* CTA aparece no hover */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <span className="inline-block px-6 py-3 bg-white text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-colors">
-                            {ctaContent}
-                          </span>
-                        </div>
                       </div>
                     </div>
                   </Link>
@@ -193,17 +165,10 @@ export default function PackagesSection({
                           {pkg.name}
                         </h3>
                         {pkg.description && (
-                          <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed mb-4">
+                          <p className="text-white/90 text-base md:text-lg max-w-md leading-relaxed">
                             {pkg.description}
                           </p>
                         )}
-                        
-                        {/* CTA aparece no hover */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <span className="inline-block px-6 py-3 bg-white text-primary font-semibold rounded-full hover:bg-primary hover:text-white transition-colors">
-                            {packagesCtaContent}
-                          </span>
-                        </div>
                       </div>
                     </div>
                   </Link>
@@ -212,6 +177,7 @@ export default function PackagesSection({
             )}
           </>
         )}
+        <SectionReserveCta />
       </div>
     </section>
   );

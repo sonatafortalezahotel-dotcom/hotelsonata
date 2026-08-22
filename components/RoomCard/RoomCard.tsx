@@ -10,6 +10,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Users, Maximize2, Eye, Waves, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 interface RoomCardProps {
   room: {
@@ -228,11 +229,7 @@ export default function RoomCard({ room }: RoomCardProps) {
             {t.seeDetails}
           </Link>
         </Button>
-        <Button asChild className="flex-1">
-          <Link href={`/reservas?room=${room.code}`}>
-            {t.reserve}
-          </Link>
-        </Button>
+        <OmnibeesReserveButton className="flex-1" />
       </CardFooter>
     </Card>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react"
 import Link from "next/link";
 import Image from "@/lib/app-image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Instagram, Facebook, MessageCircle, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -21,6 +21,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getPageContent } from "@/lib/utils/pageContent";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 interface HeaderContentProps {
   usePrimaryBackground?: boolean;
@@ -149,8 +150,9 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
             </div>
           </Link>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile actions */}
           <div className="flex lg:hidden items-center gap-2">
+            <OmnibeesReserveButton size="sm" className="px-3" />
             <ThemeToggle
               variant="ghost"
               className={cn(textColor, languageButtonHover)}
@@ -188,6 +190,10 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                         {getNavLabel(item.fieldKey)}
                       </Link>
                     ))}
+                    <OmnibeesReserveButton
+                      size="lg"
+                      className="mt-4 w-full"
+                    />
                   </nav>
 
                   {/* Mobile Language Selector */}
@@ -265,6 +271,8 @@ export default function HeaderContent({ usePrimaryBackground = false }: HeaderCo
                 </Link>
               );
             })}
+
+            <OmnibeesReserveButton size="header" className="flex-shrink-0" />
 
             <ThemeToggle
               variant="ghost"

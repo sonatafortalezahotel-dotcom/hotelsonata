@@ -22,6 +22,7 @@ import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { usePhotoTracker } from "@/lib/hooks/usePhotoTracker";
+import { SectionReserveCta, OmnibeesReserveButton } from "@/components/OmnibeesReserveButton";
 
 function getNested(obj: Record<string, unknown>, path: string): string {
   const value = path.split(".").reduce((o: unknown, k) => (o as Record<string, unknown>)?.[k], obj);
@@ -292,6 +293,7 @@ function HotelPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Timeline - Nossa Jornada */}
@@ -396,6 +398,7 @@ function HotelPageContent() {
             `}</style>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Nossos Diferenciais */}
@@ -437,6 +440,7 @@ function HotelPageContent() {
             })}
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Acomodações */}
@@ -546,6 +550,7 @@ function HotelPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* CTA Section */}
@@ -557,12 +562,7 @@ function HotelPageContent() {
           <p className="text-lg mb-8 max-w-2xl mx-auto text-primary-foreground/90">
             {editor?.editMode ? <PageText page="hotel" section="cta" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("hotel", "cta", "subtitle", locale, overrides) || t.cta.subtitle)}
           </p>
-          <a 
-            href="/"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-primary hover:bg-white/90 h-11 px-8"
-          >
-            {editor?.editMode ? <PageText page="hotel" section="cta" fieldKey="button" locale={locale} as="span" /> : (getPageContent("hotel", "cta", "button", locale, overrides) || t.cta.button)}
-          </a>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Calendar as CalendarIcon, Users, Search, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
+import { Calendar as CalendarIcon, Users, CalendarCheck, Loader2, ChevronDown, Tag, ChevronUp } from "lucide-react";
 import { format, startOfDay, startOfMonth, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { es } from "date-fns/locale/es";
@@ -21,7 +21,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { PageText } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { toast } from "sonner";
-import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
+import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage, OMNIBEES_HOTEL_URL, getReserveNowLabel } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
@@ -121,9 +121,9 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
   const editor = useEditor();
   const globalOverrides = editor?.globalOverrides ?? {};
   const labels = {
-    pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", rooms: "Quartos", guests: "Hóspedes", promoCode: "CUPOM", reserve: "PESQUISAR", selectDate: "Selecione a data" },
-    es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", rooms: "Habitaciones", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "BUSCAR", selectDate: "Seleccione la fecha" },
-    en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", rooms: "Rooms", guests: "Guests", promoCode: "COUPON", reserve: "SEARCH", selectDate: "Select date" },
+    pt: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adultos", children: "Crianças", rooms: "Quartos", guests: "Hóspedes", promoCode: "CUPOM", reserve: "Reserve Agora", selectDate: "Selecione a data" },
+    es: { checkIn: "Entrada", checkOut: "Salida", adults: "Adultos", children: "Niños", rooms: "Habitaciones", guests: "Huéspedes", promoCode: "CUPÓN", reserve: "Reserve ahora", selectDate: "Seleccione la fecha" },
+    en: { checkIn: "Check-in", checkOut: "Check-out", adults: "Adults", children: "Children", rooms: "Rooms", guests: "Guests", promoCode: "COUPON", reserve: "Book Now", selectDate: "Select date" },
   };
   const t = labels[locale as keyof typeof labels] || labels.pt;
   const getLabel = (fieldKey: string) => {
@@ -171,15 +171,11 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
     if (date) setCheckOutOpen(false);
   };
 
+  const reserveNowLabel = getReserveNowLabel(locale as "pt" | "es" | "en");
+
   const handleReserve = () => {
     if (!checkIn || !checkOut) {
-      toast.error(
-        locale === "en"
-          ? "Please select check-in and check-out dates"
-          : locale === "es"
-          ? "Por favor seleccione las fechas de entrada y salida"
-          : "Por favor, selecione as datas de check-in e check-out"
-      );
+      window.open(OMNIBEES_HOTEL_URL, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -379,17 +375,20 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                   )}
                 </div>
 
-                {/* Botão de busca compacto */}
+                {/* Botão Reserve Agora compacto */}
                 <Button
                   onClick={handleReserve}
-                  className="min-h-[44px] min-w-[44px] px-3 flex-shrink-0 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  className="min-h-[44px] px-3 flex-shrink-0 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                   disabled={isLoading}
-                  aria-label={locale === "en" ? "Search availability" : locale === "es" ? "Buscar disponibilidad" : "Pesquisar disponibilidade"}
+                  aria-label={reserveNowLabel}
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin text-white" aria-hidden />
                   ) : (
-                    <Search className="h-4 w-4 text-white" aria-hidden />
+                    <>
+                      <CalendarCheck className="h-4 w-4 text-white" aria-hidden />
+                      <span className="ml-1.5 text-[11px] font-bold whitespace-nowrap">{reserveNowLabel}</span>
+                    </>
                   )}
                 </Button>
 
@@ -710,22 +709,23 @@ export default function BookingBar({ isHomePage = false }: BookingBarProps) {
                 </div>
               </div>
 
-              {/* Botão de Pesquisa */}
+              {/* Botão Reserve Agora */}
               <div className="flex-shrink-0 flex items-center justify-center pl-6">
                  <Button
                   onClick={handleReserve}
                   className="w-full lg:w-auto h-8 lg:h-9 px-3 lg:px-4 font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs"
                   disabled={isLoading}
+                  aria-label={reserveNowLabel}
                 >
                   {isLoading ? (
                     <>
                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin text-white" />
-                      <span className="text-xs">{locale === "en" ? "Searching..." : locale === "es" ? "Buscando..." : "Buscando..."}</span>
+                      <span className="text-xs">{reserveNowLabel}</span>
                     </>
                   ) : (
                     <>
-                       <Search className="mr-1.5 h-4 w-4 text-white" />
-                      <span className="text-xs">{getLabel("reserve")}</span>
+                       <CalendarCheck className="mr-1.5 h-4 w-4 text-white" />
+                      <span className="text-xs">{reserveNowLabel}</span>
                     </>
                   )}
                 </Button>

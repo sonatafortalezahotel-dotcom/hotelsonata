@@ -17,6 +17,7 @@ import { PhotoStory } from "@/components/PhotoStory";
 import { useSustainability } from "@/lib/hooks/useSustainability";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import OmnibeesReserveButton, { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 function ESGPageContent() {
   const { locale } = useLanguage();
@@ -162,6 +163,7 @@ function ESGPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Sustentabilidade Ambiental */}
@@ -212,6 +214,7 @@ function ESGPageContent() {
             })}
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Inclusão e Diversidade */}
@@ -262,6 +265,7 @@ function ESGPageContent() {
             })}
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* PhotoStory - Impacto Social e Ambiental */}
@@ -374,6 +378,7 @@ function ESGPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* CTA Section */}
@@ -385,12 +390,7 @@ function ESGPageContent() {
           <p className="text-lg mb-8 max-w-2xl mx-auto text-white/90">
             {editor?.editMode ? <PageText page="esg" section="cta" fieldKey="subtitle" locale={locale} as="span" /> : (getPageContent("esg", "cta", "subtitle", locale, editor?.overrides ?? {}) || t.cta.subtitle)}
           </p>
-          <a 
-            href="/"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-green-700 hover:bg-white/90 h-11 px-8"
-          >
-            {editor?.editMode ? <PageText page="esg" section="cta" fieldKey="button" locale={locale} as="span" /> : (getPageContent("esg", "cta", "button", locale, editor?.overrides ?? {}) || t.cta.button)}
-          </a>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

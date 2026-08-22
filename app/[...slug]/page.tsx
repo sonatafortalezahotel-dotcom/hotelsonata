@@ -10,6 +10,7 @@ import { generateBreadcrumbStructuredData } from "@/lib/utils/seo";
 import { capitalizeKeywords } from "@/lib/utils/slug";
 import { GallerySection } from "@/components/GallerySection/GallerySection";
 import { getLandingPageBySlug, parseLandingSlug } from "@/lib/seo-landing-page";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 
@@ -501,16 +502,7 @@ export default async function LandingPage({ params }: PageProps) {
                   ? "Experimente lo mejor de Fortaleza en Hotel Sonata de Iracema"
                   : "Viva o melhor de Fortaleza no Hotel Sonata de Iracema"}
               </p>
-              <a
-                href="/reservas"
-                className="inline-block px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-              >
-                {locale === "en"
-                  ? "Book Now"
-                  : locale === "es"
-                  ? "Reservar Ahora"
-                  : "Reservar Agora"}
-              </a>
+              <OmnibeesReserveButton size="lg" />
             </div>
           </article>
         </div>

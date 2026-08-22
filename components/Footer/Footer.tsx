@@ -13,6 +13,7 @@ import { getPageContent } from "@/lib/utils/pageContent";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import { useEffect, useState } from "react";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 /** Mesmas 2 logos do bloco "Prêmios de Excelência" da home (AwardsSection) */
 const EXCELLENCE_AWARDS_LOGOS = [
@@ -157,6 +158,7 @@ export default function Footer() {
               <p className="text-primary-foreground/80 mb-6 leading-relaxed text-sm min-w-0 break-words">
                 {getFooterText("description", t.description)}
               </p>
+              <OmnibeesReserveButton className="mb-6" />
               <div className="flex items-center gap-3">
                 {socialLinks.map((social) => {
                   const Icon = social.icon;

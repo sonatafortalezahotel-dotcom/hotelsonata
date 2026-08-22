@@ -16,6 +16,18 @@ const OMNIBEES_CONFIG = {
   currencyId: "16", // 16 = BRL (Real Brasileiro)
 } as const;
 
+/** Motor de reservas direto (CTAs sem datas) */
+export const OMNIBEES_HOTEL_URL = "https://book.omnibees.com/hotel/2712";
+
+export const OMNIBEES_RESERVE_BUTTON_CLASSNAME =
+  "inline-flex items-center justify-center gap-2 font-semibold bg-orange-500 hover:bg-orange-600 text-white shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
+export function getReserveNowLabel(locale: "pt" | "es" | "en" = "pt"): string {
+  if (locale === "en") return "Book Now";
+  if (locale === "es") return "Reserve ahora";
+  return "Reserve Agora";
+}
+
 /**
  * Mapeia o locale do site para o formato de idioma da Omnibees
  */

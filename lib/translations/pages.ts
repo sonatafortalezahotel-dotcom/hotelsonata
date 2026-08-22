@@ -16,7 +16,7 @@ export const pageTranslations = {
       cta: {
         title: "Pronto para Sua Experiência?",
         subtitle: "Reserve agora e garanta as melhores tarifas e condições especiais",
-        bookNow: "Reservar Agora",
+        bookNow: "Reserve Agora",
         contact: "Fale Conosco"
       },
       highlights: {
@@ -77,7 +77,7 @@ export const pageTranslations = {
       cta: {
         title: "Reserve e Saboreie",
         subtitle: "Café da manhã incluído em todas as reservas. Venha experimentar!",
-        bookNow: "Fazer Reserva"
+        bookNow: "Reserve Agora"
       },
       highlightsList: {
         tapioca: "Tapiocas e crepiocas preparadas na hora",
@@ -134,7 +134,7 @@ export const pageTranslations = {
       cta: {
         title: "Viva a Experiência Completa",
         subtitle: "Reserve agora e aproveite todas as atividades incluídas na sua estadia",
-        bookNow: "Fazer Reserva"
+        bookNow: "Reserve Agora"
       },
       photoStory: {
         title: "Seu Dia de Lazer Completo",
@@ -173,7 +173,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "Para mais informações sobre nossos serviços, entre em contato com o setor de reservas ou recepção",
-        button: "Falar com Reservas"
+        button: "Reserve Agora"
       },
       activities: {
         pool: { title: "Área de Piscina", description: "Cadeiras de sol, chuveirão e vista para o mar. Você também pode contar com o atendimento do nosso restaurante nessa área.", schedule: "6:00 às 20:00 hrs", badge: "Vista Mar", tags: ["Restaurante", "Água de Coco", "Relaxamento"] },
@@ -300,7 +300,7 @@ export const pageTranslations = {
       cta: {
         title: "Hospede-se com Propósito",
         subtitle: "Ao escolher o Hotel Sonata, você apoia práticas sustentáveis e responsáveis",
-        button: "Fazer Reserva"
+        button: "Reserve Agora"
       }
     },
     // Página Eventos
@@ -414,7 +414,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atendimento Personalizado",
-        button: "Falar com Reservas"
+        button: "Reserve Agora"
       },
       access: {
         title: "Acesso e Localização",
@@ -500,7 +500,7 @@ export const pageTranslations = {
       cta: {
         title: "Seja Parte da Nossa História",
         subtitle: "Venha conhecer o hotel que há 20 anos faz de Fortaleza um destino ainda mais especial",
-        button: "Fazer Reserva"
+        button: "Reserve Agora"
       },
       bikes: {
         message: "Use nossas bicicletas gratuitas para explorar a orla e conhecer Fortaleza de forma sustentável"
@@ -560,7 +560,7 @@ export const pageTranslations = {
         rule2: "Evitar permanência na área do restaurante",
         fee: ""
       },
-      button: "Falar com Reservas"
+      button: "Reserve Agora"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -601,7 +601,7 @@ export const pageTranslations = {
       footer: {
         text: "Para mais informações sobre nossos serviços, entre em contato com o setor de reservas ou recepção",
         exploreButton: "Explorar Todas as Experiências",
-        contactButton: "Falar com Reservas"
+        contactButton: "Reserve Agora"
       }
     },
     // Seção de Prêmios
@@ -990,7 +990,7 @@ export const pageTranslations = {
         children: "Crianças",
         guests: "Hóspedes",
         promoCode: "CUPOM",
-        reserve: "PESQUISAR",
+        reserve: "Reserve Agora",
         selectDate: "Selecione a data",
       },
       reservationForm: {
@@ -1002,7 +1002,7 @@ export const pageTranslations = {
         children: "Crianças",
         promoCode: "CUPOM",
         promoCodePlaceholder: "CUPOM",
-        reserve: "PESQUISAR",
+        reserve: "Reserve Agora",
         selectDate: "Selecione a data",
       },
       awards: {
@@ -1051,7 +1051,7 @@ export const pageTranslations = {
       cta: {
         title: "¿Listo para Tu Experiencia?",
         subtitle: "Reserva ahora y garantiza las mejores tarifas y condiciones especiales",
-        bookNow: "Reservar Ahora",
+        bookNow: "Reserve ahora",
         contact: "Contáctanos"
       },
       highlights: {
@@ -1112,7 +1112,7 @@ export const pageTranslations = {
       cta: {
         title: "Reserva y Saborea",
         subtitle: "Desayuno incluido en todas las reservas. ¡Ven a probar!",
-        bookNow: "Hacer Reserva"
+        bookNow: "Reserve ahora"
       },
       highlightsList: {
         tapioca: "Tapiocas y crepiocas preparadas al momento",
@@ -1169,7 +1169,7 @@ export const pageTranslations = {
       cta: {
         title: "Vive la Experiencia Completa",
         subtitle: "Reserva ahora y aprovecha todas las actividades incluidas en tu estadía",
-        bookNow: "Hacer Reserva"
+        bookNow: "Reserve ahora"
       },
       photoStory: {
         title: "Tu Día de Ocio Completo",
@@ -1208,7 +1208,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "Para más información sobre nuestros servicios, contacta con el departamento de reservas o recepción",
-        button: "Hablar con Reservas"
+        button: "Reserve ahora"
       },
       activities: {
         pool: { title: "Área de Piscina", description: "Sillas de sol, duchas y vista al mar. También servicio del restaurante.", schedule: "6:00 a 20:00", badge: "Vista Mar", tags: ["Restaurante", "Agua de Coco"] },
@@ -1335,7 +1335,7 @@ export const pageTranslations = {
       cta: {
         title: "Hospédate con Propósito",
         subtitle: "Al elegir el Hotel Sonata, apoyas prácticas sostenibles y responsables",
-        button: "Hacer Reserva"
+        button: "Reserve ahora"
       }
     },
     // Página Eventos
@@ -1449,7 +1449,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Atención Personalizada",
-        button: "Hablar con Reservas"
+        button: "Reserve ahora"
       },
       access: {
         title: "Acceso y Ubicación",
@@ -1535,7 +1535,7 @@ export const pageTranslations = {
       cta: {
         title: "Sé Parte de Nuestra Historia",
         subtitle: "Ven a conocer el hotel que hace 20 años hace de Fortaleza un destino aún más especial",
-        button: "Hacer Reserva"
+        button: "Reserve ahora"
       },
       bikes: {
         message: "Usa nuestras bicicletas gratuitas para explorar la orla y conocer Fortaleza de forma sostenible"
@@ -1595,7 +1595,7 @@ export const pageTranslations = {
         rule2: "Evitar permanencia en el área del restaurante",
         fee: ""
       },
-      button: "Hablar con Reservas"
+      button: "Reserve ahora"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -1636,7 +1636,7 @@ export const pageTranslations = {
       footer: {
         text: "Para más información sobre nuestros servicios, contacta el sector de reservas o recepción",
         exploreButton: "Explorar Todas las Experiencias",
-        contactButton: "Hablar con Reservas"
+        contactButton: "Reserve ahora"
       }
     },
     // Seção de Prêmios
@@ -1951,7 +1951,7 @@ export const pageTranslations = {
         children: "Niños",
         guests: "Huéspedes",
         promoCode: "CUPÓN",
-        reserve: "BUSCAR",
+        reserve: "Reserve ahora",
         selectDate: "Seleccione la fecha",
       },
       reservationForm: {
@@ -1963,7 +1963,7 @@ export const pageTranslations = {
         children: "Niños",
         promoCode: "CUPÓN",
         promoCodePlaceholder: "CUPÓN",
-        reserve: "BUSCAR",
+        reserve: "Reserve ahora",
         selectDate: "Seleccione la fecha",
       },
       awards: {
@@ -2162,7 +2162,7 @@ export const pageTranslations = {
       cta: {
         title: "Book and Taste",
         subtitle: "Breakfast included in all reservations. Come and try!",
-        bookNow: "Make a Reservation"
+        bookNow: "Book Now"
       },
       highlightsList: {
         tapioca: "Tapiocas and crepiocas prepared to order",
@@ -2219,7 +2219,7 @@ export const pageTranslations = {
       cta: {
         title: "Live the Complete Experience",
         subtitle: "Book now and enjoy all activities included in your stay",
-        bookNow: "Make a Reservation"
+        bookNow: "Book Now"
       },
       photoStory: {
         title: "Your Complete Leisure Day",
@@ -2258,7 +2258,7 @@ export const pageTranslations = {
       },
       contactReception: {
         text: "For more information about our services, contact the reservations or reception department",
-        button: "Contact Reservations"
+        button: "Book Now"
       },
       activities: {
         pool: { title: "Pool Area", description: "Sun loungers, showers and sea view. Restaurant service available.", schedule: "6:00 to 20:00", badge: "Sea View", tags: ["Restaurant", "Coconut Water"] },
@@ -2385,7 +2385,7 @@ export const pageTranslations = {
       cta: {
         title: "Stay with Purpose",
         subtitle: "By choosing Hotel Sonata, you support sustainable and responsible practices",
-        button: "Make a Reservation"
+        button: "Book Now"
       }
     },
     // Página Eventos
@@ -2499,7 +2499,7 @@ export const pageTranslations = {
       },
       cta: {
         title: "Personalized Service",
-        button: "Contact Reservations"
+        button: "Book Now"
       },
       access: {
         title: "Access and Location",
@@ -2585,7 +2585,7 @@ export const pageTranslations = {
       cta: {
         title: "Be Part of Our History",
         subtitle: "Come visit the hotel that for 20 years has made Fortaleza an even more special destination",
-        button: "Make a Reservation"
+        button: "Book Now"
       },
       bikes: {
         message: "Use our free bicycles to explore the waterfront and discover Fortaleza in a sustainable way"
@@ -2645,7 +2645,7 @@ export const pageTranslations = {
         rule2: "Avoid staying in the restaurant area",
         fee: ""
       },
-      button: "Contact Reservations"
+      button: "Book Now"
     },
     // Serviços de Lazer
     leisureServices: {
@@ -2686,7 +2686,7 @@ export const pageTranslations = {
       footer: {
         text: "For more information about our services, contact the reservations or reception department",
         exploreButton: "Explore All Experiences",
-        contactButton: "Contact Reservations"
+        contactButton: "Book Now"
       }
     },
     // Seção de Prêmios
@@ -3001,7 +3001,7 @@ export const pageTranslations = {
         children: "Children",
         guests: "Guests",
         promoCode: "COUPON",
-        reserve: "SEARCH",
+        reserve: "Book Now",
         selectDate: "Select date",
       },
       reservationForm: {
@@ -3013,7 +3013,7 @@ export const pageTranslations = {
         children: "Children",
         promoCode: "COUPON",
         promoCodePlaceholder: "COUPON",
-        reserve: "SEARCH",
+        reserve: "Book Now",
         selectDate: "Select date",
       },
       awards: {

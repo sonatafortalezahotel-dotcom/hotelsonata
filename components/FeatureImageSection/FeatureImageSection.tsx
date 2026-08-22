@@ -3,7 +3,7 @@
 import Image from "@/lib/app-image";
 import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 interface FeatureImageSectionProps {
   title: string | ReactNode;
@@ -31,8 +31,6 @@ export function FeatureImageSection({
   badge,
   imagePosition = "right",
   features,
-  ctaText,
-  ctaLink,
   backgroundColor = "white",
   imageQuality = 80,
 }: FeatureImageSectionProps) {
@@ -74,12 +72,6 @@ export function FeatureImageSection({
                 ))}
               </ul>
             )}
-
-            {ctaText && ctaLink && (
-              <Button size="lg" asChild>
-                <a href={ctaLink}>{ctaText}</a>
-              </Button>
-            )}
           </div>
 
           {/* Imagem - elemento decorativo contido para não cortar conteúdo da seção abaixo */}
@@ -109,6 +101,7 @@ export function FeatureImageSection({
             <div className="absolute -z-10 -bottom-4 -right-4 left-4 top-4 bg-primary/10 rounded-2xl pointer-events-none" aria-hidden />
           </div>
         </div>
+        <SectionReserveCta />
       </div>
     </section>
   );

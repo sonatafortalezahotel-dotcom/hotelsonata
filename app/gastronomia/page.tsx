@@ -13,6 +13,7 @@ import { AmenityCard } from "@/components/AmenityCard";
 import { HeroWithImage } from "@/components/HeroWithImage";
 import { GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import { PhotoStory } from "@/components/PhotoStory";
+import OmnibeesReserveButton, { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 import { useGastronomy } from "@/lib/hooks/useGastronomy";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
@@ -272,6 +273,7 @@ function GastronomiaPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Galeria de Pratos - Café da Manhã - GRID 1x4 */}
@@ -318,6 +320,7 @@ function GastronomiaPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* PhotoStory - Experiência Gastronômica */}
@@ -391,6 +394,7 @@ function GastronomiaPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Room Service */}
@@ -421,6 +425,7 @@ function GastronomiaPageContent() {
             </span>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* CTA Section */}
@@ -440,16 +445,7 @@ function GastronomiaPageContent() {
               getPageContent("gastronomia", "cta", "subtitle", locale, editor?.overrides ?? {}) || t.cta.subtitle
             )}
           </p>
-          <a 
-            href="/"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white text-amber-700 hover:bg-white/90 h-11 px-8"
-          >
-            {editor?.editMode ? (
-              <PageText page="gastronomia" section="cta" fieldKey="bookNow" locale={locale} as="span" placeholder={t.cta.bookNow} />
-            ) : (
-              getPageContent("gastronomia", "cta", "bookNow", locale, editor?.overrides ?? {}) || t.cta.bookNow
-            )}
-          </a>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

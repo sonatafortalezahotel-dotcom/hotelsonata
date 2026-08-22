@@ -1,0 +1,13 @@
+---
+description: Backlog — estudar renderização de avaliações Google e Tripadvisor
+alwaysApply: true
+---
+
+# Atividade pendente: avaliações
+
+Estudar e depois implementar, com dados reais (sem mock), como renderizar no site:
+
+1. **Google Reviews** — Places API, Place ID do hotel, widget oficial ou cards próprios com cache no banco.
+2. **Tripadvisor** — widget CDWR/oficial ou API, alinhado à seção de prêmios já existente.
+
+Critérios: performance, LGPD, atualização automática, layout no visual do Sonata (home e/ou hotel). Não implementar nesta entrega; é atividade para o próximo ciclo.

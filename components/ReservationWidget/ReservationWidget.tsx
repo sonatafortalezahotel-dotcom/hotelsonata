@@ -25,6 +25,7 @@ import {
 import {
   Calendar as CalendarIcon,
   CheckCircle2,
+  CalendarCheck,
 } from "lucide-react";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import {
@@ -39,7 +40,7 @@ import {
   distributeGuests,
   getGuestDistributionErrorMessage,
 } from "@/lib/utils/guestDistribution";
-import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage } from "@/lib/utils/omnibees";
+import { buildOmnibeesUrl, getOmnibeesDistributionErrorMessage, OMNIBEES_HOTEL_URL, getReserveNowLabel } from "@/lib/utils/omnibees";
 import {
   disableCheckInCalendarDate,
   disableCheckOutCalendarDate,
@@ -103,7 +104,7 @@ export default function ReservationWidget({
 
   const labels = {
     pt: {
-      title: "Reservar Agora",
+      title: "Reserve Agora",
       checkIn: "Check-in",
       checkOut: "Check-out",
       adults: "Adultos",
@@ -112,7 +113,7 @@ export default function ReservationWidget({
       checking: "Verificando...",
       available: "Disponível",
       unavailable: "Indisponível",
-      continue: "Fazer reserva",
+      continue: "Reserve Agora",
       guestInfo: "Dados do Hóspede",
       name: "Nome Completo",
       namePlaceholder: "Seu nome completo",
@@ -136,7 +137,7 @@ export default function ReservationWidget({
       selectDate: "Selecione a data",
     },
     es: {
-      title: "Reservar Ahora",
+      title: "Reserve ahora",
       checkIn: "Entrada",
       checkOut: "Salida",
       adults: "Adultos",
@@ -145,7 +146,7 @@ export default function ReservationWidget({
       checking: "Verificando...",
       available: "Disponible",
       unavailable: "No Disponible",
-      continue: "Hacer reserva",
+      continue: "Reserve ahora",
       guestInfo: "Datos del Huésped",
       name: "Nombre Completo",
       namePlaceholder: "Su nombre completo",
@@ -178,7 +179,7 @@ export default function ReservationWidget({
       checking: "Checking...",
       available: "Available",
       unavailable: "Unavailable",
-      continue: "Make reservation",
+      continue: "Book Now",
       guestInfo: "Guest Information",
       name: "Full Name",
       namePlaceholder: "Your full name",
@@ -215,10 +216,10 @@ export default function ReservationWidget({
     return formatPriceCurrency(price, locale);
   };
 
-  /** Redireciona para o site de reservas Omnibees (book.omnibees.com) – gestão é feita lá */
+  /** Redireciona para o motor de reservas Omnibees */
   const handleGoToOmnibees = () => {
     if (!checkIn || !checkOut) {
-      toast.error(t.selectDate);
+      window.open(OMNIBEES_HOTEL_URL, "_blank", "noopener,noreferrer");
       return;
     }
     if (!isAfter(startOfDay(checkOut), startOfDay(checkIn))) {
@@ -493,16 +494,15 @@ export default function ReservationWidget({
           </div>
         )}
 
-        {/* Botão para ir ao site de reservas (book.omnibees.com) */}
-        {checkIn && checkOut && (
-          <Button
-            onClick={handleGoToOmnibees}
-            size="lg"
-            className="w-full"
-          >
-            {t.continue}
-          </Button>
-        )}
+        {/* Botão Reserve Agora (Omnibees) */}
+        <Button
+          onClick={handleGoToOmnibees}
+          size="lg"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+        >
+          <CalendarCheck className="mr-2 h-4 w-4" aria-hidden />
+          {getReserveNowLabel(locale as "pt" | "es" | "en")}
+        </Button>
 
         {/* Informações Adicionais */}
         <div className="space-y-3 pt-4 border-t text-sm">

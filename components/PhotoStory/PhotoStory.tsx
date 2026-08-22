@@ -4,6 +4,7 @@ import Image from "@/lib/app-image";
 import { useEffect, useRef, useState, ReactNode } from "react";
 import { ElegantCarousel } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 interface PhotoStoryItem {
   image: string | ReactNode | null;
@@ -221,6 +222,7 @@ export function PhotoStory({
           ))}
         </div>
       </div>
+      <SectionReserveCta />
     </section>
   );
 }

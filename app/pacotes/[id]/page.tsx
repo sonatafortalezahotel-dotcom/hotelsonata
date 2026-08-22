@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { HeroWithImage } from "@/components/HeroWithImage";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -188,7 +189,7 @@ export default function PackageDetailPage() {
       validPeriod: "Período Válido",
       category: "Categoria",
       consult: "Consulte",
-      reserve: "Reservar Agora",
+      reserve: "Reserve Agora",
       description: "Descrição",
       from: "De",
       to: "até",
@@ -207,7 +208,7 @@ export default function PackageDetailPage() {
       validPeriod: "Período Válido",
       category: "Categoría",
       consult: "Consultar",
-      reserve: "Reservar Ahora",
+      reserve: "Reserve ahora",
       description: "Descripción",
       from: "Desde",
       to: "hasta",
@@ -489,11 +490,7 @@ export default function PackageDetailPage() {
                     </p>
                   </div>
 
-                  <Button asChild size="lg" className="w-full">
-                    <Link href={`/reservas?package=${pkg.id}`}>
-                      {t.reserve}
-                    </Link>
-                  </Button>
+                  <OmnibeesReserveButton size="lg" className="w-full" />
 
                   <div className="space-y-3 pt-4 text-sm">
                     <div className="flex items-start gap-2">

@@ -1,0 +1,17 @@
+---
+description: CTAs públicos do site sempre Reserve Agora, laranja, Omnibees
+alwaysApply: true
+---
+
+# CTAs de reserva
+
+Todo botão de ação no site público (home, hotel, restaurante/gastronomia, lazer, ESG, quartos, eventos, cards e hero) usa o componente `OmnibeesReserveButton`:
+
+- Texto: **Reserve Agora** (pt), **Reserve ahora** (es), **Book Now** (en)
+- Cor: laranja da marca (`bg-orange-500 hover:bg-orange-600`)
+- Destino: `https://book.omnibees.com/hotel/2712`
+- Ícone: `CalendarCheck`
+
+Depois de cada bloco de conteúdo das páginas públicas, no vão (`py-16 lg:py-24`), usar `SectionReserveCta` — um único **Reserve Agora** após o bloco, não um botão em cada card/slide interno.
+
+Não criar CTAs com "Ver cardápio", "Saiba mais", "Fazer reserva" ou link para `/reservas`. Exceções: envio de formulário (contato/orçamento de evento), navegação do menu e "Ver detalhes" de quarto.

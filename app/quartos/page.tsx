@@ -16,6 +16,7 @@ import { useGallery } from "@/lib/hooks/useGallery";
 import { useRooms } from "@/lib/hooks/useRooms";
 import { getGalleryImageTitle } from "@/lib/utils";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import OmnibeesReserveButton, { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 function RoomsPageContentWrapper() {
   const { locale } = useLanguage();
@@ -148,6 +149,7 @@ function RoomsPageContentWrapper() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Rooms Section - bloco em full largura */}
@@ -163,6 +165,19 @@ function RoomsPageContentWrapper() {
           </div>
 
           <RoomsPageContent />
+        </div>
+        <SectionReserveCta />
+      </section>
+
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/90 to-primary text-primary-foreground">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            {t.cta.title}
+          </h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto text-primary-foreground/90">
+            {t.cta.subtitle}
+          </p>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

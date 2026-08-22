@@ -7,8 +7,6 @@ import VideoCarousel from "@/components/VideoCarousel";
 import ReservationForm from "@/components/ReservationForm";
 import PackagesSection from "@/components/PackagesSection";
 import SocialMediaFeed from "@/components/SocialMediaFeed";
-import { ExperienceCard } from "@/components/ExperienceCard";
-import { PhotoStory } from "@/components/PhotoStory";
 import { HorizontalScroll, EditorialCarousel, EditorialSlide, GalleryOneLeftTwoRight, GALLERY_ONE_LEFT_TWO_RIGHT_GRID_HEIGHT } from "@/components/HorizontalScroll";
 import NordestinoPattern from "@/components/NordestinoPattern";
 import { PageText, PageImage } from "@/components/PageEditor";
@@ -17,6 +15,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { getPageTranslation } from "@/lib/translations/pages";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { cn } from "@/lib/utils";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
 import type { HomeInitialData } from "@/lib/home-data";
 
@@ -532,6 +531,7 @@ export default function HomeClient({
           )}
         </EditorialCarousel>
       </section>
+      <SectionReserveCta />
 
       {/* PhotoStory - Um Dia no Hotel - GRID 1x4 FULLWIDTH */}
       <section className="relative overflow-x-clip">
@@ -655,6 +655,7 @@ export default function HomeClient({
           );
         })()}
       </section>
+      <SectionReserveCta />
 
       {/* Galeria - Momentos Inesquecíveis - MASONRY ANIMADO */}
       <section className="py-10 lg:py-24 bg-background relative overflow-x-clip">
@@ -713,6 +714,7 @@ export default function HomeClient({
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Feed de Redes Sociais - integrado com banco de dados */}

@@ -18,6 +18,7 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 // Função para buscar informações de contato
 async function getContactInfo() {
@@ -312,6 +313,7 @@ function ContatoPageContent() {
             </p>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Contato Section */}
@@ -666,6 +668,7 @@ function ContatoPageContent() {
             </Card>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Mapa */}
@@ -681,6 +684,7 @@ function ContatoPageContent() {
           title="Localização Hotel Sonata de Iracema"
         />
       </section>
+      <SectionReserveCta className="pb-16 lg:pb-24" />
     </>
   );
 }

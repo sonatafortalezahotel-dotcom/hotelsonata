@@ -8,6 +8,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { PageText } from "@/components/PageEditor";
 import type { PageKey } from "@/lib/utils/pageContent";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 export function AccommodationsSection() {
   const { locale } = useLanguage();
@@ -96,11 +97,7 @@ export function AccommodationsSection() {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-8">
-          <a href="https://api.whatsapp.com/send?phone=558540061616&text=Ol%c3%a1,%20vi%20o%20site%20de%20voc%c3%aas%20e%20gostaria%20de%20mais%20informa%c3%a7%c3%b5es%20por%20favor." target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8">
-            {editor?.editMode ? <PageText page={pageKey} section="accommodations" fieldKey="button" locale={locale} as="span" /> : (getPageContent(pageKey, "accommodations", "button", locale, overrides) || t.button)}
-          </a>
-        </div>
+        <SectionReserveCta />
       </div>
     </section>
   );

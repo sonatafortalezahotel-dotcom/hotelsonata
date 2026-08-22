@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/context/LanguageContext";
 import { PageText, PageImage } from "@/components/PageEditor";
 import { getPageContent } from "@/lib/utils/pageContent";
 import { getGalleryImageByPath } from "@/lib/utils/gallery-helpers";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 interface Highlight {
   id: number;
@@ -59,12 +60,6 @@ export default function VideoCarousel({
       <PageText page="home" section="highlights" fieldKey={`${index}.description`} locale={locale as "pt" | "es" | "en"} as="span" />
     ) : (
       getPageContent("home", "highlights", `${index}.description`, locale as "pt" | "es" | "en", overrides) || items[index]?.description
-    );
-  const getCta = () =>
-    editor?.editMode ? (
-      <PageText page="home" section="highlights" fieldKey="cta" locale={locale as "pt" | "es" | "en"} as="span" />
-    ) : (
-      getPageContent("home", "highlights", "cta", locale as "pt" | "es" | "en", overrides) || "Saiba Mais"
     );
 
   useEffect(() => {
@@ -235,16 +230,10 @@ export default function VideoCarousel({
               {getDescription(currentIndex)}
             </p>
           )}
-          {(currentItem.link || editor?.editMode) && (
-            <Button
-              asChild
-              size="lg"
-              className="mt-4 sm:mt-6 shadow-lg"
-            >
-              <a href={currentItem.link || "#"}>
-                {getCta()}
-              </a>
-            </Button>
+          {(currentItem.title || currentItem.description || editor?.editMode) && (
+            <div className="mt-4 sm:mt-6 flex justify-center">
+              <OmnibeesReserveButton size="lg" />
+            </div>
           )}
         </div>
       </div>

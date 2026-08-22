@@ -12,6 +12,7 @@ import { getPageContentIcon } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import type { PageKey } from "@/lib/utils/pageContent";
 import { useGallery } from "@/lib/hooks/useGallery";
+import { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 
 const SERVICE_KEYS = ["pool", "fitness", "bikes", "beachTennis", "massage"] as const;
 const DEFAULT_ICON_NAMES: Record<string, string> = {
@@ -93,20 +94,8 @@ export function LeisureServicesSection() {
           <p className="text-muted-foreground mb-4">
             {editor?.editMode ? <PageText page={pageKey} section="leisureServices" fieldKey="footer.text" locale={locale} as="span" /> : (getPageContent(pageKey, "leisureServices", "footer.text", locale, overrides) || t.footer.text)}
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a href="/lazer" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8">
-              {editor?.editMode ? <PageText page={pageKey} section="leisureServices" fieldKey="footer.exploreButton" locale={locale} as="span" /> : (getPageContent(pageKey, "leisureServices", "footer.exploreButton", locale, overrides) || t.footer.exploreButton)}
-            </a>
-            <a
-              href="https://api.whatsapp.com/send?phone=558540061616&text=Ol%c3%a1,%20vi%20o%20site%20de%20voc%c3%aas%20e%20gostaria%20de%20mais%20informa%c3%a7%c3%b5es%20por%20favor."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
-            >
-              {editor?.editMode ? <PageText page={pageKey} section="leisureServices" fieldKey="footer.contactButton" locale={locale} as="span" /> : (getPageContent(pageKey, "leisureServices", "footer.contactButton", locale, overrides) || t.footer.contactButton)}
-            </a>
-          </div>
         </div>
+        <SectionReserveCta />
       </div>
     </section>
   );

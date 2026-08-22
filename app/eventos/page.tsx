@@ -19,6 +19,7 @@ import { useEditor } from "@/lib/context/EditorContext";
 import { getPageContent, getPageContentIcon } from "@/lib/utils/pageContent";
 import { getIcon } from "@/lib/icon-registry";
 import { PageText, PageImage, EditableIcon } from "@/components/PageEditor";
+import OmnibeesReserveButton, { SectionReserveCta } from "@/components/OmnibeesReserveButton";
 import { useEvents } from "@/lib/hooks/useEvents";
 import { useGallery } from "@/lib/hooks/useGallery";
 import { getGalleryImageTitle } from "@/lib/utils";
@@ -219,6 +220,7 @@ function EventosPageContent() {
             />
           )}
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Facilidades */}
@@ -284,6 +286,7 @@ function EventosPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Tabela Comparativa de Capacidades */}
@@ -309,6 +312,7 @@ function EventosPageContent() {
             </p>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Galeria - Tipos de Configuração */}
@@ -401,6 +405,7 @@ function EventosPageContent() {
             </div>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Planta do Espaço */}
@@ -442,11 +447,9 @@ function EventosPageContent() {
             <p className="text-sm text-muted-foreground mb-6">
               {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="note" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "layout", "note", locale, contentOverrides) || t.layout.note)}
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              {editor?.editMode ? <PageText page="eventos" section="layout" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "layout", "button", locale, contentOverrides) || t.layout.button)}
-            </Button>
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Tipos de Eventos */}
@@ -503,6 +506,7 @@ function EventosPageContent() {
             })}
           </div>
         </div>
+        <SectionReserveCta />
       </section>
 
       {/* Formulário de Contato B2B */}
@@ -734,14 +738,7 @@ function EventosPageContent() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-8">
             {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="title" locale={locale} as="span" className="block" /> : (getPageContent("eventos", "cta", "title", locale, contentOverrides) || t.cta.title)}
           </h2>
-          <a
-            href="https://wa.me/558540061616"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-12 px-8"
-          >
-            {editor?.editMode ? <PageText page="eventos" section="cta" fieldKey="button" locale={locale} as="span" /> : (getPageContent("eventos", "cta", "button", locale, contentOverrides) || t.cta.button)}
-          </a>
+          <OmnibeesReserveButton size="lg" />
         </div>
       </section>
     </>

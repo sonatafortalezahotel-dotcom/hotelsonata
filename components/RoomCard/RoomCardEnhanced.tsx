@@ -11,6 +11,7 @@ import { Users, Maximize2, Eye, Waves, ChevronLeft, ChevronRight, Loader2, Alert
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useCurrency } from "@/lib/hooks/useCurrency";
 import { cn } from "@/lib/utils";
+import OmnibeesReserveButton from "@/components/OmnibeesReserveButton";
 
 interface RoomCardEnhancedProps {
   room: {
@@ -40,8 +41,6 @@ interface RoomCardEnhancedProps {
 
 export default function RoomCardEnhanced({ 
   room, 
-  checkIn, 
-  checkOut, 
   onImageClick,
   className 
 }: RoomCardEnhancedProps) {
@@ -83,7 +82,7 @@ export default function RoomCardEnhanced({
   const labels = {
     pt: {
       seeDetails: "Ver Detalhes",
-      reserve: "Reservar Agora",
+      reserve: "Reserve Agora",
       seaView: "Vista Mar",
       balcony: "Varanda",
       m2: "m²",
@@ -131,11 +130,6 @@ export default function RoomCardEnhanced({
   const t = labels[locale as keyof typeof labels] || labels.pt;
   const isAvailable = room.available !== false; // Default true se não verificado
   const amenities = room.translatedAmenities || room.amenities || [];
-
-  // Construir URL de reserva com parâmetros - Redirecionar para detalhes do quarto
-  const reservationUrl = checkIn && checkOut 
-    ? `/quartos/${room.code}?checkin=${checkIn}&checkout=${checkOut}`
-    : `/quartos/${room.code}`;
 
   return (
     <Card className={cn(
@@ -327,15 +321,7 @@ export default function RoomCardEnhanced({
             {t.seeDetails}
           </Link>
         </Button>
-        <Button 
-          asChild 
-          className="flex-1"
-          disabled={!isAvailable}
-        >
-          <Link href={reservationUrl}>
-            {t.reserve}
-          </Link>
-        </Button>
+        <OmnibeesReserveButton className="flex-1" />
       </CardFooter>
     </Card>
   );
