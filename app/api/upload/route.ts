@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const folder = formData.get("folder") as string | null;
-    const access = "public" as const;
+    const access = "private" as const;
 
     if (!file) {
       return NextResponse.json(

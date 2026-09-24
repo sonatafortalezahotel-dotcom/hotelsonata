@@ -2,7 +2,7 @@ import { put } from "@vercel/blob";
 
 export interface UploadOptions {
   folder?: string; // Pasta onde o arquivo será salvo
-  access?: "public";
+  access?: "private";
 }
 
 /**
@@ -21,7 +21,7 @@ export async function uploadFile(
     throw new Error("BLOB_READ_WRITE_TOKEN não está configurado");
   }
 
-  const { folder = "hotel-sonata", access = "public" } = options;
+  const { folder = "hotel-sonata", access = "private" } = options;
 
   // Gera o caminho completo do arquivo
   const path = folder ? `${folder}/${filename}` : filename;

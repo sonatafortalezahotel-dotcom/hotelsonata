@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
     const folder = formData.get("folder") as string | null;
-    const access = "public" as const;
+    const access = "private" as const;
     const baseFilename = (formData.get("baseFilename") as string) || "file";
 
     if (!files || files.length === 0) {
