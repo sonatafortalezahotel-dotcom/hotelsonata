@@ -67,11 +67,12 @@ export async function GET(
       .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
       .toBuffer();
 
-    return new NextResponse(jpeg, {
+    const body = new Uint8Array(jpeg);
+    return new NextResponse(body, {
       status: 200,
       headers: {
         "Content-Type": "image/jpeg",
-        "Content-Length": String(jpeg.length),
+        "Content-Length": String(body.byteLength),
         "Cache-Control":
           "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400",
         "X-Content-Type-Options": "nosniff",
