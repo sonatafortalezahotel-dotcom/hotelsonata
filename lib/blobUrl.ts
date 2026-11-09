@@ -30,8 +30,9 @@ export function toClientBlobUrl(url: string | null | undefined): string {
 
 /**
  * URL absoluta pública para Open Graph / Twitter / RSS / JSON-LD.
- * Crawlers (WhatsApp, Facebook, etc.) não autenticam em *.private.blob… (403);
- * reescreve para o proxy do site, que responde 200.
+ * Crawlers (WhatsApp, Facebook, etc.) não autenticam em *.private.blob… (403)
+ * e rejeitam WebP / respostas sem Content-Length — por isso usamos /api/og-image
+ * (JPEG + Content-Length), não o blob-proxy bruto.
  */
 export function toAbsoluteShareImageUrl(
   url: string | null | undefined,
@@ -40,14 +41,55 @@ export function toAbsoluteShareImageUrl(
   if (!url || typeof url !== "string") {
     return "";
   }
-  const client = toClientBlobUrl(url.trim());
-  if (!client || client.startsWith("data:")) {
+  const trimmed = url.trim();
+  if (!trimmed || trimmed.startsWith("data:")) {
     return "";
+  }
+
+  const base = siteUrl.replace(/\/$/, "");
+  let pathname = "";
+
+  if (trimmed.startsWith("/api/og-image/")) {
+    return `${base}${trimmed}`;
+  }
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    try {
+      const absolute = new URL(trimmed);
+      if (absolute.pathname.startsWith("/api/og-image/")) {
+        return trimmed;
+      }
+    } catch {
+      // fall through
+    }
+  }
+  if (trimmed.startsWith("/api/blob-proxy/")) {
+    pathname = trimmed.slice("/api/blob-proxy".length);
+  } else {
+    try {
+      const u = new URL(trimmed);
+      if (PRIVATE_BLOB.test(u.hostname)) {
+        pathname = u.pathname;
+      }
+    } catch {
+      // relative path below
+    }
+  }
+
+  if (pathname) {
+    const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+    return `${base}/api/og-image${path}`;
+  }
+
+  const client = toClientBlobUrl(trimmed);
+  if (!client) {
+    return "";
+  }
+  if (client.startsWith("/api/blob-proxy/")) {
+    return `${base}/api/og-image${client.slice("/api/blob-proxy".length)}`;
   }
   if (client.startsWith("http://") || client.startsWith("https://")) {
     return client;
   }
-  const base = siteUrl.replace(/\/$/, "");
   return client.startsWith("/") ? `${base}${client}` : `${base}/${client}`;
 }
 
