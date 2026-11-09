@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { db } from "@/lib/db";
 import { seoMetadata } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { toAbsoluteShareImageUrl } from "@/lib/blobUrl";
 
 export interface SEOData {
   title: string;
@@ -75,9 +76,11 @@ export function generateMetadata(
   // URL canônica
   const canonical = seoData.canonicalUrl || `${siteUrl}${path}`;
   
-  // Imagem Open Graph (1200x630px recomendado)
+  // Imagem Open Graph (1200x630px recomendado).
+  // Private Vercel Blob → proxy público (crawlers não acessam *.private.blob…).
   const ogImage = seoData.ogImage || `${siteUrl}/og-image.jpg`;
-  const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`;
+  const ogImageUrl =
+    toAbsoluteShareImageUrl(ogImage, siteUrl) || `${siteUrl}/og-image.jpg`;
 
   // Keywords combinadas
   const keywords = [
@@ -334,9 +337,7 @@ export function generateRoomStructuredData(options: {
 }): object {
   const siteUrl = options.siteUrl ?? DEFAULT_SITE_URL;
   const image = options.image
-    ? options.image.startsWith("http")
-      ? options.image
-      : `${siteUrl}${options.image}`
+    ? toAbsoluteShareImageUrl(options.image, siteUrl) || `${siteUrl}/og-image.jpg`
     : `${siteUrl}/og-image.jpg`;
   const structuredData: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -372,7 +373,8 @@ export function generateProductOfferStructuredData(options: {
   availability?: "InStock" | "OutOfStock" | "PreOrder";
 }): object {
   const siteUrl = options.siteUrl ?? DEFAULT_SITE_URL;
-  const imageUrl = options.image.startsWith("http") ? options.image : `${siteUrl}${options.image}`;
+  const imageUrl =
+    toAbsoluteShareImageUrl(options.image, siteUrl) || `${siteUrl}/og-image.jpg`;
   const structuredData: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -440,7 +442,7 @@ export function generateBlogPostingStructuredData(options: {
     headline: options.headline,
     ...(options.description && { description: options.description }),
     image: options.image
-      ? (options.image.startsWith("http") ? options.image : `${siteUrl}${options.image}`)
+      ? toAbsoluteShareImageUrl(options.image, siteUrl) || `${siteUrl}/og-image.jpg`
       : `${siteUrl}/og-image.jpg`,
     datePublished: options.datePublished,
     dateModified: options.dateModified,

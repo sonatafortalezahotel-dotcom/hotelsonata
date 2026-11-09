@@ -28,6 +28,29 @@ export function toClientBlobUrl(url: string | null | undefined): string {
   return url;
 }
 
+/**
+ * URL absoluta pública para Open Graph / Twitter / RSS / JSON-LD.
+ * Crawlers (WhatsApp, Facebook, etc.) não autenticam em *.private.blob… (403);
+ * reescreve para o proxy do site, que responde 200.
+ */
+export function toAbsoluteShareImageUrl(
+  url: string | null | undefined,
+  siteUrl: string
+): string {
+  if (!url || typeof url !== "string") {
+    return "";
+  }
+  const client = toClientBlobUrl(url.trim());
+  if (!client || client.startsWith("data:")) {
+    return "";
+  }
+  if (client.startsWith("http://") || client.startsWith("https://")) {
+    return client;
+  }
+  const base = siteUrl.replace(/\/$/, "");
+  return client.startsWith("/") ? `${base}${client}` : `${base}/${client}`;
+}
+
 /** Reescreve `src` de `<img>` e URLs em `data-gallery` para o proxy (exibição no browser). */
 export function rewriteBlobUrlsInHtml(html: string): string {
   if (!html) {

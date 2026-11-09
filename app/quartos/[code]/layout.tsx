@@ -5,6 +5,7 @@ import { rooms, roomTranslations } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { generateMetadata as generateSEOMetadata, generateRoomStructuredData } from "@/lib/utils/seo";
 import { StructuredData } from "@/components/SEO/StructuredData";
+import { toAbsoluteShareImageUrl } from "@/lib/blobUrl";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 const SITE_NAME = "Hotel Sonata de Iracema";
@@ -84,9 +85,8 @@ export async function generateMetadata({
     const path = locale === "pt" ? `/quartos/${code}` : `/${locale}/quartos/${code}`;
     const ogImage =
       "imageUrl" in row && row.imageUrl
-        ? row.imageUrl.startsWith("http")
-          ? row.imageUrl
-          : `${SITE_URL}${row.imageUrl}`
+        ? toAbsoluteShareImageUrl(String(row.imageUrl), SITE_URL) ||
+          `${SITE_URL}/og-image.jpg`
         : `${SITE_URL}/og-image.jpg`;
 
     return generateSEOMetadata(

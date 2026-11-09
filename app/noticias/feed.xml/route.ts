@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { toAbsoluteShareImageUrl } from "@/lib/blobUrl";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 const SITE_NAME = "Hotel Sonata de Iracema";
@@ -47,9 +48,7 @@ export async function GET(request: Request) {
         const description = post.excerpt || post.title || "";
         const image =
           post.featuredImageUrl &&
-          (post.featuredImageUrl.startsWith("http")
-            ? post.featuredImageUrl
-            : `${SITE_URL}${post.featuredImageUrl}`);
+          toAbsoluteShareImageUrl(post.featuredImageUrl, SITE_URL);
         return {
           title: escapeXml(post.title),
           link,

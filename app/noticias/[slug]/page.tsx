@@ -21,6 +21,7 @@ import {
   blogPostCategories,
   blogPostTags,
 } from "@/lib/db/schema";
+import { toAbsoluteShareImageUrl } from "@/lib/blobUrl";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://hotelsonata.com.br";
 
@@ -191,11 +192,8 @@ export async function generateMetadata({
   const path = `${basePath}/${post.slug}`;
   const canonical = post.canonicalUrl || `${SITE_URL}${path}`;
   const ogImage = post.ogImage || post.featuredImageUrl;
-  const ogImageUrl = ogImage
-    ? ogImage.startsWith("http")
-      ? ogImage
-      : `${SITE_URL}${ogImage}`
-    : `${SITE_URL}/og-image.jpg`;
+  const ogImageUrl =
+    toAbsoluteShareImageUrl(ogImage, SITE_URL) || `${SITE_URL}/og-image.jpg`;
 
   const title = post.metaTitle || post.title;
   const description = post.metaDescription || post.excerpt || post.title;
@@ -261,7 +259,11 @@ export default async function BlogPostPage({
   const blogPostingData = generateBlogPostingStructuredData({
     headline: post.title,
     description: post.excerpt || post.metaDescription || undefined,
-    image: post.ogImage || post.featuredImageUrl || undefined,
+    image:
+      toAbsoluteShareImageUrl(
+        post.ogImage || post.featuredImageUrl,
+        SITE_URL
+      ) || undefined,
     datePublished: publishedTime,
     dateModified: modifiedTime,
     url: canonical,
